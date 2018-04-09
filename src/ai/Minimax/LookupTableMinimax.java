@@ -54,6 +54,10 @@ public class LookupTableMinimax extends AI {
             move = play.move;
             System.out.print("BEST PLAY SCORE: " + play.score + "   ");
         }
+        if (move == null) {
+            System.err.println("DB Table is empty!");
+            System.exit(0);
+        }
         System.out.println("BEST MOVE:  " + "oldRow: " + move.oldRow +
                 ", oldCol: " + move.oldCol + ", newRow: " + move.newRow + ", newCol: " + move.newCol);
         return move;
