@@ -70,7 +70,6 @@ public class StateSpaceCalc {
                     bestMove = child.getState().getMove();
                 }
             }
-            //if(beta <= alpha) break;
         }
         if (transpoPlay == null || depth > transpoPlay.depth) {
             if (transpoPlay == null) if (findBranchFactor) legalMoves += node.getState().getLegalMoves().size();
