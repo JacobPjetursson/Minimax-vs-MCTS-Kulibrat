@@ -19,12 +19,13 @@ public class InitDatabase {
         Connection conn = getConnection();
         System.out.println("TIME SPENT CONNECTING: " + (System.currentTimeMillis() - startTime));
 
-        /*
-        String tableName = "plays_1";
+        for(int i = 1; i <= 10; i++) {
+        String tableName = "plays_" + i;
         conn.createStatement().execute("drop table " + tableName);
         conn.createStatement().execute("create table " + tableName +
                 "(id bigint primary key, oldRow smallint, oldCol smallint, newRow smallint, newCol smallint, team smallint)");
-        */
+        }
+
         getCurrentDBTables(conn);
     }
 

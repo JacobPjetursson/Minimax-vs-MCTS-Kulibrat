@@ -23,13 +23,9 @@ public class LookupTableMinimax extends AI {
     public LookupTableMinimax(int team, State state, boolean overwriteDBTable) {
         super(team);
         lookupTable = new HashMap<>();
+
         if (useDB) {
-            conn = null;
-            try {
-                conn = getConnection();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            conn = getConnection(state.getPointsToWin());
             if (overwriteDBTable) {
                 System.out.println("Rebuilding lookup table. This will take some time.");
                 buildLookupTable(state);
@@ -136,11 +132,25 @@ public class LookupTableMinimax extends AI {
         return 0;
     }
 
-    private Connection getConnection() throws SQLException {
+    private Connection getConnection(int pointsToWin) {
         System.out.println("Connecting to database. This might take some time");
-        Connection conn = DriverManager.getConnection(
-                JDBC_URL);
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(
+                    JDBC_URL);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         System.out.println("Connection successful");
+
+        // Creating the table, if it does not exist already
+        String tableName = "plays_" + pointsToWin;
+        try {
+            conn.createStatement().execute("create table " + tableName +
+                   "(id bigint primary key, oldRow smallint, oldCol smallint, newRow smallint, newCol smallint, team smallint)");
+        } catch (SQLException e) {
+            System.out.println("Table '" + tableName + "' exists in the DB");
+        }
         return conn;
     }
 
@@ -148,9 +158,6 @@ public class LookupTableMinimax extends AI {
         System.out.println("Inserting data into table. This will take some time");
         String tableName = "plays_" + pointsToWin;
         long startTime = System.currentTimeMillis();
-        //conn.createStatement().execute("drop table " + tableName);
-        //conn.createStatement().execute("create table " + tableName +
-        //        "(id bigint primary key, oldRow smallint, oldCol smallint, newRow smallint, newCol smallint, team smallint)");
         conn.createStatement().execute("truncate table " + tableName);
 
         final int batchSize = 1000;
