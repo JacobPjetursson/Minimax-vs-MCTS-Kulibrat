@@ -46,21 +46,13 @@ public class LookupTableMinimax extends AI {
         }
         // table lookup
         Node simNode = new Node(state);
-        Move move = null;
+        Move move;
         if (useDB) {
-            try {
-                move = queryData(simNode.getHashCode(), state.getPointsToWin());
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            move = queryData(simNode.getHashCode(), state.getPointsToWin());
         } else {
             MinimaxPlay play = iterativeDeepeningMinimax(state);
             move = play.move;
             System.out.print("BEST PLAY SCORE: " + play.score + "   ");
-        }
-        if (move == null) {
-            System.err.println("DB Table is empty!");
-            System.exit(0);
         }
         System.out.println("BEST MOVE:  " + "oldRow: " + move.oldRow +
                 ", oldCol: " + move.oldCol + ", newRow: " + move.newRow + ", newCol: " + move.newCol);
@@ -183,18 +175,22 @@ public class LookupTableMinimax extends AI {
         System.out.println("Data inserted successfully. Time spent: " + (System.currentTimeMillis() - startTime));
     }
 
-    private Move queryData(Long key, int pointsToWin) throws SQLException {
+    private Move queryData(Long key, int pointsToWin) {
         Move move = null;
         String tableName = "plays_" + pointsToWin;
-        Statement statement = conn.createStatement();
-        ResultSet resultSet = statement.executeQuery("select oldRow, oldCol, newRow, newCol, team from " + tableName + " where id=" + key);
-        while (resultSet.next()) {
-            move = new Move(resultSet.getInt(1), resultSet.getInt(2),
-                    resultSet.getInt(3), resultSet.getInt(4), resultSet.getInt(5));
+        try {
+            Statement statement = conn.createStatement();
+            ResultSet resultSet = statement.executeQuery("select oldRow, oldCol, newRow, newCol, team from " + tableName + " where id=" + key);
+            while (resultSet.next()) {
+                move = new Move(resultSet.getInt(1), resultSet.getInt(2),
+                        resultSet.getInt(3), resultSet.getInt(4), resultSet.getInt(5));
+            }
+            statement.close();
+        } catch (SQLException e) {
+            System.out.println("Table '" + tableName + "' does not exist! Exiting.");
+            System.exit(0);
         }
-        statement.close();
         return move;
     }
-
 }
 
