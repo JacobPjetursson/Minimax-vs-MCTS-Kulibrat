@@ -19,7 +19,7 @@ public class PlayPane extends GridPane {
         mode = setMode(playerRedInstance, playerBlackInstance);
 
         playArea = new PlayArea(playerRedInstance, playerBlackInstance, pointsToWin, mode);
-        navPane = new NavPane(playerRedInstance, playerBlackInstance, pointsToWin, redTime, blackTime);
+        navPane = new NavPane(playerRedInstance, playerBlackInstance, pointsToWin, redTime, blackTime, overwriteDB);
         add(playArea, 1, 0);
         add(navPane, 0, 0);
 

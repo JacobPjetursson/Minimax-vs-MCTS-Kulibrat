@@ -23,7 +23,7 @@ public class NavPane extends VBox {
     private Button menuButton;
     private VBox AIWidgets;
 
-    public NavPane(int playerRedInstance, int playerBlackInstance, int pointsToWin, int redTime, int blackTime) {
+    public NavPane(int playerRedInstance, int playerBlackInstance, int pointsToWin, int redTime, int blackTime, boolean overwriteDB) {
         setMinWidth(Globals.WIDTH / 3);
         setAlignment(Pos.CENTER);
         setSpacing(40);
@@ -31,7 +31,7 @@ public class NavPane extends VBox {
 
         restartButton = new Button("Restart Game");
         buttons.add(restartButton);
-        restartButton.setOnMouseClicked(event -> restartGame(playerRedInstance, playerBlackInstance, pointsToWin, redTime, blackTime));
+        restartButton.setOnMouseClicked(event -> restartGame(playerRedInstance, playerBlackInstance, pointsToWin, redTime, blackTime, overwriteDB));
 
         startAIButton = new Button("Start AI vs. AI");
         buttons.add(startAIButton);
@@ -57,12 +57,12 @@ public class NavPane extends VBox {
         getChildren().addAll(restartButton, menuButton);
     }
 
-    private void restartGame(int playerRedInstance, int playerBlackInstance, int pointsToWin, int redTime, int blackTime) {
+    private void restartGame(int playerRedInstance, int playerBlackInstance, int pointsToWin, int redTime, int blackTime, boolean overwriteDB) {
         Stage prevStage = (Stage) getScene().getWindow();
 
         Stage newStage = new Stage();
         newStage.setScene(new Scene(new RestartGamePane(prevStage, playerRedInstance,
-                playerBlackInstance, pointsToWin, redTime, blackTime), 400, 150));
+                playerBlackInstance, pointsToWin, redTime, blackTime, overwriteDB), 400, 150));
         newStage.initModality(Modality.APPLICATION_MODAL);
         newStage.initOwner(getScene().getWindow());
         newStage.setOnCloseRequest(Event::consume);

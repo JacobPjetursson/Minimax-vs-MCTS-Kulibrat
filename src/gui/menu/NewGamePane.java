@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import misc.Globals;
 
@@ -59,8 +60,22 @@ public class NewGamePane extends AnchorPane {
                 if (!finalBox.getChildren().contains(redDelayBox)) {
                     finalBox.getChildren().add(1, redDelayBox);
                 }
+                if (!playerBlackChoices.getValue().equals(lookup)) {
+                    finalBox.getChildren().remove(overwriteDB);
+                }
+            } else if(playerRedChoices.getItems().get((Integer) newValue).equals(human)) {
+                finalBox.getChildren().remove(redDelayBox);
+                if (!playerBlackChoices.getValue().equals(lookup)) {
+                    finalBox.getChildren().remove(overwriteDB);
+                }
             } else {
                 finalBox.getChildren().remove(redDelayBox);
+                if(playerRedChoices.getItems().get((Integer) newValue).equals(lookup)) {
+                    if (!finalBox.getChildren().contains(overwriteDB)) {
+                        int index = finalBox.getChildren().contains(blackDelayBox) ? 4 : 3;
+                        finalBox.getChildren().add(index, overwriteDB);
+                    }
+                }
             }
         });
 
@@ -83,8 +98,22 @@ public class NewGamePane extends AnchorPane {
                     int index = finalBox.getChildren().contains(redDelayBox) ? 3 : 2;
                     finalBox.getChildren().add(index, blackDelayBox);
                 }
+                if (!playerRedChoices.getValue().equals(lookup)) {
+                    finalBox.getChildren().remove(overwriteDB);
+                }
+            } else if(playerBlackChoices.getItems().get((Integer) newValue).equals(human)) {
+                finalBox.getChildren().remove(blackDelayBox);
+                if (!playerRedChoices.getValue().equals(lookup)) {
+                    finalBox.getChildren().remove(overwriteDB);
+                }
             } else {
                 finalBox.getChildren().remove(blackDelayBox);
+                if(playerBlackChoices.getItems().get((Integer) newValue).equals(lookup)) {
+                    if (!finalBox.getChildren().contains(overwriteDB)) {
+                        int index = finalBox.getChildren().contains(redDelayBox) ? 4 : 3;
+                        finalBox.getChildren().add(index, overwriteDB);
+                    }
+                }
             }
         });
 
@@ -151,6 +180,10 @@ public class NewGamePane extends AnchorPane {
         blackDelayBox = new HBox(AIDelayLabelBlack, blackDelayField);
         blackDelayBox.setAlignment(Pos.CENTER);
 
+        overwriteDB = new CheckBox("Overwrite Database");
+        overwriteDB.setFont(Font.font("Verdana", 15));
+        overwriteDB.setTextFill(Color.WHITE);
+
         Button startGame = new Button("Start Game");
         startGame.setMinWidth(Globals.WIDTH / 4);
         startGame.setOnMouseClicked(event -> {
@@ -167,7 +200,7 @@ public class NewGamePane extends AnchorPane {
             stage.setScene(new Scene(new PlayPane(playerRedMode,
                     playerBlackMode, pointsToWinChoices.getValue(),
                     Integer.parseInt(redDelayField.getCharacters().toString()),
-                    Integer.parseInt(blackDelayField.getCharacters().toString())),
+                    Integer.parseInt(blackDelayField.getCharacters().toString()), overwriteDB.isSelected()),
                     Globals.WIDTH, Globals.HEIGHT));
         });
 
