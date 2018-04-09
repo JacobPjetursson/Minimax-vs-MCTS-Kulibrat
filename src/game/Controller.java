@@ -14,8 +14,10 @@ import gui.board.BoardTile;
 import gui.board.Goal;
 import javafx.application.Platform;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -35,7 +37,7 @@ public class Controller {
 
     private boolean endGamePopup;
 
-    public Controller(PlayPane playPane, int playerRedInstance, int playerBlackInstance, int pointsToWin, int mode, int redTime, int blackTime) {
+    public Controller(PlayPane playPane, int playerRedInstance, int playerBlackInstance, int pointsToWin, int mode, int redTime, int blackTime, boolean overwriteDB) {
         Zobrist.initialize(); // Generate random numbers for state configs
         this.mode = mode;
         state = new State(pointsToWin);
@@ -48,7 +50,7 @@ public class Controller {
             if (playerRedInstance == MINIMAX) {
                 aiRed = new Minimax(RED, redTime);
             } else if (playerRedInstance == LOOKUP_TABLE) {
-                aiRed = new LookupTableMinimax(RED, state);
+                aiRed = new LookupTableMinimax(RED, state, overwriteDB);
             } else {
                 aiRed = new MCTS(state, RED, redTime);
 
@@ -58,7 +60,7 @@ public class Controller {
             if (playerBlackInstance == MINIMAX) {
                 aiBlack = new Minimax(BLACK, blackTime);
             } else if (playerBlackInstance == LOOKUP_TABLE) {
-                aiBlack = new LookupTableMinimax(BLACK, state);
+                aiBlack = new LookupTableMinimax(BLACK, state, overwriteDB);
             } else {
                 aiBlack = new MCTS(state, BLACK, blackTime);
             }

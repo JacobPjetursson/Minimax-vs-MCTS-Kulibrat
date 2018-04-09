@@ -13,7 +13,7 @@ import misc.Globals;
 
 class RestartGamePane extends AnchorPane {
 
-    RestartGamePane(Stage primaryStage, int playerRedMode, int playerBlackMode, int pointsToWin, int redTime, int blackTime) {
+    RestartGamePane(Stage primaryStage, int playerRedMode, int playerBlackMode, int pointsToWin, int redTime, int blackTime, boolean overwriteDB) {
         Label label = new Label("Are you sure you want to restart?");
         label.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
         label.setAlignment(Pos.CENTER);
@@ -32,7 +32,7 @@ class RestartGamePane extends AnchorPane {
             stage.close();
 
             primaryStage.setScene(new Scene(new PlayPane(playerRedMode,
-                    playerBlackMode, pointsToWin, redTime, blackTime),
+                    playerBlackMode, pointsToWin, redTime, blackTime, overwriteDB),
                     Globals.WIDTH, Globals.HEIGHT));
 
         });

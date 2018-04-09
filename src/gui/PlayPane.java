@@ -14,7 +14,7 @@ public class PlayPane extends GridPane {
 
     private int mode;
 
-    public PlayPane(int playerRedInstance, int playerBlackInstance, int pointsToWin, int redTime, int blackTime) {
+    public PlayPane(int playerRedInstance, int playerBlackInstance, int pointsToWin, int redTime, int blackTime, boolean overwriteDB) {
         setup();
         mode = setMode(playerRedInstance, playerBlackInstance);
 
@@ -23,7 +23,7 @@ public class PlayPane extends GridPane {
         add(playArea, 1, 0);
         add(navPane, 0, 0);
 
-        new Controller(this, playerRedInstance, playerBlackInstance, pointsToWin, mode, redTime, blackTime);
+        new Controller(this, playerRedInstance, playerBlackInstance, pointsToWin, mode, redTime, blackTime, overwriteDB);
     }
 
     private void setup() {

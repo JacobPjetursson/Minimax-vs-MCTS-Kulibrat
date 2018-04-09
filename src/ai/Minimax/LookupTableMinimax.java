@@ -14,14 +14,13 @@ import static misc.Globals.RED;
 
 public class LookupTableMinimax extends AI {
     private boolean useDB = true;
-    private boolean overwriteDBTable = false;
     private int CURR_MAX_DEPTH;
     private HashMap<Long, MinimaxPlay> lookupTable;
 
     private String JDBC_URL = "jdbc:derby:lookupDB;create=true";
     private Connection conn;
 
-    public LookupTableMinimax(int team, State state) {
+    public LookupTableMinimax(int team, State state, boolean overwriteDBTable) {
         super(team);
         lookupTable = new HashMap<>();
         if (useDB) {
@@ -70,14 +69,6 @@ public class LookupTableMinimax extends AI {
         System.out.println("BEST MOVE:  " + "oldRow: " + move.oldRow +
                 ", oldCol: " + move.oldCol + ", newRow: " + move.newRow + ", newCol: " + move.newCol);
         return move;
-
-        /*
-        MinimaxPlay play = lookupTable.get(simNode.getHashCode());
-        System.out.println("From lookup table: " + "Score: " + play.score + ", Play:  oldRow: " + play.move.oldRow + ", oldCol: " +
-                play.move.oldCol + ", newRow: " + play.move.newRow + ", newCol: " + play.move.newCol + ", team: " + play.move.team);
-        return play.move;
-        */
-
     }
 
     private void buildLookupTable(State state) {
@@ -197,5 +188,6 @@ public class LookupTableMinimax extends AI {
         statement.close();
         return move;
     }
+
 }
 
