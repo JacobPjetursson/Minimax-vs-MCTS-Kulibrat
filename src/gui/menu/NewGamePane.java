@@ -180,7 +180,7 @@ public class NewGamePane extends AnchorPane {
         blackDelayBox = new HBox(AIDelayLabelBlack, blackDelayField);
         blackDelayBox.setAlignment(Pos.CENTER);
 
-        overwriteDB = new CheckBox("Overwrite Database");
+        overwriteDB = new CheckBox("Overwrite Database\n (Takes a lot of time)");
         overwriteDB.setFont(Font.font("Verdana", 15));
         overwriteDB.setTextFill(Color.WHITE);
 
