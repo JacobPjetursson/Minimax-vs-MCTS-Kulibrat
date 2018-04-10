@@ -70,7 +70,7 @@ public class LookupTableMinimax extends AI {
     }
 
     private MinimaxPlay iterativeDeepeningMinimax(State state) {
-        CURR_MAX_DEPTH = 25; //
+        CURR_MAX_DEPTH = 25;
         boolean done = false;
         MinimaxPlay play = null;
         while (!done) {
@@ -79,6 +79,13 @@ public class LookupTableMinimax extends AI {
             int prevSize = lookupTable.size();
             play = minimax(simNode, CURR_MAX_DEPTH);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH + ", TABLE SIZE: " + lookupTable.size());
+
+            String teamString = (team == RED) ? "RED" : "BLACK";
+            String oppString = (team == BLACK) ? "BLACK" : "RED";
+            if(play.score > 1000) System.out.println(teamString + " has the winning strategy!");
+            else if(play.score < -1000) System.out.println(oppString + " has the winning strategy!");
+            else System.err.println("ERROR: Noone has a winning strategy according to function!");
+            
             if (lookupTable.size() == prevSize) done = true;
         }
         return play;
