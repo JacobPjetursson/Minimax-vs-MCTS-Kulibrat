@@ -99,7 +99,7 @@ public class LookupTableMinimax extends AI {
             return new MinimaxPlay(bestMove, heuristic(node.getState(), depth), depth);
         }
         MinimaxPlay transpoPlay = lookupTable.get(node.getHashCode());
-        if (transpoPlay != null && depth <= transpoPlay.depth) {
+        if (transpoPlay != null && (depth <= transpoPlay.depth || Math.abs(transpoPlay.score) >= 1000)) {
             return transpoPlay;
         }
         for (Node child : node.getChildren()) {

@@ -1,5 +1,6 @@
 package ai.Minimax;
 
+import ai.AI;
 import game.Logic;
 import game.Move;
 import game.State;
@@ -9,14 +10,17 @@ import java.util.HashMap;
 import static misc.Globals.BLACK;
 import static misc.Globals.RED;
 
-public class FindWinnerStrategy {
-    private static boolean cutOff = false;
-    private static int team = RED;
-    private static HashMap<Long, MinimaxPlay> transTable = new HashMap<>();
-    private static int CURR_MAX_DEPTH;
-    private static Node prevBestNode;
+public class Temp extends AI {
+    private boolean cutOff = false;
+    private HashMap<Long, MinimaxPlay> transTable = new HashMap<>();
+    private int CURR_MAX_DEPTH;
+    private Node prevBestNode;
 
-    private static Move makeMove(State state) {
+    public Temp(int team)  {
+        super(team);
+    }
+
+    public Move makeMove(State state) {
         if (state.getLegalMoves().size() == 1) {
             return state.getLegalMoves().get(0);
         }
@@ -27,7 +31,7 @@ public class FindWinnerStrategy {
 
     }
 
-    private static MinimaxPlay iterativeDeepeningMinimax(State state) {
+    private MinimaxPlay iterativeDeepeningMinimax(State state) {
         CURR_MAX_DEPTH = 0;
         prevBestNode = null;
         cutOff = false;
@@ -41,15 +45,13 @@ public class FindWinnerStrategy {
             if (play.score == 1000 || play.score == -1000) cutOff = true;
             bestPlay = play;
         }
-        System.out.println("Score: " + bestPlay.score + ", Final Depth: " + CURR_MAX_DEPTH +
-                ", Final table size: " + transTable.size() + ", Play:  oldRow: " + bestPlay.move.oldRow + ", oldCol: " +
-                bestPlay.move.oldCol + ", newRow: " + bestPlay.move.newRow + ", newCol: " +
-                bestPlay.move.newCol + ", team: " + bestPlay.move.team);
+        System.out.println("Score: " + bestPlay.score + ", Final Depth: " + CURR_MAX_DEPTH + ", Play:  oldRow: " + bestPlay.move.oldRow + ", oldCol: " +
+                bestPlay.move.oldCol + ", newRow: " + bestPlay.move.newRow + ", newCol: " + bestPlay.move.newCol + ", team: " + bestPlay.move.team);
 
         return bestPlay;
     }
 
-    public static MinimaxPlay minimax(Node node, int depth, int alpha, int beta) {
+    public MinimaxPlay minimax(Node node, int depth, int alpha, int beta) {
         Move bestMove = null;
         int score;
         int bestScore = (node.getState().getTurn() == team) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
@@ -106,20 +108,13 @@ public class FindWinnerStrategy {
         return new MinimaxPlay(bestMove, bestScore, depth);
     }
 
-    private static int heuristic(State state) {
+    private int heuristic(State state) {
         int opponent = (team == RED) ? BLACK : RED;
         int winner = Logic.getWinner(state);
 
         if (winner == team) return 1000;
         else if (winner == opponent) return -1000;
         return 0;
-    }
-
-    public static void main(String[] args) {
-        Zobrist.initialize();
-
-        State state = new State(8);
-        Move move = makeMove(state);
     }
 }
 

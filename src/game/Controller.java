@@ -4,6 +4,7 @@ import ai.AI;
 import ai.MCTS.MCTS;
 import ai.Minimax.LookupTableMinimax;
 import ai.Minimax.Minimax;
+import ai.Minimax.Temp;
 import ai.Minimax.Zobrist;
 import gui.EndGamePane;
 import gui.NavPane;
@@ -48,7 +49,8 @@ public class Controller {
 
         if (playerRedInstance != HUMAN) {
             if (playerRedInstance == MINIMAX) {
-                aiRed = new Minimax(RED, redTime);
+                //aiRed = new Minimax(RED, redTime);
+                aiRed = new Temp(RED);
             } else if (playerRedInstance == LOOKUP_TABLE) {
                 aiRed = new LookupTableMinimax(RED, state, overwriteDB);
             } else {
@@ -58,7 +60,8 @@ public class Controller {
         }
         if (playerBlackInstance != HUMAN) {
             if (playerBlackInstance == MINIMAX) {
-                aiBlack = new Minimax(BLACK, blackTime);
+                //aiBlack = new Minimax(BLACK, blackTime);
+                aiBlack = new Temp(BLACK);
             } else if (playerBlackInstance == LOOKUP_TABLE) {
                 aiBlack = new LookupTableMinimax(BLACK, state, overwriteDB);
             } else {
