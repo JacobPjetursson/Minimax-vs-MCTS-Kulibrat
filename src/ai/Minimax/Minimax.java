@@ -96,7 +96,7 @@ public class Minimax extends AI {
             }
         }
         for (Node child : node.getChildren()) {
-            if (moveOrdering) if (child.equals(prevBestNode)) continue;
+            if (moveOrdering && depth == CURR_MAX_DEPTH) if (child.equals(prevBestNode)) continue;
 
             score = minimax(child, depth - 1, alpha, beta, startTime).score;
             if (node.getState().getTurn() == team) {
