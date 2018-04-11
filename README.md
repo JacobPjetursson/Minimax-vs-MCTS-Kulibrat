@@ -12,4 +12,4 @@ The third agent is cheating, since it just looks up the best move from a local d
 The database stores all possible states from the current game configuration and links them to the best respective play.
 The DB is not uploaded to Git due to its size. It is generated, if wished, when starting the project, and is then stored for future use.
 
-The project can be compiled as is. There is also an executable JAR-file which launches the project instantly
+The project can be compiled as is. There is also an executable JAR-file which launches the project instantly. For that to work properly, the database and library files must be in the same folder as the JAR-file.
