@@ -48,7 +48,7 @@ public class Minimax extends AI {
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
             CURR_MAX_DEPTH++;
             MinimaxPlay play = minimax(simNode, CURR_MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, startTime);
-            if (play.score == 1000) winCutOff = true;
+            if (Math.abs(play.score) >= 1000) winCutOff = true;
             if (!searchCutOff) bestPlay = play;
         }
         // random move if null (No time to calculate minimax)
@@ -69,13 +69,13 @@ public class Minimax extends AI {
         if (outOfTime(startTime)) searchCutOff = true;
 
         if (Logic.gameOver(node.getState()) || depth <= 0 || searchCutOff) {
-            return new MinimaxPlay(null, heuristic(node.getState()), depth);
+            return new MinimaxPlay(null, heuristic(node.getState(), depth), depth);
 
         }
         MinimaxPlay transpoPlay = null;
         if (useTranspo) {
             transpoPlay = transTable.get(node.getHashCode());
-            if (transpoPlay != null && depth <= transpoPlay.depth) {
+            if (transpoPlay != null && (depth <= transpoPlay.depth ||Math.abs(transpoPlay.score) >= 1000) ) {
                 return transpoPlay;
             }
         }
@@ -143,14 +143,17 @@ public class Minimax extends AI {
         winCutOff = false;
     }
 
-    private int heuristic(State state) {
+    private int heuristic(State state, int depth) {
+        // AI plays optimally
+        int m = 2000;
+        int n = (CURR_MAX_DEPTH - depth);
         // TODO - play around with this
         int scoreH = 0;
         int opponent = (team == RED) ? BLACK : RED;
         if (Logic.gameOver(state)) {
             if (Logic.getWinner(state) == team) {
-                return 1000;
-            } else if (Logic.getWinner(state) == opponent) scoreH -= 1000;
+                return (m-n);
+            } else if (Logic.getWinner(state) == opponent) return -(m-n);
         }
 
         // Bonus for point difference

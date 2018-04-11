@@ -13,11 +13,6 @@ public abstract class Logic {
         for (Point p : state.getPieces(team)) {
             moves.addAll(legalMovesFromPiece(p.y, p.x, team, state));
         }
-        /*
-        if(state.getUnplaced(team) > 0) {
-            moves.addAll(legalMovesFromPiece(-1, -1, team, state));
-        }
-        */
         return moves;
     }
 

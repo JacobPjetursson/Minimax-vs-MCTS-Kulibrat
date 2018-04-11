@@ -31,7 +31,7 @@ public class FindWinnerStrategy {
         MinimaxPlay bestPlay = null;
         while (!cutOff) {
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
-            CURR_MAX_DEPTH+=20;
+            CURR_MAX_DEPTH+=1;
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH);
             System.out.println("CURRENT TABLE SIZE: " + transTable.size());
             MinimaxPlay play = minimax(simNode, CURR_MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE);
@@ -54,7 +54,7 @@ public class FindWinnerStrategy {
         }
         MinimaxPlay transpoPlay;
         transpoPlay = transTable.get(node.getHashCode());
-        if (transpoPlay != null && depth <= transpoPlay.depth) {
+        if (transpoPlay != null && (depth <= transpoPlay.depth || Math.abs(transpoPlay.score) == 1000)) {
             return transpoPlay;
         }
         for (Node child : node.getChildren()) {
@@ -92,7 +92,7 @@ public class FindWinnerStrategy {
     public static void main(String[] args) {
         Zobrist.initialize();
 
-        State state = new State(5);
+        State state = new State(1);
         Move move = makeMove(state);
     }
 }
