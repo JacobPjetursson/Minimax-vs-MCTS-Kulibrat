@@ -69,7 +69,7 @@ public class Minimax extends AI {
         if (outOfTime(startTime)) searchCutOff = true;
 
         if (Logic.gameOver(node.getState()) || depth <= 0 || searchCutOff) {
-            return new MinimaxPlay(null, heuristic(node.getState(), depth), depth);
+            return new MinimaxPlay(null, heuristic(node.getState()), depth);
 
         }
         MinimaxPlay transpoPlay = null;
@@ -143,17 +143,15 @@ public class Minimax extends AI {
         winCutOff = false;
     }
 
-    private int heuristic(State state, int depth) {
-        // AI plays optimally
-        int m = 2000;
-        int n = (CURR_MAX_DEPTH - depth);
+    private int heuristic(State state) {
         // TODO - play around with this
         int scoreH = 0;
-        int opponent = (team == RED) ? BLACK : RED;
+        int opponent = (team == BLACK) ? BLACK : RED;
         if (Logic.gameOver(state)) {
-            if (Logic.getWinner(state) == team) {
-                return (m-n);
-            } else if (Logic.getWinner(state) == opponent) return -(m-n);
+            int winner = Logic.getWinner(state);
+            if (winner == team) {
+                return 1000;
+            } else if (winner == opponent) return -1000;
         }
 
         // Bonus for point difference

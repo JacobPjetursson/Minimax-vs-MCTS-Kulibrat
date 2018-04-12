@@ -38,7 +38,7 @@ public class FindWinnerStrategy {
             MinimaxPlay play = minimax(simNode, CURR_MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH);
             System.out.println("CURRENT TABLE SIZE: " + transTable.size());
-            if (play.score == 1000 || play.score == -1000) cutOff = true;
+            if (Math.abs(play.score) >= 1000) cutOff = true;
             bestPlay = play;
         }
         System.out.println("Score: " + bestPlay.score + ", Final Depth: " + CURR_MAX_DEPTH +
@@ -55,11 +55,11 @@ public class FindWinnerStrategy {
         int bestScore = (node.getState().getTurn() == team) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
         if (Logic.gameOver(node.getState()) || depth <= 0) {
-            return new MinimaxPlay(bestMove, heuristic(node.getState()), depth);
+            return new MinimaxPlay(bestMove, heuristic(node.getState(), depth), depth);
         }
         MinimaxPlay transpoPlay;
         transpoPlay = transTable.get(node.getHashCode());
-        if (transpoPlay != null && (depth <= transpoPlay.depth || Math.abs(transpoPlay.score) == 1000)) {
+        if (transpoPlay != null && (depth <= transpoPlay.depth || Math.abs(transpoPlay.score) >= 1000)) {
             return transpoPlay;
         }
 
@@ -106,19 +106,23 @@ public class FindWinnerStrategy {
         return new MinimaxPlay(bestMove, bestScore, depth);
     }
 
-    private static int heuristic(State state) {
+    private static int heuristic(State state, int depth) {
+        // AI plays optimally
+        int m = 2000;
+        int n = (CURR_MAX_DEPTH - depth);
         int opponent = (team == RED) ? BLACK : RED;
         int winner = Logic.getWinner(state);
 
-        if (winner == team) return 1000;
-        else if (winner == opponent) return -1000;
+        if (winner == team) return (m-n);
+        else if (winner == opponent) return -(m-n);
         return 0;
     }
 
     public static void main(String[] args) {
         Zobrist.initialize();
-
-        State state = new State(8);
+        int pointsToWin = 5;
+        System.out.println("Finding the optimal strategy when playing to " + pointsToWin + " points");
+        State state = new State(pointsToWin);
         Move move = makeMove(state);
     }
 }
