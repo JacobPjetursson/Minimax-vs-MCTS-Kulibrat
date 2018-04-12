@@ -42,7 +42,7 @@ public class Temp extends AI {
             MinimaxPlay play = minimax(simNode, CURR_MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH);
             System.out.println("CURRENT TABLE SIZE: " + transTable.size());
-            if (play.score == 1000 || play.score == -1000) cutOff = true;
+            if (Math.abs(play.score) >= 1000) cutOff = true;
             bestPlay = play;
         }
         System.out.println("Score: " + bestPlay.score + ", Final Depth: " + CURR_MAX_DEPTH + ", Play:  oldRow: " + bestPlay.move.oldRow + ", oldCol: " +
@@ -61,7 +61,7 @@ public class Temp extends AI {
         }
         MinimaxPlay transpoPlay;
         transpoPlay = transTable.get(node.getHashCode());
-        if (transpoPlay != null && (depth <= transpoPlay.depth || Math.abs(transpoPlay.score) == 1000)) {
+        if (transpoPlay != null && (depth <= transpoPlay.depth || Math.abs(transpoPlay.score) >= 1000)) {
             return transpoPlay;
         }
 
