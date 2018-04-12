@@ -120,7 +120,7 @@ public class FindWinnerStrategy {
 
     public static void main(String[] args) {
         Zobrist.initialize();
-        int pointsToWin = 5;
+        int pointsToWin = 6;
         System.out.println("Finding the optimal strategy when playing to " + pointsToWin + " points");
         State state = new State(pointsToWin);
         Move move = makeMove(state);

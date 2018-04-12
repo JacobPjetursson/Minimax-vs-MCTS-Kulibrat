@@ -13,7 +13,7 @@ import static misc.Globals.BLACK;
 import static misc.Globals.RED;
 
 public class LookupTableMinimax extends AI {
-    private boolean useDB = false;
+    private boolean useDB = true;
     private int CURR_MAX_DEPTH;
     private HashMap<Long, MinimaxPlay> lookupTable;
 
@@ -70,7 +70,7 @@ public class LookupTableMinimax extends AI {
     }
 
     private MinimaxPlay iterativeDeepeningMinimax(State state) {
-        CURR_MAX_DEPTH =0;
+        CURR_MAX_DEPTH =25;
         boolean done = false;
         MinimaxPlay play = null;
         while (!done) {
@@ -79,13 +79,15 @@ public class LookupTableMinimax extends AI {
             int prevSize = lookupTable.size();
             play = minimax(simNode, CURR_MAX_DEPTH);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH + ", TABLE SIZE: " + lookupTable.size());
-            if (lookupTable.size() == prevSize || play.score >= 1000) done = true;
+            if (lookupTable.size() == prevSize) done = true;
         }
+        /*
         String teamString = (team == RED) ? "RED" : "BLACK";
         String oppString = (team == BLACK) ? "BLACK" : "RED";
         if(play.score > 1000) System.out.println(teamString + " has the winning strategy!");
         else if(play.score < -1000) System.out.println(oppString + " has the winning strategy!");
         else System.err.println("ERROR: Noone has a winning strategy according to minimax!");
+        */
 
         return play;
     }
@@ -99,7 +101,7 @@ public class LookupTableMinimax extends AI {
             return new MinimaxPlay(bestMove, heuristic(node.getState(), depth), depth);
         }
         MinimaxPlay transpoPlay = lookupTable.get(node.getHashCode());
-        if (transpoPlay != null && (depth <= transpoPlay.depth || Math.abs(transpoPlay.score) >= 1000)) {
+        if (transpoPlay != null && (depth <= transpoPlay.depth)) {
             return transpoPlay;
         }
         for (Node child : node.getChildren()) {
