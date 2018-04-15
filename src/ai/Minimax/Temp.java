@@ -11,7 +11,6 @@ import static misc.Globals.BLACK;
 import static misc.Globals.RED;
 
 public class Temp extends AI {
-    private boolean cutOff = false;
     private HashMap<Long, MinimaxPlay> transTable = new HashMap<>();
     private int CURR_MAX_DEPTH;
     private Node prevBestNode;
@@ -34,15 +33,15 @@ public class Temp extends AI {
     private MinimaxPlay iterativeDeepeningMinimax(State state) {
         CURR_MAX_DEPTH = 0;
         prevBestNode = null;
-        cutOff = false;
+        boolean done = false;
         MinimaxPlay bestPlay = null;
-        while (!cutOff) {
+        while (!done) {
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
             CURR_MAX_DEPTH+=1;
             MinimaxPlay play = minimax(simNode, CURR_MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH);
             System.out.println("CURRENT TABLE SIZE: " + transTable.size());
-            if (play.score == 1000 || play.score == -1000) cutOff = true;
+            if (Math.abs(play.score) >= 1000) done = true;
             bestPlay = play;
         }
         System.out.println("Score: " + bestPlay.score + ", Final Depth: " + CURR_MAX_DEPTH + ", Play:  oldRow: " + bestPlay.move.oldRow + ", oldCol: " +
