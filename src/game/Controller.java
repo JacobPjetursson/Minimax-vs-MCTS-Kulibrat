@@ -50,7 +50,6 @@ public class Controller {
         if (playerRedInstance != HUMAN) {
             if (playerRedInstance == MINIMAX) {
                 aiRed = new Minimax(RED, redTime);
-                //aiRed = new Temp(RED);
             } else if (playerRedInstance == LOOKUP_TABLE) {
                 aiRed = new LookupTableMinimax(RED, state, overwriteDB);
             } else {
@@ -61,7 +60,6 @@ public class Controller {
         if (playerBlackInstance != HUMAN) {
             if (playerBlackInstance == MINIMAX) {
                 aiBlack = new Minimax(BLACK, blackTime);
-                //aiBlack = new Temp(BLACK);
             } else if (playerBlackInstance == LOOKUP_TABLE) {
                 aiBlack = new LookupTableMinimax(BLACK, state, overwriteDB);
             } else {

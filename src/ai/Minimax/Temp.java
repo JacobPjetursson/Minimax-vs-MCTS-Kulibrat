@@ -6,6 +6,7 @@ import game.Move;
 import game.State;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 import static misc.Globals.BLACK;
 import static misc.Globals.RED;
@@ -34,18 +35,24 @@ public class Temp extends AI {
         CURR_MAX_DEPTH = 0;
         prevBestNode = null;
         boolean done = false;
+        transTable = new HashMap<>();
         MinimaxPlay bestPlay = null;
+        long startTime = System.currentTimeMillis();
         while (!done) {
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
             CURR_MAX_DEPTH+=1;
             MinimaxPlay play = minimax(simNode, CURR_MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH);
             System.out.println("CURRENT TABLE SIZE: " + transTable.size());
+
             if (Math.abs(play.score) >= 1000) done = true;
             bestPlay = play;
         }
-        System.out.println("Score: " + bestPlay.score + ", Final Depth: " + CURR_MAX_DEPTH + ", Play:  oldRow: " + bestPlay.move.oldRow + ", oldCol: " +
-                bestPlay.move.oldCol + ", newRow: " + bestPlay.move.newRow + ", newCol: " + bestPlay.move.newCol + ", team: " + bestPlay.move.team);
+        System.out.println("Score: " + bestPlay.score + ", Final Depth: " + CURR_MAX_DEPTH +
+                ", Final table size: " + transTable.size() + ", Play:  oldRow: " + bestPlay.move.oldRow + ", oldCol: " +
+                bestPlay.move.oldCol + ", newRow: " + bestPlay.move.newRow + ", newCol: " +
+                bestPlay.move.newCol + ", team: " + bestPlay.move.team);
+        System.out.println("TIME SPENT: " + (System.currentTimeMillis() - startTime));
 
         return bestPlay;
     }
@@ -108,14 +115,11 @@ public class Temp extends AI {
     }
 
     private int heuristic(State state, int depth) {
-        // AI plays optimally
-        int m = 2000;
-        int n = (CURR_MAX_DEPTH - depth);
         int opponent = (team == RED) ? BLACK : RED;
         int winner = Logic.getWinner(state);
 
-        if (winner == team) return (m-n);
-        else if (winner == opponent) return -(m-n);
+        if (winner == team) return 1000;
+        else if (winner == opponent) return -1000;
         return 0;
     }
 }

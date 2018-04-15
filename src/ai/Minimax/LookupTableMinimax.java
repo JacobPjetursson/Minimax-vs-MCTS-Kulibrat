@@ -13,20 +13,20 @@ import static misc.Globals.BLACK;
 import static misc.Globals.RED;
 
 public class LookupTableMinimax extends AI {
-    private boolean useDB = true;
+    private boolean useDB = false;
     private int CURR_MAX_DEPTH;
     private HashMap<Long, MinimaxPlay> lookupTable;
 
     private String JDBC_URL = "jdbc:derby:lookupDB;create=true";
     private Connection conn;
 
-    public LookupTableMinimax(int team, State state, boolean overwriteDBTable) {
+    public LookupTableMinimax(int team, State state, boolean overwriteDB) {
         super(team);
         lookupTable = new HashMap<>();
 
         if (useDB) {
             conn = getConnection(state.getPointsToWin());
-            if (overwriteDBTable) {
+            if (overwriteDB) {
                 System.out.println("Rebuilding lookup table. This will take some time.");
                 buildLookupTable(state);
                 try {

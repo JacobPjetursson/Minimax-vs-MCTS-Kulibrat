@@ -49,7 +49,7 @@ public class FindWinnerStrategy {
         int bestScore = (node.getState().getTurn() == team) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
         if (Logic.gameOver(node.getState()) || depth <= 0) {
-            return new MinimaxPlay(bestMove, heuristic(node.getState(), depth), depth);
+            return new MinimaxPlay(bestMove, heuristic(node.getState()), depth);
         }
         MinimaxPlay transpoPlay;
         transpoPlay = transTable.get(node.getHashCode());
@@ -100,15 +100,12 @@ public class FindWinnerStrategy {
         return new MinimaxPlay(bestMove, bestScore, depth);
     }
 
-    private static int heuristic(State state, int depth) {
-        // AI plays optimally
-        int m = 2000;
-        int n = (CURR_MAX_DEPTH - depth);
+    private static int heuristic(State state) {
         int opponent = (team == RED) ? BLACK : RED;
         int winner = Logic.getWinner(state);
 
-        if (winner == team) return (m-n);
-        else if (winner == opponent) return -(m-n);
+        if (winner == team) return 1000;
+        else if (winner == opponent) return -1000;
         return 0;
     }
 
