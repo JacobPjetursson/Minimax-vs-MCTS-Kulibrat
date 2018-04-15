@@ -5,6 +5,7 @@ import game.Move;
 import game.State;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 import static misc.Globals.BLACK;
 import static misc.Globals.RED;
@@ -16,28 +17,20 @@ public class FindWinnerStrategy {
     private static int CURR_MAX_DEPTH;
     private static Node prevBestNode;
 
-    private static Move makeMove(State state) {
-        if (state.getLegalMoves().size() == 1) {
-            return state.getLegalMoves().get(0);
-        }
-        long startTime = System.currentTimeMillis();
-        Move move = iterativeDeepeningMinimax(state).move;
-        System.out.println("TIME SPENT: " + (System.currentTimeMillis() - startTime));
-        return move;
-
-    }
 
     private static MinimaxPlay iterativeDeepeningMinimax(State state) {
         CURR_MAX_DEPTH = 0;
         prevBestNode = null;
         cutOff = false;
         MinimaxPlay bestPlay = null;
+        long startTime = System.currentTimeMillis();
         while (!cutOff) {
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
             CURR_MAX_DEPTH+=1;
             MinimaxPlay play = minimax(simNode, CURR_MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH);
             System.out.println("CURRENT TABLE SIZE: " + transTable.size());
+
             if (Math.abs(play.score) >= 1000) cutOff = true;
             bestPlay = play;
         }
@@ -45,6 +38,7 @@ public class FindWinnerStrategy {
                 ", Final table size: " + transTable.size() + ", Play:  oldRow: " + bestPlay.move.oldRow + ", oldCol: " +
                 bestPlay.move.oldCol + ", newRow: " + bestPlay.move.newRow + ", newCol: " +
                 bestPlay.move.newCol + ", team: " + bestPlay.move.team);
+        System.out.println("TIME SPENT: " + (System.currentTimeMillis() - startTime));
 
         return bestPlay;
     }
@@ -120,10 +114,10 @@ public class FindWinnerStrategy {
 
     public static void main(String[] args) {
         Zobrist.initialize();
-        int pointsToWin = 6;
+        int pointsToWin = 2;
         System.out.println("Finding the optimal strategy when playing to " + pointsToWin + " points");
         State state = new State(pointsToWin);
-        Move move = makeMove(state);
+        MinimaxPlay play = iterativeDeepeningMinimax(state);
     }
 }
 

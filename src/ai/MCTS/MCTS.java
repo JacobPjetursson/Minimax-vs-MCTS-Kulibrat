@@ -15,7 +15,7 @@ public class MCTS extends AI {
     // PARAMETERS
     private long calculationTime;
     private int max_moves = 300; // todo - replace with while loop?
-    private boolean useHeuristics = true;
+    private boolean useHeuristics = false;
     private boolean preplay = false;
     private int minimaxDepth = 2;
     private Minimax minimax;
