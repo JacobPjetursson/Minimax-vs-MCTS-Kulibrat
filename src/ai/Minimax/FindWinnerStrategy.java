@@ -5,42 +5,37 @@ import game.Move;
 import game.State;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
 import static misc.Globals.BLACK;
 import static misc.Globals.RED;
 
 public class FindWinnerStrategy {
-    private static boolean cutOff = false;
     private static int team = RED;
     private static HashMap<Long, MinimaxPlay> transTable = new HashMap<>();
     private static int CURR_MAX_DEPTH;
     private static Node prevBestNode;
 
 
-    private static MinimaxPlay iterativeDeepeningMinimax(State state) {
+    private static void iterativeDeepeningMinimax(State state) {
         CURR_MAX_DEPTH = 0;
         prevBestNode = null;
-        cutOff = false;
+        boolean done = false;
         MinimaxPlay bestPlay = null;
         long startTime = System.currentTimeMillis();
-        while (!cutOff) {
+        while (!done) {
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
             CURR_MAX_DEPTH+=1;
-            MinimaxPlay play = minimax(simNode, CURR_MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            bestPlay = minimax(simNode, CURR_MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH);
             System.out.println("CURRENT TABLE SIZE: " + transTable.size());
 
-            if (Math.abs(play.score) >= 1000) cutOff = true;
-            bestPlay = play;
+            if (Math.abs(bestPlay.score) >= 1000) done = true;
         }
         System.out.println("Score: " + bestPlay.score + ", Final Depth: " + CURR_MAX_DEPTH +
                 ", Final table size: " + transTable.size() + ", Play:  oldRow: " + bestPlay.move.oldRow + ", oldCol: " +
                 bestPlay.move.oldCol + ", newRow: " + bestPlay.move.newRow + ", newCol: " +
                 bestPlay.move.newCol + ", team: " + bestPlay.move.team);
         System.out.println("TIME SPENT: " + (System.currentTimeMillis() - startTime));
-
-        return bestPlay;
     }
 
     public static MinimaxPlay minimax(Node node, int depth, int alpha, int beta) {
@@ -111,10 +106,10 @@ public class FindWinnerStrategy {
 
     public static void main(String[] args) {
         Zobrist.initialize();
-        int pointsToWin = 2;
+        int pointsToWin = 5;
         System.out.println("Finding the optimal strategy when playing to " + pointsToWin + " points");
         State state = new State(pointsToWin);
-        MinimaxPlay play = iterativeDeepeningMinimax(state);
+        iterativeDeepeningMinimax(state);
     }
 }
 

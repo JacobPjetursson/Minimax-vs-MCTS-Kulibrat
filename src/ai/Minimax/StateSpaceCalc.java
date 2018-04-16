@@ -5,6 +5,7 @@ import game.Move;
 import game.State;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 import static misc.Globals.BLACK;
 import static misc.Globals.RED;
@@ -16,33 +17,26 @@ public class StateSpaceCalc {
     private static boolean findBranchFactor = true;
 
 
-    private static Move calcStateSpace(State state) {
-        MinimaxPlay bestPlay = iterativeDeepeningMinimax(state);
-        System.out.println("FINAL TABLE SIZE: " + transTable.size());
+    private static void calcStateSpace(State state) {
+        iterativeDeepeningMinimax(state);
+        System.out.println("FINAL STATE SPACE SIZE: " + transTable.size());
         double avgBranchFactor = 0;
         if (findBranchFactor) avgBranchFactor = ((double) legalMoves / (double) transTable.size());
         System.out.println("AVG BRANCHING FACTOR: " + avgBranchFactor);
-        System.out.println("Score: " + bestPlay.score + ", Play:  oldRow: " + bestPlay.move.oldRow + ", oldCol: " +
-                bestPlay.move.oldCol + ", newRow: " + bestPlay.move.newRow + ", newCol: " + bestPlay.move.newCol + ", team: " + bestPlay.move.team);
-
-        return bestPlay.move;
-
     }
 
-    private static MinimaxPlay iterativeDeepeningMinimax(State state) {
-        MinimaxPlay bestPlay = null;
+    private static void iterativeDeepeningMinimax(State state) {
         int CURR_MAX_DEPTH = 0;
         boolean done = false;
         while (!done) {
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
             CURR_MAX_DEPTH++;
             int prevSize = transTable.size();
-            bestPlay = minimax(simNode, CURR_MAX_DEPTH);
+            minimax(simNode, CURR_MAX_DEPTH);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH);
             System.out.println("TABLE SIZE: " + transTable.size());
             if (transTable.size() == prevSize) done = true;
         }
-        return bestPlay;
     }
 
     public static MinimaxPlay minimax(Node node, int depth) {
@@ -52,6 +46,7 @@ public class StateSpaceCalc {
         if (Logic.gameOver(node.getState()) || depth == 0) {
             return new MinimaxPlay(bestMove, heuristic(node.getState()), depth);
         }
+
         MinimaxPlay transpoPlay = transTable.get(node.getHashCode());
         if (transpoPlay != null && depth <= transpoPlay.depth) {
             return transpoPlay;
@@ -71,10 +66,12 @@ public class StateSpaceCalc {
                 }
             }
         }
+
         if (transpoPlay == null || depth > transpoPlay.depth) {
             if (transpoPlay == null) if (findBranchFactor) legalMoves += node.getState().getLegalMoves().size();
             transTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
         }
+
         return new MinimaxPlay(bestMove, bestScore, depth);
     }
 
@@ -91,7 +88,7 @@ public class StateSpaceCalc {
         Zobrist.initialize();
 
         State state = new State(1);
-        Move move = calcStateSpace(state);
+        calcStateSpace(state);
     }
 }
 

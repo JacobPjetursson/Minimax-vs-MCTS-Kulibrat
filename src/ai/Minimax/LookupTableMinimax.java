@@ -13,7 +13,7 @@ import static misc.Globals.BLACK;
 import static misc.Globals.RED;
 
 public class LookupTableMinimax extends AI {
-    private boolean useDB = false;
+    private boolean useDB = true;
     private int CURR_MAX_DEPTH;
     private HashMap<Long, MinimaxPlay> lookupTable;
 
@@ -70,16 +70,16 @@ public class LookupTableMinimax extends AI {
     }
 
     private MinimaxPlay iterativeDeepeningMinimax(State state) {
-        CURR_MAX_DEPTH =25;
+        CURR_MAX_DEPTH =35;
         boolean done = false;
         MinimaxPlay play = null;
         while (!done) {
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
-            CURR_MAX_DEPTH += 2;
+            CURR_MAX_DEPTH += 1;
             int prevSize = lookupTable.size();
             play = minimax(simNode, CURR_MAX_DEPTH);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH + ", TABLE SIZE: " + lookupTable.size());
-            if (lookupTable.size() == prevSize) done = true;
+            if (lookupTable.size() == prevSize && Math.abs(play.score) >= 1000) done = true;
         }
         return play;
     }
