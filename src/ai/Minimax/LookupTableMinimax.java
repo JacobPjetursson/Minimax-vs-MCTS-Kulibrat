@@ -70,16 +70,21 @@ public class LookupTableMinimax extends AI {
     }
 
     private MinimaxPlay iterativeDeepeningMinimax(State state) {
-        CURR_MAX_DEPTH =35;
+        CURR_MAX_DEPTH =45;
         boolean done = false;
         MinimaxPlay play = null;
         while (!done) {
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
-            CURR_MAX_DEPTH += 1;
+            CURR_MAX_DEPTH += 5;
             int prevSize = lookupTable.size();
             play = minimax(simNode, CURR_MAX_DEPTH);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH + ", TABLE SIZE: " + lookupTable.size());
             if (lookupTable.size() == prevSize && Math.abs(play.score) >= 1000) done = true;
+
+            if(Math.abs(play.score) >= 1000) {
+                String winner = (play.score > 1000) ? "RED" : "BLACK";
+                System.out.println("A SOLUTION HAS BEEN FOUND, WINNING STRAT GOES TO: " + winner + " WITH " + play.score + " POINTS!");
+            }
         }
         return play;
     }
