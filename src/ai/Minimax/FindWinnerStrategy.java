@@ -5,8 +5,8 @@ import game.Move;
 import game.State;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
-import static misc.Globals.BLACK;
 import static misc.Globals.RED;
 
 public class FindWinnerStrategy {
@@ -14,7 +14,6 @@ public class FindWinnerStrategy {
     private static HashMap<Long, MinimaxPlay> transTable = new HashMap<>();
     private static int CURR_MAX_DEPTH;
     private static Node prevBestNode;
-
 
     private static void iterativeDeepeningMinimax(State state) {
         CURR_MAX_DEPTH = 0;
@@ -48,9 +47,11 @@ public class FindWinnerStrategy {
         }
         MinimaxPlay transpoPlay;
         transpoPlay = transTable.get(node.getHashCode());
-        if (transpoPlay != null && (depth <= transpoPlay.depth || Math.abs(transpoPlay.score) >= 1000)) {
+        if (transpoPlay != null && (depth <= transpoPlay.depth &&
+                (CURR_MAX_DEPTH-depth)+transpoPlay.depth <= CURR_MAX_DEPTH)/* || Math.abs(transpoPlay.score) >= 1000*/) {
             return transpoPlay;
         }
+
 
         if (depth == CURR_MAX_DEPTH && prevBestNode != null) {
             score = minimax(prevBestNode, depth - 1, alpha, beta).score;
@@ -87,26 +88,31 @@ public class FindWinnerStrategy {
             }
             if (beta <= alpha) break;
         }
-        if (depth == CURR_MAX_DEPTH)
+        if (depth == CURR_MAX_DEPTH) {
             prevBestNode = node.getNextNode(bestMove);
+        }
+        transpoPlay = transTable.get(node);
         if (transpoPlay == null || depth > transpoPlay.depth) {
+        //if (transpoPlay == null && Math.abs(bestScore) >= 1000) {
             transTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
         }
+
         return new MinimaxPlay(bestMove, bestScore, depth);
     }
 
     private static int heuristic(State state) {
-        int opponent = (team == RED) ? BLACK : RED;
-        int winner = Logic.getWinner(state);
+        if(Logic.gameOver(state)) {
+            int winner = Logic.getWinner(state);
 
-        if (winner == team) return 1000;
-        else if (winner == opponent) return -1000;
+            if (winner == team) return 1000;
+            else return -1000;
+        }
         return 0;
     }
 
     public static void main(String[] args) {
         Zobrist.initialize();
-        int pointsToWin = 5;
+        int pointsToWin = 3;
         System.out.println("Finding the optimal strategy when playing to " + pointsToWin + " points");
         State state = new State(pointsToWin);
         iterativeDeepeningMinimax(state);

@@ -35,7 +35,7 @@ public class Temp extends AI {
         CURR_MAX_DEPTH = 0;
         prevBestNode = null;
         boolean done = false;
-        transTable = new HashMap<>();
+        //transTable = new HashMap<>();
         MinimaxPlay bestPlay = null;
         long startTime = System.currentTimeMillis();
         while (!done) {
@@ -63,7 +63,7 @@ public class Temp extends AI {
         int bestScore = (node.getState().getTurn() == team) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
         if (Logic.gameOver(node.getState()) || depth <= 0) {
-            return new MinimaxPlay(bestMove, heuristic(node.getState(), depth), depth);
+            return new MinimaxPlay(bestMove, heuristic(node.getState()), depth);
         }
         MinimaxPlay transpoPlay;
         transpoPlay = transTable.get(node.getHashCode());
@@ -109,17 +109,19 @@ public class Temp extends AI {
         if (depth == CURR_MAX_DEPTH)
             prevBestNode = node.getNextNode(bestMove);
         if (transpoPlay == null || depth > transpoPlay.depth) {
+        //if (transpoPlay == null && Math.abs(bestScore) >= 1000) {
             transTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
         }
         return new MinimaxPlay(bestMove, bestScore, depth);
     }
 
-    private int heuristic(State state, int depth) {
-        int opponent = (team == RED) ? BLACK : RED;
-        int winner = Logic.getWinner(state);
+    private int heuristic(State state) {
+        if(Logic.gameOver(state)) {
+            int winner = Logic.getWinner(state);
 
-        if (winner == team) return 1000;
-        else if (winner == opponent) return -1000;
+            if (winner == team) return 1000;
+            else return -1000;
+        }
         return 0;
     }
 }

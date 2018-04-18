@@ -26,6 +26,7 @@ import static misc.Globals.*;
 
 public class Controller {
     private int mode;
+    private int turnNo;
     private AI aiRed;
     private AI aiBlack;
     private Button startAIButton;
@@ -41,6 +42,7 @@ public class Controller {
     public Controller(PlayPane playPane, int playerRedInstance, int playerBlackInstance, int pointsToWin, int mode, int redTime, int blackTime, boolean overwriteDB) {
         Zobrist.initialize(); // Generate random numbers for state configs
         this.mode = mode;
+        turnNo = 0;
         state = new State(pointsToWin);
         endGamePopup = false;
 
@@ -50,6 +52,7 @@ public class Controller {
         if (playerRedInstance != HUMAN) {
             if (playerRedInstance == MINIMAX) {
                 aiRed = new Minimax(RED, redTime);
+                //aiRed = new Temp(RED);
             } else if (playerRedInstance == LOOKUP_TABLE) {
                 aiRed = new LookupTableMinimax(RED, state, overwriteDB);
             } else {
@@ -114,22 +117,23 @@ public class Controller {
                 doHumanTurn(new Move(piece.getRow(), piece.getCol(), -1, -1, piece.getTeam()));
             }
         });
-        playArea.update(state);
+        playArea.update(state, turnNo);
         if (mode == HUMAN_VS_AI && playerRedInstance != HUMAN) {
             aiThread = new Thread(this::doAITurn);
-            //aiThread.setDaemon(true);
+            aiThread.setDaemon(true);
             aiThread.start();
         }
     }
 
     private void doHumanTurn(Move move) {
         state = state.getNextState(move);
+        turnNo++;
         if (aiRed != null) aiRed.update(state);
         if (aiBlack != null) aiBlack.update(state);
 
         playArea.highlightMoves(move.oldRow, move.oldCol, move.team, false);
         playArea.deselect();
-        playArea.update(state);
+        playArea.update(state, turnNo);
         checkGameOver();
 
         if (Logic.gameOver(state)) return;
@@ -139,7 +143,7 @@ public class Controller {
             System.out.println("TEAM " + ((move.team == RED) ? "Black" : "Red") + "'s turn has been skipped!");
         } else if (mode == HUMAN_VS_AI) {
             aiThread = new Thread(this::doAITurn);
-            //aiThread.setDaemon(true);
+            aiThread.setDaemon(true);
             aiThread.start();
         }
     }
@@ -166,7 +170,7 @@ public class Controller {
             }
 
         });
-        //aiThread.setDaemon(true);
+        aiThread.setDaemon(true);
         aiThread.start();
     }
 
@@ -179,11 +183,12 @@ public class Controller {
             move = aiBlack.makeMove(state);
         }
         state = state.getNextState(move);
+        turnNo++;
         if (aiRed != null) aiRed.update(state);
         if (aiBlack != null) aiBlack.update(state);
         // Update gui elements on another thread
         Platform.runLater(() -> {
-            playArea.update(state);
+            playArea.update(state, turnNo);
             checkGameOver();
         });
         if (Logic.gameOver(state)) return;

@@ -67,12 +67,12 @@ public class PlayArea extends GridPane {
 
     }
 
-    public void update(State state) {
+    public void update(State state, int turnNo) {
         this.state = state;
         board.update(state, this);
         playerRed.update(state);
         playerBlack.update(state);
-        info.update(state);
+        info.update(state, turnNo);
     }
 
     public void deselect() {

@@ -70,12 +70,12 @@ public class LookupTableMinimax extends AI {
     }
 
     private MinimaxPlay iterativeDeepeningMinimax(State state) {
-        CURR_MAX_DEPTH =45;
+        CURR_MAX_DEPTH =30;
         boolean done = false;
         MinimaxPlay play = null;
         while (!done) {
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
-            CURR_MAX_DEPTH += 5;
+            CURR_MAX_DEPTH += 2;
             int prevSize = lookupTable.size();
             play = minimax(simNode, CURR_MAX_DEPTH);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH + ", TABLE SIZE: " + lookupTable.size());

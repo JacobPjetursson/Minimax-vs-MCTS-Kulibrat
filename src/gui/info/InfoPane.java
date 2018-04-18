@@ -17,6 +17,7 @@ public class InfoPane extends VBox {
     private ScoreBoard scoreBoard;
     private Circle turnCircle;
     private Label skippedTurn;
+    private Label turnNumberLabel;
     private int prevTurn = 0;
 
     public InfoPane(int pointsToWin, int mode) {
@@ -35,6 +36,9 @@ public class InfoPane extends VBox {
         HBox turn = new HBox(turnLabel, turnCircle);
         turn.setAlignment(Pos.CENTER);
 
+        turnNumberLabel = new Label("Turn number: 0");
+        turnNumberLabel.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
+
         Label pointsToWinLabel = new Label("Points To Win: " + pointsToWin);
         pointsToWinLabel.setFont(Font.font("Verdana", 15));
 
@@ -47,7 +51,7 @@ public class InfoPane extends VBox {
         skippedTurn.setFont(Font.font("Verdana", 15));
 
 
-        VBox infoBox = new VBox(turn, pointsToWinLabel, modeLabel, skippedTurn);
+        VBox infoBox = new VBox(turn, turnNumberLabel, pointsToWinLabel, modeLabel, skippedTurn);
         infoBox.setAlignment(Pos.CENTER);
         infoBox.setSpacing(15);
 
@@ -55,9 +59,10 @@ public class InfoPane extends VBox {
         getChildren().addAll(scoreBoard, infoBox);
     }
 
-    public void update(State state) {
+    public void update(State state, int turnNo) {
         scoreBoard.updateScore(state);
         updateTurn(state);
+        turnNumberLabel.setText("Turn number: " + turnNo);
 
         if (prevTurn == state.getTurn()) {
             String team = (state.getTurn() == RED) ? "Black" : "Red";
