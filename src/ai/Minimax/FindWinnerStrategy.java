@@ -5,7 +5,6 @@ import game.Move;
 import game.State;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
 import static misc.Globals.RED;
 
@@ -92,7 +91,6 @@ public class FindWinnerStrategy {
         if (depth == CURR_MAX_DEPTH) {
             prevBestNode = node.getNextNode(bestMove);
         }
-        transpoPlay = transTable.get(node);
         if (transpoPlay == null || depth > transpoPlay.depth) {
         //if (transpoPlay == null && Math.abs(bestScore) >= 1000) {
             transTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
