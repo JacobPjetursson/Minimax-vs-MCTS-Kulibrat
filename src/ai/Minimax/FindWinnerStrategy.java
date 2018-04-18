@@ -47,8 +47,9 @@ public class FindWinnerStrategy {
         }
         MinimaxPlay transpoPlay;
         transpoPlay = transTable.get(node.getHashCode());
-        if (transpoPlay != null && (depth <= transpoPlay.depth &&
-                (CURR_MAX_DEPTH-depth)+transpoPlay.depth <= CURR_MAX_DEPTH)/* || Math.abs(transpoPlay.score) >= 1000*/) {
+        if (transpoPlay != null && (depth <= transpoPlay.depth
+                || Math.abs(transpoPlay.score) == 1000)) {
+                //&& CURR_MAX_DEPTH-depth+transpoPlay.depth <= CURR_MAX_DEPTH ) ) {
             return transpoPlay;
         }
 
@@ -112,7 +113,7 @@ public class FindWinnerStrategy {
 
     public static void main(String[] args) {
         Zobrist.initialize();
-        int pointsToWin = 3;
+        int pointsToWin = 2;
         System.out.println("Finding the optimal strategy when playing to " + pointsToWin + " points");
         State state = new State(pointsToWin);
         iterativeDeepeningMinimax(state);
