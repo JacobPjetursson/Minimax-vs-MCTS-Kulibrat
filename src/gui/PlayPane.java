@@ -1,7 +1,9 @@
 package gui;
 
 import game.Controller;
+import gui.board.BoardPiece;
 import javafx.geometry.Pos;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import misc.Globals;
@@ -12,18 +14,14 @@ public class PlayPane extends GridPane {
     private PlayArea playArea;
     private NavPane navPane;
 
-    private int mode;
-
-    public PlayPane(int playerRedInstance, int playerBlackInstance, int pointsToWin, int redTime, int blackTime, boolean overwriteDB) {
+    public PlayPane(Controller cont) {
         setup();
-        mode = setMode(playerRedInstance, playerBlackInstance);
 
-        playArea = new PlayArea(playerRedInstance, playerBlackInstance, pointsToWin, mode);
-        navPane = new NavPane(playerRedInstance, playerBlackInstance, pointsToWin, redTime, blackTime, overwriteDB);
+        playArea = new PlayArea(cont);
+        navPane = new NavPane(cont);
         add(playArea, 1, 0);
         add(navPane, 0, 0);
 
-        new Controller(this, playerRedInstance, playerBlackInstance, pointsToWin, mode, redTime, blackTime, overwriteDB);
     }
 
     private void setup() {
@@ -41,15 +39,5 @@ public class PlayPane extends GridPane {
 
     public NavPane getNavPane() {
         return navPane;
-    }
-
-    private int setMode(int playerRedInstance, int playerBlackInstance) {
-        if (playerRedInstance == HUMAN && playerBlackInstance == HUMAN) {
-            return HUMAN_VS_HUMAN;
-        } else if (playerRedInstance != HUMAN ^ playerBlackInstance != HUMAN) {
-            return HUMAN_VS_AI;
-        } else {
-            return AI_VS_AI;
-        }
     }
 }

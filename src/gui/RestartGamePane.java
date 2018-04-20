@@ -1,5 +1,6 @@
 package gui;
 
+import game.Controller;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -11,9 +12,12 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import misc.Globals;
 
+import static misc.Globals.BLACK;
+import static misc.Globals.RED;
+
 class RestartGamePane extends AnchorPane {
 
-    RestartGamePane(Stage primaryStage, int playerRedMode, int playerBlackMode, int pointsToWin, int redTime, int blackTime, boolean overwriteDB) {
+    RestartGamePane(Stage primaryStage, Controller cont) {
         Label label = new Label("Are you sure you want to restart?");
         label.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
         label.setAlignment(Pos.CENTER);
@@ -30,11 +34,8 @@ class RestartGamePane extends AnchorPane {
         yesBtn.setOnMouseClicked(event -> {
             Stage stage = (Stage) getScene().getWindow();
             stage.close();
-
-            primaryStage.setScene(new Scene(new PlayPane(playerRedMode,
-                    playerBlackMode, pointsToWin, redTime, blackTime, overwriteDB),
-                    Globals.WIDTH, Globals.HEIGHT));
-
+            new Controller(primaryStage, cont.getPlayerInstance(RED),
+                    cont.getPlayerInstance(BLACK), cont.getPointsToWin(), cont.getTime(RED), cont.getTime(BLACK), cont.getOverwriteDB());
         });
 
         Button noBtn = new Button("No");

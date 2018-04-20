@@ -1,5 +1,6 @@
 package gui.info;
 
+import game.Controller;
 import game.State;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -50,19 +51,23 @@ public class InfoPane extends VBox {
         skippedTurn = new Label();
         skippedTurn.setFont(Font.font("Verdana", 15));
 
+        VBox turnBox = new VBox(turn, turnNumberLabel);
+        turnBox.setAlignment(Pos.CENTER);
+        turnBox.setSpacing(15);
 
-        VBox infoBox = new VBox(turn, turnNumberLabel, pointsToWinLabel, modeLabel, skippedTurn);
+        VBox infoBox = new VBox(pointsToWinLabel, modeLabel, skippedTurn);
         infoBox.setAlignment(Pos.CENTER);
         infoBox.setSpacing(15);
 
 
-        getChildren().addAll(scoreBoard, infoBox);
+        getChildren().addAll(scoreBoard, turnBox, infoBox);
     }
 
-    public void update(State state, int turnNo) {
+    public void update(Controller cont) {
+        State state = cont.getState();
         scoreBoard.updateScore(state);
         updateTurn(state);
-        turnNumberLabel.setText("Turn number: " + turnNo);
+        turnNumberLabel.setText("Turn number: " + cont.getTurnNo());
 
         if (prevTurn == state.getTurn()) {
             String team = (state.getTurn() == RED) ? "Black" : "Red";

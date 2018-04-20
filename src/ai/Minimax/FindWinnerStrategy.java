@@ -47,8 +47,8 @@ public class FindWinnerStrategy {
         MinimaxPlay transpoPlay;
         transpoPlay = transTable.get(node.getHashCode());
         if (transpoPlay != null && (depth <= transpoPlay.depth
-                || Math.abs(transpoPlay.score) == 1000)) {
-                //&& CURR_MAX_DEPTH-depth+transpoPlay.depth <= CURR_MAX_DEPTH ) ) {
+                //|| Math.abs(transpoPlay.score) == 1000)) {
+                && CURR_MAX_DEPTH-depth+transpoPlay.depth <= CURR_MAX_DEPTH ) ) {
             return transpoPlay;
         }
 

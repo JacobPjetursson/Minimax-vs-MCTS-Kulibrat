@@ -1,5 +1,6 @@
 package gui.board;
 
+import game.Controller;
 import game.State;
 import gui.PlayArea;
 import javafx.geometry.Pos;
@@ -32,7 +33,8 @@ public class Board extends GridPane {
         return TILESIZE;
     }
 
-    public void update(State state, PlayArea playArea) {
+    public void update(Controller cont) {
+        State state = cont.getState();
         int[][] stateBoard = state.getBoard();
         for (int i = 0; i < tiles.length; i++) {
             for (int j = 0; j < tiles[i].length; j++) {
@@ -40,7 +42,7 @@ public class Board extends GridPane {
                 int stateTile = stateBoard[i][j];
                 // moved to tile
                 if (tile.getChildren().isEmpty() && stateTile != 0) {
-                    tile.getChildren().add(new BoardPiece(stateTile, playArea, i, j));
+                    tile.getChildren().add(new BoardPiece(stateTile, cont, i, j));
                 }
                 // moved from tile
                 else if (!tile.getChildren().isEmpty() && stateTile == 0) {
@@ -51,7 +53,7 @@ public class Board extends GridPane {
                     BoardPiece piece = (BoardPiece) tile.getChildren().get(0);
                     if (piece.getTeam() != stateTile) {
                         tile.getChildren().remove(piece);
-                        tile.getChildren().add(new BoardPiece(stateTile, playArea, i, j));
+                        tile.getChildren().add(new BoardPiece(stateTile, cont, i, j));
                     }
                 }
             }

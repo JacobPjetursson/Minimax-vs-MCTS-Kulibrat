@@ -29,10 +29,7 @@ public class LookupTableMinimax extends AI {
         if (useDB) {
             conn = getConnection(state.getPointsToWin());
             if (overwriteDB) {
-                if(team != RED) {
-                    System.err.println("Only red should be building the lookup table. Exiting");
-                    System.exit(0);
-                }
+                this.team = RED;
                 System.out.println("Rebuilding lookup table. This will take some time.");
                 buildLookupTable(state);
                 try {
@@ -40,13 +37,15 @@ public class LookupTableMinimax extends AI {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+                this.team = team;
             }
         }
 
     }
 
     public Move makeMove(State state) {
-        System.out.println("Finding best play");
+        String teamstr = (team == BLACK) ? "BLACK" : "RED";
+        System.out.println("Finding best play for " + teamstr);
         if (state.getLegalMoves().size() == 1) {
             return state.getLegalMoves().get(0);
         }
@@ -59,7 +58,7 @@ public class LookupTableMinimax extends AI {
             play = iterativeDeepeningMinimax(state);
         }
         if (play == null) {
-            System.err.println("DB Table is empty!");
+            System.err.println("DB Table is empty and needs to be rebuilt. Exiting");
             System.exit(0);
         }
         Move move = play.move;
@@ -79,14 +78,22 @@ public class LookupTableMinimax extends AI {
     private MinimaxPlay iterativeDeepeningMinimax(State state) {
         CURR_MAX_DEPTH =0;
         boolean done = false;
+        int doneCounter = 0;
         MinimaxPlay play = null;
         while (!done) {
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
             CURR_MAX_DEPTH += 1;
             int prevSize = lookupTable.size();
+
             play = minimax(simNode, CURR_MAX_DEPTH);
-            System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH + ", TABLE SIZE: " + lookupTable.size());
-            if (lookupTable.size() == prevSize && Math.abs(play.score) >= 1000) done = true; // Last statement should not be needed
+            System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH + ", LOOKUP TABLE SIZE: " + lookupTable.size() +
+                    ", TRANSPO TABLE SIZE: " + transpoTable.size());
+            if (lookupTable.size() == prevSize && Math.abs(play.score) >= 1000) { // Last part should not be needed
+                doneCounter++;
+                if(doneCounter == 5) done = true;
+            } else {
+                doneCounter = 0;
+            }
 
             if(Math.abs(play.score) >= 1000) {
                 String player = (team == RED) ? "RED" : "BLACK";
@@ -110,8 +117,10 @@ public class LookupTableMinimax extends AI {
         if (transpoPlay != null && depth <= transpoPlay.depth) {
             return transpoPlay;
         }
+        boolean exploredChildren = true;
         for (Node child : node.getChildren()) {
             score = minimax(child, depth - 1).score;
+            if(score == 0) exploredChildren = false;
             if (node.getState().getTurn() == team) {
                 if (score > bestScore) {
                     bestScore = score;
@@ -128,8 +137,9 @@ public class LookupTableMinimax extends AI {
             transpoTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
         }
         MinimaxPlay play = lookupTable.get(node.getHashCode());
-        if( (play == null && Math.abs(bestScore) >= 1000))
+        if( (play == null && exploredChildren/*Math.abs(bestScore) >= 1000)*/)) {
             lookupTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
+        }
         return new MinimaxPlay(bestMove, bestScore, depth);
     }
 

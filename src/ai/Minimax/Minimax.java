@@ -15,7 +15,6 @@ import static misc.Globals.RED;
 public class Minimax extends AI {
     private long calculationTime;
     private boolean searchCutOff = false;
-    private boolean winCutOff = false;
     private boolean moveOrdering = false;
     private int CURR_MAX_DEPTH;
     private boolean useTranspo = true;
@@ -44,11 +43,10 @@ public class Minimax extends AI {
     private MinimaxPlay iterativeDeepeningMinimax(State state, long startTime) {
         resetVariables();
         MinimaxPlay bestPlay = null;
-        while (!outOfTime(startTime) && !winCutOff) {
+        while (!outOfTime(startTime)) {
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
             CURR_MAX_DEPTH++;
             MinimaxPlay play = minimax(simNode, CURR_MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, startTime);
-            if (Math.abs(play.score) >= 1000) winCutOff = true;
             if (!searchCutOff) bestPlay = play;
         }
         // random move if null (No time to calculate minimax)
@@ -140,7 +138,7 @@ public class Minimax extends AI {
         CURR_MAX_DEPTH = 0;
         prevBestNode = null;
         searchCutOff = false;
-        winCutOff = false;
+
     }
 
     private int heuristic(State state) {

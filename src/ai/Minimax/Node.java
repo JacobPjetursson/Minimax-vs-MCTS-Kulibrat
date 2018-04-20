@@ -39,11 +39,7 @@ public class Node {
     }
 
     public Node getNextNode(Move m) {
-        Node node = new Node(this);
-        Logic.doTurn(m, node.getState());
-        node.updateHashCode(this.state);
-        node.state.setMove(m);
-        return node;
+        return new Node(this, m);
     }
 
     public ArrayList<Node> getChildren() {

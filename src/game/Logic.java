@@ -101,7 +101,6 @@ public abstract class Logic {
     }
 
     public static void doTurn(Move m, State state) {
-        // TODO - consider checking for legal turns
         if (gameOver(state)) return;
         else if (m.team != state.getTurn()) {
             System.out.println("Not your turn");

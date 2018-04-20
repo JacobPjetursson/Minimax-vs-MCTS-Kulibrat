@@ -1,5 +1,6 @@
 package gui.board;
 
+import game.Controller;
 import game.State;
 import gui.PlayArea;
 import javafx.geometry.Pos;
@@ -12,24 +13,23 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 import java.net.URL;
+import java.util.ArrayList;
 
 import static misc.Globals.*;
 
 public class Player extends VBox {
     private int team;
-    private int type;
-    private PlayArea playArea;
     private GridPane gridPaneBoard;
-    private GridPane gridPaneDisplay;
+    private ArrayList<BoardPiece> pieces;
 
 
-    public Player(int team, int type, PlayArea playArea) {
+    public Player(int team, Controller cont) {
         this.team = team;
-        this.playArea = playArea;
-        this.type = type;
+        pieces = new ArrayList<>();
+        int type = cont.getPlayerInstance(team);
         setAlignment(Pos.CENTER);
         setSpacing(10);
-        int size = playArea.getBoard().getTileSize();
+        int size = 60;
 
         gridPaneBoard = new GridPane();
         gridPaneBoard.setAlignment(Pos.CENTER);
@@ -44,7 +44,9 @@ public class Player extends VBox {
         }
 
         for (int i = 0; i < 4; i++) {
-            gridPaneBoard.add(pieceBox(new BoardPiece(team, playArea)), i, 0);
+            BoardPiece bp = new BoardPiece(team, cont);
+            pieces.add(bp);
+            gridPaneBoard.add(pieceBox(bp), i, 0);
         }
         URL urlRed = this.getClass().getClassLoader().getResource("playerIconRed.png");
         URL urlBlack = this.getClass().getClassLoader().getResource("playerIconBlack.png");
@@ -58,7 +60,7 @@ public class Player extends VBox {
         BorderPane imgPane = new BorderPane();
         imgPane.setCenter(imgView);
 
-        gridPaneDisplay = new GridPane();
+        GridPane gridPaneDisplay = new GridPane();
         gridPaneDisplay.setAlignment(Pos.CENTER);
         gridPaneDisplay.setPrefSize((size * 4) / 3, size);
         gridPaneDisplay.setMaxWidth((size * 4) / 3);
@@ -77,12 +79,18 @@ public class Player extends VBox {
 
     }
 
-    public void update(State state) {
+    public void update(Controller cont) {
+        State state = cont.getState();
         if (gridPaneBoard.getChildren().size() > state.getUnplaced(team)) {
-            if (playArea.getSelected() != null) {
-                gridPaneBoard.getChildren().remove(playArea.getSelected().getParent());
+            if (cont.getSelected() != null) { //Human turn
+                BoardPiece bp = cont.getSelected();
+                pieces.remove(bp);
+                gridPaneBoard.getChildren().remove(bp.getParent());
             } else {
-                gridPaneBoard.getChildren().remove(0);
+                HBox parent = (HBox) gridPaneBoard.getChildren().get(0);
+                BoardPiece bp = (BoardPiece) parent.getChildren().get(0);
+                pieces.remove(bp);
+                gridPaneBoard.getChildren().remove(parent);
             }
         } else if (gridPaneBoard.getChildren().size() < state.getUnplaced(team)) {
             for (int i = 0; i < 4; i++) {
@@ -94,12 +102,18 @@ public class Player extends VBox {
                     }
                 }
                 if (!occupied) {
-                    gridPaneBoard.add(pieceBox(new BoardPiece(team, playArea)), i, 0);
+                    BoardPiece bp = new BoardPiece(team, cont);
+                    pieces.add(bp);
+                    gridPaneBoard.add(pieceBox(bp), i, 0);
                     break;
                 }
 
             }
         }
+    }
+
+    public ArrayList<BoardPiece> getPieces() {
+        return pieces;
     }
 
     private Color getColor() {
@@ -111,9 +125,5 @@ public class Player extends VBox {
         HBox box = new HBox(piece);
         box.setAlignment(Pos.CENTER);
         return box;
-    }
-
-    public int getType() {
-        return type;
     }
 }

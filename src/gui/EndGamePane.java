@@ -1,5 +1,6 @@
 package gui;
 
+import game.Controller;
 import gui.menu.MenuPane;
 import gui.menu.NewGamePane;
 import javafx.geometry.Pos;
@@ -19,11 +20,11 @@ import static misc.Globals.RED;
 public class EndGamePane extends AnchorPane {
 
 
-    public EndGamePane(Stage primaryStage, int team) {
+    public EndGamePane(Stage primaryStage, int team, Controller cont) {
         Label label = new Label();
         if (team == RED) label.setText("Congratulations player Red!");
-        else if (team == BLACK) label.setText(("Congratulations player Black!"));
-        else label.setText(("No turns possible: It's a draw!"));
+        else label.setText(("Congratulations player Black!"));
+
 
         label.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
         label.setAlignment(Pos.CENTER);
@@ -40,28 +41,25 @@ public class EndGamePane extends AnchorPane {
         menuBtn.setOnMouseClicked(event -> {
             Stage stage = (Stage) getScene().getWindow();
             stage.close();
-
             primaryStage.setScene(new Scene(new MenuPane(),
                     Globals.WIDTH, Globals.HEIGHT));
 
         });
 
-        Button newGameBtn = new Button("New Game");
-        HBox newGame = new HBox(newGameBtn);
-        newGame.setAlignment(Pos.CENTER);
-        AnchorPane.setRightAnchor(newGame, 40.0);
-        AnchorPane.setTopAnchor(newGame, 0.0);
-        AnchorPane.setBottomAnchor(newGame, 0.0);
-        newGameBtn.setOnMouseClicked(event -> {
+        Button restartGameBtm = new Button("Restart Game");
+        HBox restartGame = new HBox(restartGameBtm);
+        restartGame.setAlignment(Pos.CENTER);
+        AnchorPane.setRightAnchor(restartGame, 40.0);
+        AnchorPane.setTopAnchor(restartGame, 0.0);
+        AnchorPane.setBottomAnchor(restartGame, 0.0);
+        restartGameBtm.setOnMouseClicked(event -> {
             Stage stage = (Stage) getScene().getWindow();
             stage.close();
-
-            primaryStage.setScene(new Scene(new NewGamePane(),
-                    Globals.WIDTH, Globals.HEIGHT));
-
+            new Controller(primaryStage, cont.getPlayerInstance(RED),
+                    cont.getPlayerInstance(BLACK), cont.getPointsToWin(), cont.getTime(RED), cont.getTime(BLACK), cont.getOverwriteDB());
         });
 
-        getChildren().addAll(label, menu, newGame);
+        getChildren().addAll(label, menu, restartGame);
 
     }
 }
