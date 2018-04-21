@@ -17,6 +17,7 @@ public class LookupTableMinimax extends AI {
     private int CURR_MAX_DEPTH;
     private HashMap<Long, MinimaxPlay> transpoTable;
     private HashMap<Long, MinimaxPlay> lookupTable;
+    private boolean done;
 
     private String JDBC_URL = "jdbc:derby:lookupDB;create=true";
     private Connection conn;
@@ -77,7 +78,7 @@ public class LookupTableMinimax extends AI {
 
     private MinimaxPlay iterativeDeepeningMinimax(State state) {
         CURR_MAX_DEPTH =0;
-        boolean done = false;
+        done = false;
         int doneCounter = 0;
         MinimaxPlay play = null;
         while (!done) {
@@ -88,17 +89,18 @@ public class LookupTableMinimax extends AI {
             play = minimax(simNode, CURR_MAX_DEPTH);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH + ", LOOKUP TABLE SIZE: " + lookupTable.size() +
                     ", TRANSPO TABLE SIZE: " + transpoTable.size());
-            if (lookupTable.size() == prevSize && lookupTable.size() == transpoTable.size()
-                    && Math.abs(play.score) >= 1000) { // Last part should not be needed
-                done = true;
-            }
-                /*
+            if (lookupTable.size() == prevSize) {
                 doneCounter++;
                 if(doneCounter == 5) done = true;
-            } else {
-                doneCounter = 0;
+                else doneCounter = 0;
+                /*
+                if(lookupTable.size() == transpoTable.size() && Math.abs(play.score) >= 1000) {
+                    done = true;
+                }
+                */
             }
-            */
+
+
 
             if(Math.abs(play.score) >= 1000) {
                 String player = (team == RED) ? "RED" : "BLACK";
@@ -149,12 +151,21 @@ public class LookupTableMinimax extends AI {
                 System.out.println("Child of second middle:");
                 System.out.println("Score: " + score);
             }
+            if(score == 0 && done) {
+                System.out.println("SCORE: " + score);
+                System.out.println("DEPTH: " + depth);
+                System.out.println("CHILD IN LOOKUP: " + lookupTable.containsKey(child.getHashCode()));
+
+            }
+        }
+        if(!exploredChildren && done) {
+            System.out.println("BESTSCORE: " + bestScore);
         }
         if (transpoPlay == null || depth > transpoPlay.depth) {
             transpoTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
         }
         MinimaxPlay play = lookupTable.get(node.getHashCode());
-        if( (play == null && exploredChildren /*Math.abs(bestScore) >= 1000*/)) {
+        if( (play == null && exploredChildren && Math.abs(bestScore) >= 1000)) {
             lookupTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
         }
         return new MinimaxPlay(bestMove, bestScore, depth);
