@@ -88,12 +88,17 @@ public class LookupTableMinimax extends AI {
             play = minimax(simNode, CURR_MAX_DEPTH);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH + ", LOOKUP TABLE SIZE: " + lookupTable.size() +
                     ", TRANSPO TABLE SIZE: " + transpoTable.size());
-            if (lookupTable.size() == prevSize && Math.abs(play.score) >= 1000) { // Last part should not be needed
+            if (lookupTable.size() == prevSize && lookupTable.size() == transpoTable.size()
+                    && Math.abs(play.score) >= 1000) { // Last part should not be needed
+                done = true;
+            }
+                /*
                 doneCounter++;
                 if(doneCounter == 5) done = true;
             } else {
                 doneCounter = 0;
             }
+            */
 
             if(Math.abs(play.score) >= 1000) {
                 String player = (team == RED) ? "RED" : "BLACK";
@@ -113,6 +118,9 @@ public class LookupTableMinimax extends AI {
         if (Logic.gameOver(node.getState()) || depth == 0) {
             return new MinimaxPlay(bestMove, heuristic(node.getState(), depth), depth);
         }
+        MinimaxPlay lookupPlay = lookupTable.get(node.getHashCode());
+        if(lookupPlay != null)
+            return lookupPlay;
         MinimaxPlay transpoPlay = transpoTable.get(node.getHashCode());
         if (transpoPlay != null && depth <= transpoPlay.depth) {
             return transpoPlay;
@@ -132,12 +140,21 @@ public class LookupTableMinimax extends AI {
                     bestMove = child.getState().getMove();
                 }
             }
+            if(node.getHashCode() == 3160681311271971840L) {
+                System.out.println("Child of first left:");
+                System.out.println("Score: " + score);
+
+            }
+            if(node.getHashCode() == 486350317451566080L) {
+                System.out.println("Child of second middle:");
+                System.out.println("Score: " + score);
+            }
         }
         if (transpoPlay == null || depth > transpoPlay.depth) {
             transpoTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
         }
         MinimaxPlay play = lookupTable.get(node.getHashCode());
-        if( (play == null && exploredChildren/*Math.abs(bestScore) >= 1000)*/)) {
+        if( (play == null && exploredChildren /*Math.abs(bestScore) >= 1000*/)) {
             lookupTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
         }
         return new MinimaxPlay(bestMove, bestScore, depth);
