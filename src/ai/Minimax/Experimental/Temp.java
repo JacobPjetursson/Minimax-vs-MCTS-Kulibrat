@@ -1,6 +1,8 @@
-package ai.Minimax;
+package ai.Minimax.Experimental;
 
 import ai.AI;
+import ai.Minimax.MinimaxPlay;
+import ai.Minimax.Node;
 import game.Logic;
 import game.Move;
 import game.State;

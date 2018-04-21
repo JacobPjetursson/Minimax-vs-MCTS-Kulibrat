@@ -186,7 +186,6 @@ public class Controller {
 
     private void doHumanTurn(Move move) {
         state = state.getNextState(move);
-        System.out.println(new Node(state).getHashCode());
         turnNo++;
         if (aiRed != null) aiRed.update(state);
         if (aiBlack != null) aiBlack.update(state);

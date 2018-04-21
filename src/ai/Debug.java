@@ -8,6 +8,7 @@ import game.State;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import static misc.Globals.BLACK;
@@ -68,16 +69,6 @@ public class Debug {
         state9.updateHashCode(state7.getState());
 
 
-        Minimax minimax = new Minimax(RED, 50000);
-        //minimax.setUseTranspo(false);
-/*
-        System.out.println(minimax.minimax(state1, 15, Integer.MIN_VALUE, Integer.MAX_VALUE, System.currentTimeMillis()).score);
-        System.out.println(minimax.minimax(state2, 15, Integer.MIN_VALUE, Integer.MAX_VALUE, System.currentTimeMillis()).score);
-        System.out.println(minimax.minimax(state3, 15, Integer.MIN_VALUE, Integer.MAX_VALUE, System.currentTimeMillis()).score);
-        System.out.println(minimax.minimax(stateX, 15, Integer.MIN_VALUE, Integer.MAX_VALUE, System.currentTimeMillis()).score);
-*/
-
-
         System.out.println(state1.getHashCode() + "  " + state1.hashCode());
         System.out.println(state2.getHashCode() + "  " + state2.hashCode());
         System.out.println(state3.getHashCode() + "  " + state3.hashCode());
@@ -105,6 +96,20 @@ public class Debug {
         transSet.add(state8.getState());
         transSet.add(state9.getState());
         System.out.println(transSet.size());
+
+
+        int[][] test = new int[4][3];
+        test[0][0] = 1;
+        test[3][0] = 1;
+        test[0][2] = 1;
+
+        for(int i = 0; i < test.length; i++) {
+            for(int j = 0; j < test[i].length; j++) {
+                System.out.print(test[i][j] + " ");
+            }
+            System.out.println();
+        }
+
 
     }
 
