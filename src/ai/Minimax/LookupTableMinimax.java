@@ -16,7 +16,7 @@ import static misc.Globals.RED;
 public class LookupTableMinimax extends AI {
     private boolean useDB = true;
     private int CURR_MAX_DEPTH;
-    private HashMap<Long, MinimaxPlay> transpoTable;
+    private HashMap<Long, TranspoEntry> transpoTable;
     private HashMap<Long, MinimaxPlay> lookupTable;
     private boolean done = false;
 
@@ -84,7 +84,6 @@ public class LookupTableMinimax extends AI {
         MinimaxPlay play = null;
         while (!cutoff) {
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
-            transpoTable = new HashMap<>();
             int prevSize = lookupTable.size();
             lookupTable = new HashMap<>();
             CURR_MAX_DEPTH += 1;
@@ -124,9 +123,10 @@ public class LookupTableMinimax extends AI {
         if (Logic.gameOver(node.getState()) || depth == CURR_MAX_DEPTH) {
             return new MinimaxPlay(bestMove, heuristic(node.getState(), depth), depth);
         }
-        MinimaxPlay transpoPlay = transpoTable.get(node.getHashCode());
-        if (transpoPlay != null && transpoPlay.depth <= depth) {
-            return transpoPlay;
+        TranspoEntry transpoPlay = transpoTable.get(node.getHashCode());
+        if (transpoPlay != null && transpoPlay.play.depth <= depth &&
+                (transpoPlay.maxDepth - transpoPlay.play.depth) >= (CURR_MAX_DEPTH - depth)) {
+            return transpoPlay.play;
         }
         for (Node child : node.getChildren()) {
             score = minimax(child, depth + 1).score;
@@ -148,8 +148,9 @@ public class LookupTableMinimax extends AI {
                 }
             }
         }
-        if (transpoPlay == null || depth <= transpoPlay.depth) {
-            transpoTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
+        if (transpoPlay == null || depth <= transpoPlay.play.depth) {
+            MinimaxPlay play = new MinimaxPlay(bestMove, bestScore, depth);
+            transpoTable.put(node.getHashCode(), new TranspoEntry(play, CURR_MAX_DEPTH));
         }
         MinimaxPlay play = lookupTable.get(node.getHashCode());
         if( ((play == null || depth <= play.depth) && exploredChildren)) {
@@ -245,6 +246,19 @@ public class LookupTableMinimax extends AI {
             System.exit(0);
         }
         return play;
+    }
+    private class TranspoEntry {
+        MinimaxPlay play;
+        int maxDepth;
+
+        public TranspoEntry(Move move, int score, int depth, int maxDepth) {
+            this.play = new MinimaxPlay(move, score, depth);
+            this.maxDepth = maxDepth;
+        }
+        public TranspoEntry(MinimaxPlay play, int maxDepth) {
+            this.play = new MinimaxPlay(play.move, play.score, play.depth);
+            this.maxDepth = maxDepth;
+        }
     }
 }
 
