@@ -126,15 +126,6 @@ public class LookupTableMinimax extends AI {
         }
         MinimaxPlay transpoPlay = transpoTable.get(node.getHashCode());
         if (transpoPlay != null && transpoPlay.depth <= depth) {
-/*
-            int depthDiff = depth - transpoPlay.depth;
-
-            if (transpoPlay.score > 1000) {
-                return new MinimaxPlay(transpoPlay.move, transpoPlay.score - depthDiff, depth);
-            } else if (transpoPlay.score < -1000) {
-                return new MinimaxPlay(transpoPlay.move, transpoPlay.score + depthDiff, depth);
-            }
-*/
             return transpoPlay;
         }
         for (Node child : node.getChildren()) {
@@ -157,11 +148,11 @@ public class LookupTableMinimax extends AI {
                 }
             }
         }
-        if (transpoPlay == null || depth < transpoPlay.depth) {
+        if (transpoPlay == null || depth <= transpoPlay.depth) {
             transpoTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
         }
         MinimaxPlay play = lookupTable.get(node.getHashCode());
-        if( ((play == null || depth < play.depth) && exploredChildren)) {
+        if( ((play == null || depth <= play.depth) && exploredChildren)) {
             int tempScore = bestScore;
             if(tempScore > 1000) tempScore += depth;
             else if (tempScore < -1000) tempScore -= depth;
