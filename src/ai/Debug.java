@@ -97,19 +97,10 @@ public class Debug {
         transSet.add(state9.getState());
         System.out.println(transSet.size());
 
-
-        int[][] test = new int[4][3];
-        test[0][0] = 1;
-        test[3][0] = 1;
-        test[0][2] = 1;
-
-        for(int i = 0; i < test.length; i++) {
-            for(int j = 0; j < test[i].length; j++) {
-                System.out.print(test[i][j] + " ");
-            }
-            System.out.println();
-        }
-
+        int depth = 20;
+        System.out.println(--depth);
+        System.out.println(depth);
+        System.out.println(10 + 10);
 
     }
 

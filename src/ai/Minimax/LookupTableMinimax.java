@@ -6,6 +6,7 @@ import game.Move;
 import game.State;
 
 import java.sql.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ public class LookupTableMinimax extends AI {
     private int CURR_MAX_DEPTH;
     private HashMap<Long, MinimaxPlay> transpoTable;
     private HashMap<Long, MinimaxPlay> lookupTable;
-    private boolean done;
+    private boolean done = false;
 
     private String JDBC_URL = "jdbc:derby:lookupDB;create=true";
     private Connection conn;
@@ -78,29 +79,30 @@ public class LookupTableMinimax extends AI {
 
     private MinimaxPlay iterativeDeepeningMinimax(State state) {
         CURR_MAX_DEPTH =0;
-        done = false;
+        boolean cutoff = false;
         int doneCounter = 0;
         MinimaxPlay play = null;
-        while (!done) {
+        while (!cutoff) {
+            transpoTable = new HashMap<>();
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
             CURR_MAX_DEPTH += 1;
             int prevSize = lookupTable.size();
 
-            play = minimax(simNode, CURR_MAX_DEPTH);
+            play = minimax(simNode, 0);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH + ", LOOKUP TABLE SIZE: " + lookupTable.size() +
                     ", TRANSPO TABLE SIZE: " + transpoTable.size());
-            if (lookupTable.size() == prevSize) {
+            if (lookupTable.size() == prevSize && lookupTable.size() > 0) {
+                done = true;
                 doneCounter++;
-                if(doneCounter == 5) done = true;
-                else doneCounter = 0;
                 /*
                 if(lookupTable.size() == transpoTable.size() && Math.abs(play.score) >= 1000) {
                     done = true;
                 }
                 */
-            }
+            } else doneCounter = 0;
 
 
+            if(doneCounter == 3) cutoff = true;
 
             if(Math.abs(play.score) >= 1000) {
                 String player = (team == RED) ? "RED" : "BLACK";
@@ -116,20 +118,30 @@ public class LookupTableMinimax extends AI {
         Move bestMove = null;
         int bestScore = (node.getState().getTurn() == team) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         int score;
+        boolean exploredChildren = true;
 
-        if (Logic.gameOver(node.getState()) || depth == 0) {
+        if (Logic.gameOver(node.getState()) || depth == CURR_MAX_DEPTH) {
             return new MinimaxPlay(bestMove, heuristic(node.getState(), depth), depth);
         }
-        MinimaxPlay lookupPlay = lookupTable.get(node.getHashCode());
-        if(lookupPlay != null)
-            return lookupPlay;
         MinimaxPlay transpoPlay = transpoTable.get(node.getHashCode());
-        if (transpoPlay != null && depth <= transpoPlay.depth) {
+        if (transpoPlay != null && transpoPlay.depth  <= depth) {
+
+            int depthDiff = depth - transpoPlay.depth;
+
+            if (transpoPlay.score > 1000) {
+                return new MinimaxPlay(transpoPlay.move, transpoPlay.score - depthDiff, depth);
+            } else if (transpoPlay.score < -1000) {
+                return new MinimaxPlay(transpoPlay.move, transpoPlay.score + depthDiff, depth);
+            }
+
             return transpoPlay;
         }
-        boolean exploredChildren = true;
         for (Node child : node.getChildren()) {
-            score = minimax(child, depth - 1).score;
+            score = minimax(child, depth + 1).score;
+            if(score == 0 && done) {
+                // This situation is very rare and occurs when the first player to break the loop is in a losing position. Thus, the move is evaluated high
+                score = (node.getState().getTurn() == team) ? 1000 : -1000;
+            }
             if(score == 0) exploredChildren = false;
             if (node.getState().getTurn() == team) {
                 if (score > bestScore) {
@@ -142,30 +154,12 @@ public class LookupTableMinimax extends AI {
                     bestMove = child.getState().getMove();
                 }
             }
-            if(node.getHashCode() == 3160681311271971840L) {
-                System.out.println("Child of first left:");
-                System.out.println("Score: " + score);
-
-            }
-            if(node.getHashCode() == 486350317451566080L) {
-                System.out.println("Child of second middle:");
-                System.out.println("Score: " + score);
-            }
-            if(score == 0 && done) {
-                System.out.println("SCORE: " + score);
-                System.out.println("DEPTH: " + depth);
-                System.out.println("CHILD IN LOOKUP: " + lookupTable.containsKey(child.getHashCode()));
-
-            }
         }
-        if(!exploredChildren && done) {
-            System.out.println("BESTSCORE: " + bestScore);
-        }
-        if (transpoPlay == null || depth > transpoPlay.depth) {
+        if (transpoPlay == null || depth < transpoPlay.depth) {
             transpoTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
         }
         MinimaxPlay play = lookupTable.get(node.getHashCode());
-        if( (play == null && exploredChildren && Math.abs(bestScore) >= 1000)) {
+        if( ((play == null /* || depth <= play.depth*/) && exploredChildren)) {
             lookupTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
         }
         return new MinimaxPlay(bestMove, bestScore, depth);
@@ -173,15 +167,14 @@ public class LookupTableMinimax extends AI {
 
     private int heuristic(State state, int depth) {
         int m = 2000;
-        int n = CURR_MAX_DEPTH - depth;
         int opponent = (team == RED) ? BLACK : RED;
-        int winner = Logic.getWinner(state);
-        if (winner == team)
-            //return 1000;
-            return m-n;
-        else if (winner == opponent)
-            //return -1000;
-            return -(m-n);
+        if(Logic.gameOver(state)) {
+            int winner = Logic.getWinner(state);
+            if (winner == team)
+                return m-depth;
+            else if (winner == opponent)
+                return -(m-depth);
+        }
         return 0;
     }
 

@@ -155,6 +155,7 @@ public class Controller {
         });
         // help human checkbox
         helpHumanBox.selectedProperty().addListener((observableValue, oldValue, newValue) -> {
+            helpHumanBox.setDisable(true);
             if(newValue) {
                 if(getConnection(pointsToWin)) {
                     helpHumanBox.setSelected(true);
@@ -174,6 +175,7 @@ public class Controller {
                 helpHumanBox.setSelected(false);
                 highlightBestPiece(false);
             }
+            helpHumanBox.setDisable(false);
         });
 
         playArea.update(this);
@@ -360,18 +362,28 @@ public class Controller {
             e.printStackTrace();
         }
         if(play == null) {
-            System.err.println("PLAY DOES NOT EXIST IN DATABASE! EXITING");
-            System.exit(0);
+            System.err.println("PLAY DOES NOT EXIST IN DATABASE!");
         }
         return play;
     }
 
     private String turnsToTerminal(int score) {
         // TODO - incorrect
+        if(score == Math.abs(1000)) {
+            return "∞";
+        }
         if(score > 0) {
-            return "" + (2000-score - turnNo);
+            if(state.getTurn() == BLACK) {
+                return "" + (-2000 + score + turnNo);
+            } else {
+                return "" + (2000 - score - turnNo);
+            }
         } else {
-            return "" + (-2000-score + turnNo);
+            if(state.getTurn() == BLACK) {
+                return "" + (2000 + score - turnNo);
+            } else {
+                return "" + (-2000 - score + turnNo);
+            }
         }
     }
 
