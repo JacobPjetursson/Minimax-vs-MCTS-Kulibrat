@@ -374,15 +374,15 @@ public class Controller {
         }
         if(score > 0) {
             if(state.getTurn() == BLACK) {
-                return "" + (-2000 + score + turnNo);
+                return "" + (-2000 + score);
             } else {
-                return "" + (2000 - score - turnNo);
+                return "" + (2000 - score);
             }
         } else {
             if(state.getTurn() == BLACK) {
-                return "" + (2000 + score - turnNo);
+                return "" + (2000 + score);
             } else {
-                return "" + (-2000 - score + turnNo);
+                return "" + (-2000 - score);
             }
         }
     }

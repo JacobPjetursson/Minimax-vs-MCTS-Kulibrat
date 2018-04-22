@@ -83,10 +83,11 @@ public class LookupTableMinimax extends AI {
         int doneCounter = 0;
         MinimaxPlay play = null;
         while (!cutoff) {
-            transpoTable = new HashMap<>();
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
-            CURR_MAX_DEPTH += 1;
+            transpoTable = new HashMap<>();
             int prevSize = lookupTable.size();
+            lookupTable = new HashMap<>();
+            CURR_MAX_DEPTH += 1;
 
             play = minimax(simNode, 0);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH + ", LOOKUP TABLE SIZE: " + lookupTable.size() +
@@ -124,8 +125,8 @@ public class LookupTableMinimax extends AI {
             return new MinimaxPlay(bestMove, heuristic(node.getState(), depth), depth);
         }
         MinimaxPlay transpoPlay = transpoTable.get(node.getHashCode());
-        if (transpoPlay != null && transpoPlay.depth  <= depth) {
-
+        if (transpoPlay != null && transpoPlay.depth <= depth) {
+/*
             int depthDiff = depth - transpoPlay.depth;
 
             if (transpoPlay.score > 1000) {
@@ -133,13 +134,14 @@ public class LookupTableMinimax extends AI {
             } else if (transpoPlay.score < -1000) {
                 return new MinimaxPlay(transpoPlay.move, transpoPlay.score + depthDiff, depth);
             }
-
+*/
             return transpoPlay;
         }
         for (Node child : node.getChildren()) {
             score = minimax(child, depth + 1).score;
             if(score == 0 && done) {
-                // This situation is very rare and occurs when the first player to break the loop is in a losing position. Thus, the move is evaluated high
+                // This situation is very rare and occurs when the first player to break the loop is in a losing position.
+                // Thus, the move is evaluated high
                 score = (node.getState().getTurn() == team) ? 1000 : -1000;
             }
             if(score == 0) exploredChildren = false;
@@ -159,8 +161,11 @@ public class LookupTableMinimax extends AI {
             transpoTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
         }
         MinimaxPlay play = lookupTable.get(node.getHashCode());
-        if( ((play == null /* || depth <= play.depth*/) && exploredChildren)) {
-            lookupTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
+        if( ((play == null || depth < play.depth) && exploredChildren)) {
+            int tempScore = bestScore;
+            if(tempScore > 1000) tempScore += depth;
+            else if (tempScore < -1000) tempScore -= depth;
+            lookupTable.put(node.getHashCode(), new MinimaxPlay(bestMove, tempScore, depth));
         }
         return new MinimaxPlay(bestMove, bestScore, depth);
     }
