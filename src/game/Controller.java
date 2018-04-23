@@ -370,7 +370,8 @@ public class Controller {
 
     private String turnsToTerminal(int score) {
         // TODO - incorrect
-        if(score == Math.abs(1000)) {
+        if(Math.abs(score) == 1000) {
+        //if(score == 0) { // TODO - new version, update DB's
             return "∞";
         }
         if(score > 0) {

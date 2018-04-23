@@ -33,9 +33,11 @@ public class FindWinnerStrategy {
             if (Math.abs(bestPlay.score) >= 1000) done = true;
         }
         System.out.println("Score: " + bestPlay.score + ", Final Depth: " + CURR_MAX_DEPTH +
-                ", Final table size: " + transTable.size() + ", Play:  oldRow: " + bestPlay.move.oldRow + ", oldCol: " +
-                bestPlay.move.oldCol + ", newRow: " + bestPlay.move.newRow + ", newCol: " +
-                bestPlay.move.newCol + ", team: " + bestPlay.move.team);
+                ", Final table size: " + transTable.size());
+        String teamstr = (team == RED) ? "Red" : "Black";
+        String oppstr = (team == RED) ? "Black" : "Red";
+        String winner = (bestPlay.score > 0) ? teamstr : oppstr;
+        System.out.println("The winning strategy goes to " + winner + ". It was found in " + CURR_MAX_DEPTH + " turns!");
         System.out.println("TIME SPENT: " + (System.currentTimeMillis() - startTime));
     }
 
@@ -49,13 +51,9 @@ public class FindWinnerStrategy {
         }
         MinimaxPlay transpoPlay;
         transpoPlay = transTable.get(node.getHashCode());
-        if (transpoPlay != null && (depth <= transpoPlay.depth
-                //|| Math.abs(transpoPlay.score) == 1000)) {
-                && CURR_MAX_DEPTH-depth+transpoPlay.depth <= CURR_MAX_DEPTH ) ) {
+        if (transpoPlay != null && (depth <= transpoPlay.depth || Math.abs(transpoPlay.score) == 1000)) {
             return transpoPlay;
         }
-
-
         if (depth == CURR_MAX_DEPTH && prevBestNode != null) {
             score = minimax(prevBestNode, depth - 1, alpha, beta).score;
             if (node.getState().getTurn() == team) {
@@ -72,7 +70,6 @@ public class FindWinnerStrategy {
                 beta = Math.min(score, beta);
             }
         }
-
         for (Node child : node.getChildren()) {
             if (depth == CURR_MAX_DEPTH) if (child.equals(prevBestNode)) continue;
             score = minimax(child, depth - 1, alpha, beta).score;
@@ -95,7 +92,6 @@ public class FindWinnerStrategy {
             prevBestNode = node.getNextNode(bestMove);
         }
         if (transpoPlay == null || depth > transpoPlay.depth) {
-        //if (transpoPlay == null && Math.abs(bestScore) >= 1000) {
             transTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
         }
 

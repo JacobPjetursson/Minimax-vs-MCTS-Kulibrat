@@ -15,8 +15,7 @@ import static misc.Globals.RED;
 public class LookupTableMinimax extends AI {
     private boolean useDB = true;
     private int CURR_MAX_DEPTH;
-    private HashMap<Long, LookUp> lookupTable;
-    private boolean evalLoops = false;
+    private HashMap<Long, MinimaxPlay> lookupTable;
 
     private String JDBC_URL = "jdbc:derby:lookupDB;create=true";
     private Connection conn;
@@ -84,11 +83,9 @@ public class LookupTableMinimax extends AI {
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
             int prevSize = lookupTable.size();
             CURR_MAX_DEPTH += 1;
-
-            play = minimax(simNode, 0);
+            play = minimax(simNode, CURR_MAX_DEPTH);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH + ", LOOKUP TABLE SIZE: " + lookupTable.size());
             if (lookupTable.size() == prevSize) {
-                evalLoops = true;
                 doneCounter++;
             } else doneCounter = 0;
 
@@ -109,23 +106,17 @@ public class LookupTableMinimax extends AI {
         int bestScore = (node.getState().getTurn() == team) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         int score;
 
-        if (Logic.gameOver(node.getState()) || depth == CURR_MAX_DEPTH) {
+        if (Logic.gameOver(node.getState()) || depth == 0) {
             return new MinimaxPlay(bestMove, heuristic(node.getState()), depth);
         }
-        LookUp transpoPlay = lookupTable.get(node.getHashCode());
-        if (transpoPlay != null && transpoPlay.play.depth <= depth &&
-                (transpoPlay.depthLimit - transpoPlay.play.depth) >= (CURR_MAX_DEPTH - depth)) {
-            return transpoPlay.play;
+        MinimaxPlay transpoPlay = lookupTable.get(node.getHashCode());
+        if (transpoPlay != null && depth <= transpoPlay.depth) {
+            return transpoPlay;
         }
         for (Node child : node.getChildren()) {
-            score = minimax(child, depth + 1).score;
+            score = minimax(child, depth - 1).score;
             if(score > 1000) score--;
             else if (score < -1000) score++;
-            if(score == 0 && evalLoops) {
-                // This situation is very rare and occurs when the first player to break the loop is in a losing position.
-                // Thus, the move is evaluated high
-                score = (node.getState().getTurn() == team) ? 1000 : -1000;
-            }
             if (node.getState().getTurn() == team) {
                 if (score > bestScore) {
                     bestScore = score;
@@ -138,9 +129,9 @@ public class LookupTableMinimax extends AI {
                 }
             }
         }
-        if (transpoPlay == null || depth <= transpoPlay.play.depth) {
+        if (transpoPlay == null || depth > transpoPlay.depth) {
             lookupTable.put(node.getHashCode(),
-                    new LookUp(new MinimaxPlay(bestMove, bestScore, depth), CURR_MAX_DEPTH));
+                   new MinimaxPlay(bestMove, bestScore, depth));
         }
         return new MinimaxPlay(bestMove, bestScore, depth);
     }
@@ -188,9 +179,9 @@ public class LookupTableMinimax extends AI {
         final int batchSize = 1000;
         int count = 0;
         PreparedStatement stmt = conn.prepareStatement("insert into " + tableName + " values (?, ?, ?, ?, ?, ?, ?)");
-        for (Map.Entry<Long, LookUp> entry : lookupTable.entrySet()) {
+        for (Map.Entry<Long, MinimaxPlay> entry : lookupTable.entrySet()) {
             Long key = entry.getKey();
-            MinimaxPlay value = entry.getValue().play;
+            MinimaxPlay value = entry.getValue();
             stmt.setLong(1, key);
             stmt.setInt(2, value.move.oldRow);
             stmt.setInt(3, value.move.oldCol);
@@ -228,15 +219,6 @@ public class LookupTableMinimax extends AI {
             System.exit(0);
         }
         return play;
-    }
-    private class LookUp {
-        MinimaxPlay play;
-        int depthLimit;
-
-        LookUp(MinimaxPlay play, int depthLimit) {
-            this.play = play;
-            this.depthLimit = depthLimit;
-        }
     }
 }
 
