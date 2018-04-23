@@ -121,7 +121,7 @@ public class LookupTableMinimax extends AI {
         boolean exploredChildren = true;
 
         if (Logic.gameOver(node.getState()) || depth == CURR_MAX_DEPTH) {
-            return new MinimaxPlay(bestMove, heuristic(node.getState(), depth), depth);
+            return new MinimaxPlay(bestMove, heuristic(node.getState()), depth);
         }
         TranspoEntry transpoPlay = transpoTable.get(node.getHashCode());
         if (transpoPlay != null && transpoPlay.play.depth <= depth &&
@@ -130,12 +130,15 @@ public class LookupTableMinimax extends AI {
         }
         for (Node child : node.getChildren()) {
             score = minimax(child, depth + 1).score;
+            if(score > 1000) score--;
+            else if (score < -1000) score++;
             if(score == 0 && done) {
                 // This situation is very rare and occurs when the first player to break the loop is in a losing position.
                 // Thus, the move is evaluated high
                 score = (node.getState().getTurn() == team) ? 1000 : -1000;
             }
             if(score == 0) exploredChildren = false;
+
             if (node.getState().getTurn() == team) {
                 if (score > bestScore) {
                     bestScore = score;
@@ -154,23 +157,19 @@ public class LookupTableMinimax extends AI {
         }
         MinimaxPlay play = lookupTable.get(node.getHashCode());
         if( ((play == null || depth <= play.depth) && exploredChildren)) {
-            int tempScore = bestScore;
-            if(tempScore > 1000) tempScore += depth;
-            else if (tempScore < -1000) tempScore -= depth;
-            lookupTable.put(node.getHashCode(), new MinimaxPlay(bestMove, tempScore, depth));
+            lookupTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
         }
         return new MinimaxPlay(bestMove, bestScore, depth);
     }
 
-    private int heuristic(State state, int depth) {
-        int m = 2000;
+    private int heuristic(State state) {
         int opponent = (team == RED) ? BLACK : RED;
         if(Logic.gameOver(state)) {
             int winner = Logic.getWinner(state);
             if (winner == team)
-                return m-depth;
+                return 2000;
             else if (winner == opponent)
-                return -(m-depth);
+                return -2000;
         }
         return 0;
     }

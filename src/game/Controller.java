@@ -156,11 +156,11 @@ public class Controller {
         // help human checkbox
         helpHumanBox.selectedProperty().addListener((observableValue, oldValue, newValue) -> {
             helpHumanBox.setDisable(true);
+            deselect();
             if(newValue) {
                 if(getConnection(pointsToWin)) {
                     helpHumanBox.setSelected(true);
                     highlightBestPiece(true);
-                    deselect();
                 } else {
                     helpHumanBox.setSelected(false);
                 }
@@ -315,7 +315,8 @@ public class Controller {
     }
 
     private void highlightBestPiece(boolean highlight) {
-        MinimaxPlay bestPlay = queryPlay(new Node(state));
+        MinimaxPlay bestPlay = null;
+        if (highlight) bestPlay = queryPlay(new Node(state));
         BoardTile[][] tiles = playArea.getBoard().getTiles();
         for(int i = 0; i < tiles.length; i++) {
             for(int j = 0; j < tiles[i].length; j++) {
