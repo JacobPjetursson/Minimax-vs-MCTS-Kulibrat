@@ -250,11 +250,7 @@ public class LookupTableMinimax extends AI {
         MinimaxPlay play;
         int maxDepth;
 
-        public TranspoEntry(Move move, int score, int depth, int maxDepth) {
-            this.play = new MinimaxPlay(move, score, depth);
-            this.maxDepth = maxDepth;
-        }
-        public TranspoEntry(MinimaxPlay play, int maxDepth) {
+        TranspoEntry(MinimaxPlay play, int maxDepth) {
             this.play = new MinimaxPlay(play.move, play.score, play.depth);
             this.maxDepth = maxDepth;
         }
