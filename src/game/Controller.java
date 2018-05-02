@@ -3,6 +3,7 @@ package game;
 import ai.AI;
 import ai.MCTS.MCTS;
 import ai.Minimax.*;
+import ai.Minimax.Experimental.UltraWeak;
 import gui.EndGamePane;
 import gui.NavPane;
 import gui.PlayArea;
@@ -31,7 +32,7 @@ public class Controller {
     private int playerBlackInstance;
     private int redTime;
     private int blackTime;
-    private int pointsToWin;
+    private int scoreLimit;
     private boolean overwriteDB;
     private int turnNo;
     private AI aiRed;
@@ -50,21 +51,20 @@ public class Controller {
     private PlayArea playArea;
     private Goal goalRed;
     private Goal goalBlack;
-
     private boolean endGamePopup;
 
     public Controller(Stage primaryStage, int playerRedInstance, int playerBlackInstance,
-                      int pointsToWin, int redTime, int blackTime, boolean overwriteDB) {
+                      int scoreLimit, int redTime, int blackTime, boolean overwriteDB) {
         Zobrist.initialize(); // Generate random numbers for state configs
         this.mode = setMode(playerRedInstance, playerBlackInstance);
         this.playerRedInstance = playerRedInstance;
         this.playerBlackInstance = playerBlackInstance;
-        this.pointsToWin = pointsToWin;
+        this.scoreLimit = scoreLimit;
         this.redTime = redTime;
         this.blackTime = blackTime;
         this.overwriteDB = overwriteDB;
         this.turnNo = 0;
-        this.state = new State(pointsToWin);
+        this.state = new State(scoreLimit);
         this.primaryStage = primaryStage;
         this.endGamePopup = false;
         this.curHighLights = new ArrayList<>();
@@ -122,7 +122,7 @@ public class Controller {
             for (int j = 0; j < tiles[i].length; j++) {
                 BoardTile tile = tiles[i][j];
                 tile.setOnMouseClicked(event -> {
-                    if (tile.getHighlight()) {
+                    if (tile.getHighlight() || Globals.CUSTOMIZABLE) {
                         BoardPiece piece = selected;
                         doHumanTurn(new Move(piece.getRow(), piece.getCol(), tile.getRow(), tile.getCol(), piece.getTeam()));
                     }
@@ -141,14 +141,14 @@ public class Controller {
         });
         // Goal Red
         goalRed.setOnMouseClicked(event -> {
-            if (goalRed.getHighlight()) {
+            if (goalRed.getHighlight() || Globals.CUSTOMIZABLE) {
                 BoardPiece piece = selected;
                 doHumanTurn(new Move(piece.getRow(), piece.getCol(), -1, -1, piece.getTeam()));
             }
         });
         // Goal Black
         goalBlack.setOnMouseClicked(event -> {
-            if (goalBlack.getHighlight()) {
+            if (goalBlack.getHighlight() || Globals.CUSTOMIZABLE) {
                 BoardPiece piece = selected;
                 doHumanTurn(new Move(piece.getRow(), piece.getCol(), -1, -1, piece.getTeam()));
             }
@@ -158,7 +158,7 @@ public class Controller {
             helpHumanBox.setDisable(true);
             deselect();
             if(newValue) {
-                if(getConnection(pointsToWin)) {
+                if(getConnection(scoreLimit)) {
                     helpHumanBox.setSelected(true);
                     highlightBestPiece(true);
                 } else {
@@ -251,7 +251,7 @@ public class Controller {
             move = aiBlack.makeMove(state);
         }
         state = state.getNextState(move);
-        turnNo++;
+
         if (aiRed != null) aiRed.update(state);
         if (aiBlack != null) aiBlack.update(state);
         // Update gui elements on another thread
@@ -283,7 +283,7 @@ public class Controller {
             newStage.show();
         }
     }
-    private boolean getConnection(int pointsToWin) {
+    private boolean getConnection(int scoreLimit) {
         String JDBC_URL = "jdbc:derby:lookupDB;create=true";
         System.out.println("Connecting to database. This might take some time");
         try {
@@ -294,7 +294,7 @@ public class Controller {
         }
         System.out.println("Connection successful");
 
-        String tableName = "plays_" + pointsToWin;
+        String tableName = "plays_" + scoreLimit;
         long key = new Node(state).getHashCode();
         // Try query to check for table existance
         try {
@@ -346,7 +346,7 @@ public class Controller {
 
     private MinimaxPlay queryPlay(Node n) {
         MinimaxPlay play = null;
-        String tableName = "plays_" + pointsToWin;
+        String tableName = "plays_" + scoreLimit;
         Long key = n.getHashCode();
         try {
             Statement statement = dbConnection.createStatement();
@@ -470,8 +470,8 @@ public class Controller {
     public int getTurnNo() {
         return turnNo;
     }
-    public int getPointsToWin() {
-        return pointsToWin;
+    public int getScoreLimit() {
+        return scoreLimit;
     }
     public int getMode() {
         return mode;

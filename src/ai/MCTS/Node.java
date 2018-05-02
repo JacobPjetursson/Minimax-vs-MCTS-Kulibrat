@@ -35,7 +35,7 @@ public class Node {
         this.state = new State(node.getState());
     }
 
-    public Node getNextNode(Move m) {
+    Node getNextNode(Move m) {
         if (children == null) {
             Node node = new Node(this);
             Logic.doTurn(m, node.getState());
@@ -52,19 +52,19 @@ public class Node {
         return state;
     }
 
-    public double getPlays() {
+    double getPlays() {
         return plays;
     }
 
-    public double getWins() {
+    double getWins() {
         return wins;
     }
 
-    public void incrementPlays() {
+    void incrementPlays() {
         plays++;
     }
 
-    public void setParent(Node node) {
+    void setParent(Node node) {
         parent = node;
     }
 
@@ -79,12 +79,12 @@ public class Node {
         return children;
     }
 
-    public double UCB() {
+    double UCB() {
         double payOff = (wins / plays);
         return payOff + explorationConstant * Math.sqrt(2 * Math.log(parent.plays) / plays);
     }
 
-    public void backPropagate(int winner) {
+    void backPropagate(int winner) {
         Node node = this;
         while (node.parent != null) {
             node.plays++;
@@ -94,16 +94,4 @@ public class Node {
             node = node.parent;
         }
     }
-/*
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Node)) return false;
-        return state.equals(((Node) obj).state);
-    }
-
-    @Override
-    public int hashCode() {
-        return state.hashCode();
-    }
-*/
 }

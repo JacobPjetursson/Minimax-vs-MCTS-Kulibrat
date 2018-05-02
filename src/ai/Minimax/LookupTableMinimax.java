@@ -25,13 +25,13 @@ public class LookupTableMinimax extends AI {
         lookupTable = new HashMap<>();
 
         if (useDB) {
-            conn = getConnection(state.getPointsToWin());
+            conn = getConnection(state.getScoreLimit());
             if (overwriteDB) {
                 this.team = RED;
                 System.out.println("Rebuilding lookup table. This will take some time.");
                 buildLookupTable(state);
                 try {
-                    fillTable(state.getPointsToWin());
+                    fillTable(state.getScoreLimit());
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -51,7 +51,7 @@ public class LookupTableMinimax extends AI {
         Node simNode = new Node(state);
         MinimaxPlay play;
         if (useDB) {
-            play = queryData(simNode.getHashCode(), state.getPointsToWin());
+            play = queryData(simNode.getHashCode(), state.getScoreLimit());
         } else {
             play = iterativeDeepeningMinimax(state);
         }
@@ -148,7 +148,7 @@ public class LookupTableMinimax extends AI {
         return 0;
     }
 
-    private Connection getConnection(int pointsToWin) {
+    private Connection getConnection(int scoreLimit) {
         System.out.println("Connecting to database. This might take some time");
         Connection conn = null;
         try {
@@ -160,7 +160,7 @@ public class LookupTableMinimax extends AI {
         System.out.println("Connection successful");
 
         // Creating the table, if it does not exist already
-        String tableName = "plays_" + pointsToWin;
+        String tableName = "plays_" + scoreLimit;
         try {
             conn.createStatement().execute("create table " + tableName +
                    "(id bigint primary key, oldRow smallint, oldCol smallint, newRow smallint, newCol smallint, team smallint, score smallint)");
@@ -170,9 +170,9 @@ public class LookupTableMinimax extends AI {
         return conn;
     }
 
-    private void fillTable(int pointsToWin) throws SQLException {
+    private void fillTable(int scoreLimit) throws SQLException {
         System.out.println("Inserting data into table. This will take some time");
-        String tableName = "plays_" + pointsToWin;
+        String tableName = "plays_" + scoreLimit;
         long startTime = System.currentTimeMillis();
         conn.createStatement().execute("truncate table " + tableName);
 
@@ -200,9 +200,9 @@ public class LookupTableMinimax extends AI {
         System.out.println("Data inserted successfully. Time spent: " + (System.currentTimeMillis() - startTime));
     }
 
-    private MinimaxPlay queryData(Long key, int pointsToWin) {
+    private MinimaxPlay queryData(Long key, int scoreLimit) {
         MinimaxPlay play = null;
-        String tableName = "plays_" + pointsToWin;
+        String tableName = "plays_" + scoreLimit;
         try {
             Statement statement = conn.createStatement();
             ResultSet resultSet = statement.executeQuery("select oldRow, oldCol, newRow, newCol, team, score from " + tableName + " where id=" + key);

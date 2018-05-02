@@ -56,7 +56,7 @@ public class EndGamePane extends AnchorPane {
             Stage stage = (Stage) getScene().getWindow();
             stage.close();
             new Controller(primaryStage, cont.getPlayerInstance(RED),
-                    cont.getPlayerInstance(BLACK), cont.getPointsToWin(), cont.getTime(RED), cont.getTime(BLACK), cont.getOverwriteDB());
+                    cont.getPlayerInstance(BLACK), cont.getScoreLimit(), cont.getTime(RED), cont.getTime(BLACK), cont.getOverwriteDB());
         });
 
         getChildren().addAll(label, menu, restartGame);

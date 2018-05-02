@@ -21,7 +21,7 @@ public class InfoPane extends VBox {
     private Label turnNumberLabel;
     private int prevTurn = 0;
 
-    public InfoPane(int pointsToWin, int mode) {
+    public InfoPane(int scoreLimit, int mode) {
 
         setPrefSize(Globals.WIDTH / 3, Globals.HEIGHT);
         setSpacing(40);
@@ -40,8 +40,8 @@ public class InfoPane extends VBox {
         turnNumberLabel = new Label("Turn number: 0");
         turnNumberLabel.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
 
-        Label pointsToWinLabel = new Label("Points To Win: " + pointsToWin);
-        pointsToWinLabel.setFont(Font.font("Verdana", 15));
+        Label scoreLimitLabel = new Label("Score limit: " + scoreLimit);
+        scoreLimitLabel.setFont(Font.font("Verdana", 15));
 
         String modeText = (mode == HUMAN_VS_HUMAN) ? "Human vs. Human" :
                 (mode == HUMAN_VS_AI) ? "Human vs. AI" : "AI vs. AI";
@@ -55,7 +55,7 @@ public class InfoPane extends VBox {
         turnBox.setAlignment(Pos.CENTER);
         turnBox.setSpacing(15);
 
-        VBox infoBox = new VBox(pointsToWinLabel, modeLabel, skippedTurn);
+        VBox infoBox = new VBox(scoreLimitLabel, modeLabel, skippedTurn);
         infoBox.setAlignment(Pos.CENTER);
         infoBox.setSpacing(15);
 

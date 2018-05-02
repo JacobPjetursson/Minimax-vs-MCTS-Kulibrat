@@ -15,13 +15,13 @@ public class State {
     private int blackScore;
     private int unplacedRed;
     private int unplacedBlack;
-    private int pointsToWin;
+    private int scoreLimit;
 
     private ArrayList<Move> legalMoves;
     private Move move;
 
     // Starting state
-    public State(int pointsToWin) {
+    public State(int scoreLimit) {
         int rows = 4;
         int columns = 3;
         board = new int[rows][columns]; // Initializes to 0 (Java standard)
@@ -30,7 +30,7 @@ public class State {
         unplacedRed = 4;
         unplacedBlack = 4;
         turn = RED;
-        this.pointsToWin = pointsToWin;
+        this.scoreLimit = scoreLimit;
     }
 
     // Duplicate constructor, for "root" state
@@ -44,7 +44,7 @@ public class State {
         unplacedRed = state.unplacedRed;
         unplacedBlack = state.unplacedBlack;
         turn = state.turn;
-        pointsToWin = state.pointsToWin;
+        scoreLimit = state.scoreLimit;
 
         move = state.move;
     }
@@ -83,8 +83,8 @@ public class State {
         this.turn = turn;
     }
 
-    public int getPointsToWin() {
-        return pointsToWin;
+    public int getScoreLimit() {
+        return scoreLimit;
     }
 
     public void addUnPlaced(int team) {
@@ -146,7 +146,7 @@ public class State {
         if (!(obj instanceof State)) return false;
         State state = (State) obj;
         return this == state || turn == state.getTurn() &&
-                pointsToWin == state.getPointsToWin() &&
+                scoreLimit == state.getScoreLimit() &&
                 Arrays.deepEquals(board, state.board) &&
                 redScore == state.getScore(RED) &&
                 blackScore == state.getScore(BLACK);
@@ -154,7 +154,7 @@ public class State {
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(turn, pointsToWin, redScore, blackScore);
+        int result = Objects.hash(turn, scoreLimit, redScore, blackScore);
         result = 31 * result + Arrays.deepHashCode(board);
         return result;
 

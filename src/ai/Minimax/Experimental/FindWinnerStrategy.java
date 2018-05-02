@@ -110,9 +110,9 @@ public class FindWinnerStrategy {
 
     public static void main(String[] args) {
         Zobrist.initialize();
-        int pointsToWin = 2;
-        System.out.println("Finding the optimal strategy when playing to " + pointsToWin + " points");
-        State state = new State(pointsToWin);
+        int scoreLimit = 2;
+        System.out.println("Finding the optimal strategy when playing to " + scoreLimit + " points");
+        State state = new State(scoreLimit);
         iterativeDeepeningMinimax(state);
     }
 }

@@ -40,8 +40,4 @@ public class Zobrist {
             blackPoints[i] = (long) (r.nextDouble() * range);
         }
     }
-
-    public static long[] points(int team) {
-        return (team == RED) ? redPoints : blackPoints;
-    }
 }

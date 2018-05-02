@@ -43,11 +43,13 @@ public class Minimax extends AI {
     private MinimaxPlay iterativeDeepeningMinimax(State state, long startTime) {
         resetVariables();
         MinimaxPlay bestPlay = null;
-        while (!outOfTime(startTime)) {
+        boolean winCutOff = false;
+        while (!outOfTime(startTime) && !winCutOff) {
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
             CURR_MAX_DEPTH++;
             MinimaxPlay play = minimax(simNode, CURR_MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, startTime);
             if (!searchCutOff) bestPlay = play;
+            if(Math.abs(play.score) >= 1000) winCutOff = true;
         }
         // random move if null (No time to calculate minimax)
         if (bestPlay == null) {
@@ -73,7 +75,7 @@ public class Minimax extends AI {
         MinimaxPlay transpoPlay = null;
         if (useTranspo) {
             transpoPlay = transTable.get(node.getHashCode());
-            if (transpoPlay != null && (depth <= transpoPlay.depth ||Math.abs(transpoPlay.score) >= 1000) ) {
+            if (transpoPlay != null && (depth <= transpoPlay.depth || Math.abs(transpoPlay.score) >= 1000) ) {
                 return transpoPlay;
             }
         }

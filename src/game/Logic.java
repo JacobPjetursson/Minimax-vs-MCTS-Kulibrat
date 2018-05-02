@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 import static misc.Globals.BLACK;
+import static misc.Globals.CUSTOMIZABLE;
 import static misc.Globals.RED;
 
 public abstract class Logic {
@@ -102,7 +103,7 @@ public abstract class Logic {
 
     public static void doTurn(Move m, State state) {
         if (gameOver(state)) return;
-        else if (m.team != state.getTurn()) {
+        else if (m.team != state.getTurn() && !CUSTOMIZABLE) {
             System.out.println("Not your turn");
             return;
         }
@@ -133,8 +134,8 @@ public abstract class Logic {
     }
 
     public static boolean gameOver(State state) {
-        return state.getScore(RED) == state.getPointsToWin() ||
-                state.getScore(BLACK) == state.getPointsToWin() || locked(state);
+        return state.getScore(RED) == state.getScoreLimit() ||
+                state.getScore(BLACK) == state.getScoreLimit() || locked(state);
     }
 
     private static void passTurn(State state) {

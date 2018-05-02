@@ -4,6 +4,7 @@ import game.Controller;
 import gui.PlayArea;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import misc.Globals;
 
 import static misc.Globals.*;
 
@@ -12,7 +13,7 @@ public class BoardPiece extends Circle {
     private Controller cont;
 
     private Color color;
-    private Color yellow = new Color(0.9, 0.7, 0, 1);
+    private Color yellow = new Color(0.2, 0.7, 0, 1);
     private boolean selected;
     private boolean best;
     private int team;
@@ -91,8 +92,8 @@ public class BoardPiece extends Circle {
     }
 
     private boolean isControllable() {
-        return cont.getPlayerInstance(team) == HUMAN &&
-                cont.getState().getTurn() == this.team;
+        return Globals.CUSTOMIZABLE || (cont.getPlayerInstance(team) == HUMAN &&
+                cont.getState().getTurn() == this.team);
     }
 
     public int getCol() {

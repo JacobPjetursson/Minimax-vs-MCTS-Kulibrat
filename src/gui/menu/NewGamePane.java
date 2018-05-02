@@ -135,18 +135,18 @@ public class NewGamePane extends AnchorPane {
         HBox playerBlack = new HBox(playerBlackLabel, playerBlackChoices);
         playerBlack.setAlignment(Pos.CENTER);
 
-        ChoiceBox<Integer> pointsToWinChoices = new ChoiceBox<>();
-        pointsToWinChoices.setValue(5);
-        pointsToWinChoices.setItems(FXCollections.observableArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
-        pointsToWinChoices.setMinWidth(choiceWidth);
-        pointsToWinChoices.setMaxWidth(choiceWidth);
+        ChoiceBox<Integer> scoreLimitChoices = new ChoiceBox<>();
+        scoreLimitChoices.setValue(5);
+        scoreLimitChoices.setItems(FXCollections.observableArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+        scoreLimitChoices.setMinWidth(choiceWidth);
+        scoreLimitChoices.setMaxWidth(choiceWidth);
 
-        Label pointsToWinLabel = new Label("Points to win: ");
-        pointsToWinLabel.setFont(Font.font("Verdana", 15));
-        pointsToWinLabel.setPadding(new Insets(0, 10, 0, 0));
-        pointsToWinLabel.setTextFill(Color.WHITE);
-        HBox pointsToWinBox = new HBox(pointsToWinLabel, pointsToWinChoices);
-        pointsToWinBox.setAlignment(Pos.CENTER);
+        Label scoreLimitLabel = new Label("Score limit: ");
+        scoreLimitLabel.setFont(Font.font("Verdana", 15));
+        scoreLimitLabel.setPadding(new Insets(0, 10, 0, 0));
+        scoreLimitLabel.setTextFill(Color.WHITE);
+        HBox scoreLimitBox = new HBox(scoreLimitLabel, scoreLimitChoices);
+        scoreLimitBox.setAlignment(Pos.CENTER);
 
 
         redDelayField = new TextField("1000");
@@ -245,7 +245,7 @@ public class NewGamePane extends AnchorPane {
             }
 
             new Controller(stage, playerRedMode,
-                    playerBlackMode, pointsToWinChoices.getValue(),
+                    playerBlackMode, scoreLimitChoices.getValue(),
                     Integer.parseInt(redDelayField.getText()),
                     Integer.parseInt(blackDelayField.getText()), overwriteDB.isSelected());
         });
@@ -262,7 +262,7 @@ public class NewGamePane extends AnchorPane {
         btnBox.setAlignment(Pos.CENTER);
         btnBox.setSpacing(20);
 
-        finalBox = new VBox(playerRed, playerBlack, pointsToWinBox, btnBox);
+        finalBox = new VBox(playerRed, playerBlack, scoreLimitBox, btnBox);
         finalBox.setAlignment(Pos.CENTER);
         finalBox.setSpacing(30);
 

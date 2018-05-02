@@ -63,7 +63,7 @@ public class Node {
 /*
         State state = (State) obj;
         return this == state || turn == state.getTurn() &&
-                pointsToWin == state.getPointsToWin() &&
+                scoreLimit == state.scoreLimit() &&
                 Arrays.deepEquals(board, state.board) &&
                 //getPieces(RED).equals(state.getPieces(RED)) &&
                 //getPieces(BLACK).equals(state.getPieces(BLACK)) &&
@@ -76,8 +76,8 @@ public class Node {
     public int hashCode() {
         return (int) hash;
 /*
-        int result = Objects.hash(turn, pointsToWin, redScore, blackScore);
-        //int result = Objects.hash(getPieces(RED), getPieces(BLACK), turn, redScore, blackScore, pointsToWin);
+        int result = Objects.hash(turn, scoreLimit, redScore, blackScore);
+        //int result = Objects.hash(getPieces(RED), getPieces(BLACK), turn, redScore, blackScore, scoreLimit);
         result = 31 * result + Arrays.deepHashCode(board);
         return result;
 */

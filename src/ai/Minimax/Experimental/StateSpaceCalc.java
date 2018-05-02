@@ -19,7 +19,6 @@ public class StateSpaceCalc {
     private static int team = RED;
     private static boolean findBranchFactor = true;
 
-
     private static void calcBoardPositions(State state) {
         fullSpace = produceStateSpace();
         iterativeDeepeningMinimax(state);
@@ -48,7 +47,7 @@ public class StateSpaceCalc {
         Move bestMove = null;
         int bestScore = (node.getState().getTurn() == team) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         int score;
-        if (Logic.gameOver(node.getState()) || depth == 0) {
+        if (depth == 0) {
             return new MinimaxPlay(bestMove, heuristic(node.getState()), depth);
         }
         BoardConfig bc = new BoardConfig(node.getState());
@@ -173,12 +172,14 @@ public class StateSpaceCalc {
                 }
                 System.out.println();
             }
+            String turn = (bc.getTurn() == RED) ? "Red" : "Black";
+            System.out.println("STATE TURN: " + turn);
             System.out.println();
         }
     }
     public static void main(String[] args) {
         Zobrist.initialize();
-        int scoreLimit = 10;
+        int scoreLimit = 15;
 
         State state = new State(scoreLimit);
         calcBoardPositions(state);
