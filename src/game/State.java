@@ -141,6 +141,61 @@ public class State {
         return legalMoves;
     }
 
+    public int getMaterial(int team) {
+        int score = 0;
+        int opponent = (turn == BLACK) ? BLACK : RED;
+
+        // Bonus for legal moves
+        score += (getLegalMoves().size() * 2);
+
+        // Bonus for being in front of opponent on your turn
+        for (Point pR : getPieces(RED)) {
+            for (Point pB : getPieces(BLACK)) {
+                if (pR.x == pB.x && (pR.y-1) == pB.y) {
+                    score += 2;
+                }
+            }
+        }
+        // Win cycle bonus
+        boolean bot = false;
+        boolean mid = false;
+        boolean top = false;
+        int tempScore = 0;
+        // RED
+        for (Point p : getPieces(RED)) {
+            if (p.x == 1) {
+                if (p.y == 0) top = true;
+                else if (p.y == 1) mid = true;
+                else if (p.y == 2) bot = true;
+            }
+        }
+        if (mid && (top || bot)) {
+            tempScore += 20;
+        }
+        if (top && mid && bot) tempScore += 100;
+        score += (turn == RED) ? tempScore : -tempScore;
+
+        bot = false;
+        mid = false;
+        top = false;
+        tempScore = 0;
+        // BLACK
+        for (Point p : getPieces(BLACK)) {
+            if (p.x == 1) {
+                if (p.y == 3) top = true;
+                else if (p.y == 2) mid = true;
+                else if (p.y == 1) bot = true;
+            }
+        }
+        if (mid && (top || bot)) {
+            tempScore += 20;
+        }
+        if (top && mid && bot) tempScore += 100;
+        score += (turn == BLACK) ? tempScore : -tempScore;
+
+        return score;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof State)) return false;

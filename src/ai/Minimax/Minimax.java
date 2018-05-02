@@ -145,7 +145,6 @@ public class Minimax extends AI {
 
     private int heuristic(State state) {
         // TODO - play around with this
-        int scoreH = 0;
         int opponent = (team == BLACK) ? BLACK : RED;
         if (Logic.gameOver(state)) {
             int winner = Logic.getWinner(state);
@@ -153,62 +152,8 @@ public class Minimax extends AI {
                 return 1000;
             } else if (winner == opponent) return -1000;
         }
-
-        // Bonus for point difference
-        scoreH += (state.getScore(team) * 10 - state.getScore(opponent) * 10);
-
-        // Bonus for no legal moves
-        // TODO - why does this work?
-        scoreH += (10 - state.getLegalMoves().size() * 2);
-
-        // Penalty for being in front of opponent on his turn, and reward for opposite
-        for (Point pR : state.getPieces(RED)) {
-            for (Point pB : state.getPieces(BLACK)) {
-                if (pR.x == pB.x && pR.y == (pB.y - 1)) {
-                    scoreH += (state.getTurn() == team) ? 3 : -3;
-                }
-            }
-        }
-
-        // Middle section bonus
-        boolean bot = false;
-        boolean mid = false;
-        boolean top = false;
-        int tempScore = 0;
-        // RED
-        for (Point p : state.getPieces(RED)) {
-            if (p.x == 1) {
-                if (p.y == 0) top = true;
-                else if (p.y == 1) mid = true;
-                else if (p.y == 2) bot = true;
-            }
-        }
-        if ((top && mid) || (mid && bot)) {
-            tempScore += 20;
-        }
-        if (top && mid && bot) tempScore += 100;
-        scoreH += (team == RED) ? tempScore : -tempScore;
-
-        bot = false;
-        mid = false;
-        top = false;
-        tempScore = 0;
-        // BLACK
-        for (Point p : state.getPieces(BLACK)) {
-            if (p.x == 1) {
-                if (p.y == 3) top = true;
-                else if (p.y == 2) mid = true;
-                else if (p.y == 1) bot = true;
-            }
-        }
-        if ((top && mid) || (mid && bot)) {
-            tempScore += 20;
-        }
-        if (top && mid && bot) tempScore += 100;
-        scoreH += (team == BLACK) ? tempScore : -tempScore;
-
-
-        return scoreH;
+        if(state.getTurn() == team) return state.getMaterial(team);
+        else return -state.getMaterial(team);
     }
 
     private void chill(long startTime) {

@@ -15,7 +15,7 @@ public class MCTS extends AI {
     // PARAMETERS
     private long calculationTime;
     private int max_moves = 300; // todo - replace with while loop?
-    private boolean useHeuristics = false;
+    private boolean useMinimax = false;
     private boolean preplay = false;
     private int minimaxDepth = 2;
     private Minimax minimax;
@@ -62,7 +62,7 @@ public class MCTS extends AI {
                 break;
             }
             if (playOut) {
-                if (useHeuristics) {
+                if (useMinimax) {
                     // Shallow minimax search as rollout
                     minimax.setTeam(sim_node.getState().getTurn());
 
@@ -99,18 +99,10 @@ public class MCTS extends AI {
                     }
                 }
             } else {
-                // We found an unvisited node
-                if (useHeuristics) {
-                    // TODO - do something else here?
-                    int rIndex = new Random().nextInt(unexplored.size());
-                    bestNode = unexplored.get(rIndex);
-                } else {
-                    int rIndex = new Random().nextInt(unexplored.size());
-                    bestNode = unexplored.get(rIndex);
-                }
+                int rIndex = new Random().nextInt(unexplored.size());
+                bestNode = unexplored.get(rIndex);
                 playOut = true;
                 terminalNode = bestNode;
-
             }
             sim_node = bestNode;
         }

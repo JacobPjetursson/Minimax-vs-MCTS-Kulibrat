@@ -188,6 +188,13 @@ public class Controller {
 
     private void doHumanTurn(Move move) {
         state = state.getNextState(move);
+        for(int i = 0; i < state.getBoard().length; i++) {
+            for(int j = 0; j < state.getBoard()[i].length; j++) {
+                System.out.print(state.getBoard()[i][j] + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
         turnNo++;
         if (aiRed != null) aiRed.update(state);
         if (aiBlack != null) aiBlack.update(state);
