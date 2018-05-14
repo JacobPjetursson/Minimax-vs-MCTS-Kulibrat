@@ -22,19 +22,19 @@ public class Goal extends StackPane {
 
         setOnMouseEntered(me -> {
             if(highlight && bestMove) {
-                setStyle("-fx-background-color: rgb(255,200,0);");
+                setStyle("-fx-background-color: rgb(0, 225, 0);");
             }
             else if (highlight) {
-                setStyle("-fx-background-color: rgb(0, 0, 255);");
+                setStyle("-fx-background-color: rgb(255,200,0);");
             }
         });
 
         setOnMouseExited(me -> {
             if(highlight && bestMove) {
-                setStyle("-fx-background-color: rgb(200,150,0);");
+                setStyle("-fx-background-color: rgb(0, 150, 0);");
             }
             else if (highlight) {
-                setStyle("-fx-background-color: rgb(0, 0, 150);");
+                setStyle("-fx-background-color: rgb(200,150,0);");
             }
         });
 
@@ -48,10 +48,10 @@ public class Goal extends StackPane {
         this.highlight = highlight;
         this.bestMove = bestMove;
         if(highlight && bestMove) {
-            setStyle("-fx-background-color: rgb(200,150,0);");
+            setStyle("-fx-background-color: rgb(0, 150, 0);");
         }
         else if (highlight) {
-            setStyle("-fx-background-color: rgb(0, 0, 150);");
+            setStyle("-fx-background-color: rgb(200,150,0);");
         } else {
             setStyle("-fx-background-color: rgb(200, 200, 200);");
         }
