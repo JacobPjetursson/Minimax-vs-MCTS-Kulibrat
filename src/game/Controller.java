@@ -4,10 +4,7 @@ import ai.AI;
 import ai.MCTS.MCTS;
 import ai.Minimax.*;
 import ai.Minimax.Experimental.UltraWeak;
-import gui.EndGamePane;
-import gui.NavPane;
-import gui.PlayArea;
-import gui.PlayPane;
+import gui.*;
 import gui.board.BoardPiece;
 import gui.board.BoardTile;
 import gui.board.Goal;
@@ -19,6 +16,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import misc.Globals;
 
 import java.sql.*;
@@ -32,13 +30,13 @@ public class Controller {
     private int playerBlackInstance;
     private int redTime;
     private int blackTime;
-    private int scoreLimit;
     private boolean overwriteDB;
     private int turnNo;
     private AI aiRed;
     private AI aiBlack;
     private Button startAIButton;
     private Button stopAIButton;
+    private Button reviewButton;
     private CheckBox helpHumanBox;
     private Thread aiThread;
     private NavPane navPane;
@@ -46,28 +44,32 @@ public class Controller {
     private BoardPiece selected;
     private ArrayList<Move> curHighLights;
     private Stage primaryStage;
-
     private State state;
     private PlayArea playArea;
     private Goal goalRed;
     private Goal goalBlack;
     private boolean endGamePopup;
+    private ArrayList<State> previousStates;
+    private ArrayList<Move> previousMoves;
+    private Window window;
+
 
     public Controller(Stage primaryStage, int playerRedInstance, int playerBlackInstance,
-                      int scoreLimit, int redTime, int blackTime, boolean overwriteDB) {
+                      State state, int redTime, int blackTime, boolean overwriteDB) {
         Zobrist.initialize(); // Generate random numbers for state configs
         this.mode = setMode(playerRedInstance, playerBlackInstance);
         this.playerRedInstance = playerRedInstance;
         this.playerBlackInstance = playerBlackInstance;
-        this.scoreLimit = scoreLimit;
         this.redTime = redTime;
         this.blackTime = blackTime;
         this.overwriteDB = overwriteDB;
         this.turnNo = 0;
-        this.state = new State(scoreLimit);
+        this.state = state;
         this.primaryStage = primaryStage;
         this.endGamePopup = false;
         this.curHighLights = new ArrayList<>();
+        this.previousMoves = new ArrayList<>();
+        this.previousStates = new ArrayList<>();
 
         PlayPane playPane = new PlayPane(this);
 
@@ -76,6 +78,7 @@ public class Controller {
 
         navPane = playPane.getNavPane();
         playArea = playPane.getPlayArea();
+        window = playArea.getScene().getWindow();
 
         if (playerRedInstance == MINIMAX) {
             aiRed = new Minimax(RED, redTime);
@@ -100,11 +103,13 @@ public class Controller {
         startAIButton = navPane.getStartAIButton();
         stopAIButton = navPane.getStopAIButton();
         helpHumanBox = navPane.getHelpHumanBox();
+        reviewButton = navPane.getReviewButton();
         goalRed = playArea.getGoal(RED);
         goalBlack = playArea.getGoal(BLACK);
 
 
         if (mode == AI_VS_AI) navPane.addAIWidgets();
+        if (mode == HUMAN_VS_AI) navPane.addReviewButton();
         if (mode != AI_VS_AI) navPane.addHelpHumanBox();
 
         // Set event handlers for gui elements
@@ -139,6 +144,8 @@ public class Controller {
             aiThread.interrupt();
             stopAIButton.setDisable(true);
         });
+        // Review button
+        reviewButton.setOnMouseClicked(event -> reviewGame());
         // Goal Red
         goalRed.setOnMouseClicked(event -> {
             if (goalRed.getHighlight() || Globals.CUSTOMIZABLE) {
@@ -158,7 +165,7 @@ public class Controller {
             helpHumanBox.setDisable(true);
             deselect();
             if(newValue) {
-                if(getConnection(scoreLimit)) {
+                if(getConnection(state.getScoreLimit())) {
                     helpHumanBox.setSelected(true);
                     highlightBestPiece(true);
                 } else {
@@ -187,6 +194,8 @@ public class Controller {
     }
 
     private void doHumanTurn(Move move) {
+        previousStates.add(new State(state));
+        previousMoves.add(new Move(move.oldRow, move.oldCol, move.newRow, move.newCol, move.team));
         state = state.getNextState(move);
         turnNo++;
         if (aiRed != null) aiRed.update(state);
@@ -198,7 +207,6 @@ public class Controller {
 
         if (Logic.gameOver(state)) return;
 
-        // TODO - Info that opponent turn has been passed
         if (mode == HUMAN_VS_AI) {
             aiThread = new Thread(this::doAITurn);
             aiThread.setDaemon(true);
@@ -279,7 +287,7 @@ public class Controller {
             newStage.setScene(new Scene(new EndGamePane(primaryStage, Logic.getWinner(state),
                     this), 400, 150));
             newStage.initModality(Modality.APPLICATION_MODAL);
-            newStage.initOwner(playArea.getScene().getWindow());
+            newStage.initOwner(window);
             newStage.setOnCloseRequest(Event::consume);
             newStage.show();
         }
@@ -347,7 +355,7 @@ public class Controller {
 
     private MinimaxPlay queryPlay(Node n) {
         MinimaxPlay play = null;
-        String tableName = "plays_" + scoreLimit;
+        String tableName = "plays_" + state.getScoreLimit();
         Long key = n.getHashCode();
         try {
             Statement statement = dbConnection.createStatement();
@@ -456,6 +464,16 @@ public class Controller {
             return playerBlackInstance;
         }
     }
+
+    private void reviewGame() {
+        Stage newStage = new Stage();
+        newStage.setScene(new Scene(new ReviewPane(primaryStage, this), Globals.WIDTH - 100, Globals.HEIGHT - 100));
+        newStage.initModality(Modality.APPLICATION_MODAL);
+        newStage.initOwner(window);
+        newStage.setOnCloseRequest(Event::consume);
+        newStage.show();
+    }
+
     private int setMode(int playerRedInstance, int playerBlackInstance) {
         if (playerRedInstance == HUMAN && playerBlackInstance == HUMAN) {
             return HUMAN_VS_HUMAN;
@@ -465,6 +483,7 @@ public class Controller {
             return AI_VS_AI;
         }
     }
+
     public BoardPiece getSelected() {
         return selected;
     }
@@ -472,7 +491,7 @@ public class Controller {
         return turnNo;
     }
     public int getScoreLimit() {
-        return scoreLimit;
+        return state.getScoreLimit();
     }
     public int getMode() {
         return mode;
@@ -484,5 +503,9 @@ public class Controller {
     public boolean getOverwriteDB() {
         return overwriteDB;
     }
+    public ArrayList<State> getPreviousStates() { return previousStates; }
+    public ArrayList<Move> getPreviousMoves() { return previousMoves; }
+    public Window getWindow() { return window; }
+
 
 }

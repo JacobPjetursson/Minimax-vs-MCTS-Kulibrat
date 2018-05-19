@@ -1,43 +1,42 @@
 package gui;
 
 import game.Controller;
+import game.State;
 import gui.menu.MenuPane;
 import gui.menu.NewGamePane;
+import javafx.event.Event;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import misc.Globals;
 
 import static misc.Globals.BLACK;
+import static misc.Globals.HUMAN_VS_AI;
 import static misc.Globals.RED;
 
-public class EndGamePane extends AnchorPane {
+public class EndGamePane extends VBox {
 
 
     public EndGamePane(Stage primaryStage, int team, Controller cont) {
+        setAlignment(Pos.CENTER);
+        setSpacing(20);
         Label label = new Label();
         if (team == RED) label.setText("Congratulations player Red!");
         else label.setText(("Congratulations player Black!"));
 
-
         label.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
-        label.setAlignment(Pos.CENTER);
-        AnchorPane.setTopAnchor(label, 20.0);
-        AnchorPane.setLeftAnchor(label, 0.0);
-        AnchorPane.setRightAnchor(label, 0.0);
+        getChildren().add(label);
 
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER);
+        hBox.setSpacing(40);
         Button menuBtn = new Button("Menu");
-        HBox menu = new HBox(menuBtn);
-        menu.setAlignment(Pos.CENTER);
-        AnchorPane.setLeftAnchor(menu, 40.0);
-        AnchorPane.setTopAnchor(menu, 0.0);
-        AnchorPane.setBottomAnchor(menu, 0.0);
         menuBtn.setOnMouseClicked(event -> {
             Stage stage = (Stage) getScene().getWindow();
             stage.close();
@@ -45,21 +44,34 @@ public class EndGamePane extends AnchorPane {
                     Globals.WIDTH, Globals.HEIGHT));
 
         });
+        menuBtn.setPrefWidth(110);
+        hBox.getChildren().add(menuBtn);
 
-        Button restartGameBtm = new Button("Restart Game");
-        HBox restartGame = new HBox(restartGameBtm);
-        restartGame.setAlignment(Pos.CENTER);
-        AnchorPane.setRightAnchor(restartGame, 40.0);
-        AnchorPane.setTopAnchor(restartGame, 0.0);
-        AnchorPane.setBottomAnchor(restartGame, 0.0);
-        restartGameBtm.setOnMouseClicked(event -> {
+        Button restartGameBtn = new Button("Restart Game");
+        restartGameBtn.setOnMouseClicked(event -> {
             Stage stage = (Stage) getScene().getWindow();
             stage.close();
             new Controller(primaryStage, cont.getPlayerInstance(RED),
-                    cont.getPlayerInstance(BLACK), cont.getScoreLimit(), cont.getTime(RED), cont.getTime(BLACK), cont.getOverwriteDB());
+                    cont.getPlayerInstance(BLACK), new State(cont.getScoreLimit()), cont.getTime(RED), cont.getTime(BLACK), cont.getOverwriteDB());
         });
+        restartGameBtn.setPrefWidth(110);
+        hBox.getChildren().add(restartGameBtn);
+        getChildren().add(hBox);
 
-        getChildren().addAll(label, menu, restartGame);
+        Button reviewGameBtn = new Button("Review Game");
+        reviewGameBtn.setOnMouseClicked(event -> {
+            Stage stage = (Stage) getScene().getWindow();
+            stage.close();
+            Stage newStage = new Stage();
+            newStage.setScene(new Scene(new ReviewPane(primaryStage, cont), Globals.WIDTH - 100, Globals.HEIGHT - 100));
+            newStage.initModality(Modality.APPLICATION_MODAL);
+            newStage.initOwner(cont.getWindow());
+            newStage.setOnCloseRequest(Event::consume);
+            newStage.show();
 
+        });
+        reviewGameBtn.setPrefWidth(120);
+        if(cont.getMode() == HUMAN_VS_AI)
+            getChildren().add(reviewGameBtn);
     }
 }

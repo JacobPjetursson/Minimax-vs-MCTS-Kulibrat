@@ -26,11 +26,12 @@ public class NavPane extends VBox {
     private Button stopAIButton;
     private Button restartButton;
     private Button menuButton;
+    private Button reviewButton;
     private CheckBox helpHuman;
     private HBox helpHumanBox;
     private VBox AIWidgets;
 
-    public NavPane(Controller cont) {
+    NavPane(Controller cont) {
         setMinWidth(Globals.WIDTH / 3);
         setAlignment(Pos.CENTER);
         setSpacing(40);
@@ -61,6 +62,9 @@ public class NavPane extends VBox {
         menuButton = new Button("Menu");
         buttons.add(menuButton);
         menuButton.setOnMouseClicked(event -> goToMenu());
+
+        reviewButton = new Button("Review Game");
+        buttons.add(reviewButton);
 
 
         for (Button button : buttons) {
@@ -95,6 +99,8 @@ public class NavPane extends VBox {
         getChildren().add(helpHumanBox);
     }
 
+    public void addReviewButton() { getChildren().add(reviewButton); }
+
     public Button getStartAIButton() {
         return startAIButton;
     }
@@ -114,4 +120,6 @@ public class NavPane extends VBox {
     public CheckBox getHelpHumanBox() {
         return helpHuman;
     }
+
+    public Button getReviewButton() { return reviewButton; }
 }

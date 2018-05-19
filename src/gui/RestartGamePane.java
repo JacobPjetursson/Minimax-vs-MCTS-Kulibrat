@@ -1,6 +1,7 @@
 package gui;
 
 import game.Controller;
+import game.State;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -35,7 +36,7 @@ class RestartGamePane extends AnchorPane {
             Stage stage = (Stage) getScene().getWindow();
             stage.close();
             new Controller(primaryStage, cont.getPlayerInstance(RED),
-                    cont.getPlayerInstance(BLACK), cont.getScoreLimit(), cont.getTime(RED), cont.getTime(BLACK), cont.getOverwriteDB());
+                    cont.getPlayerInstance(BLACK), new State(cont.getScoreLimit()), cont.getTime(RED), cont.getTime(BLACK), cont.getOverwriteDB());
         });
 
         Button noBtn = new Button("No");
