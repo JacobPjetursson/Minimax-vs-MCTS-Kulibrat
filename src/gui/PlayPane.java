@@ -27,6 +27,7 @@ public class PlayPane extends GridPane {
     private void setup() {
         setAlignment(Pos.CENTER);
         setPrefSize(Globals.WIDTH, Globals.HEIGHT);
+        setStyle("-fx-background-color: rgb(255, 255, 255);");
         ColumnConstraints column = new ColumnConstraints(Globals.WIDTH / 3);
         ColumnConstraints column1 = new ColumnConstraints(Globals.WIDTH * 2 / 3);
         getColumnConstraints().add(column);

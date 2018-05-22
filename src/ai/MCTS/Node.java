@@ -14,7 +14,6 @@ public class Node {
     private double plays = 0;
     private double wins = 0;
     private Node parent;
-    private double explorationConstant = 1.4; // standard is sqrt(2) ~ 1.4
 
     // Starting Root state
     public Node(State startState) {
@@ -79,9 +78,9 @@ public class Node {
         return children;
     }
 
-    double UCB() {
+    double UCB(double explorationConstant) {
         double payOff = (wins / plays);
-        return payOff + explorationConstant * Math.sqrt(2 * Math.log(parent.plays) / plays);
+        return payOff + explorationConstant * Math.sqrt(Math.log(parent.plays) / plays);
     }
 
     void backPropagate(int winner) {

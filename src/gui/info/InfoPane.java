@@ -71,7 +71,7 @@ public class InfoPane extends VBox {
 
         if (prevTurn == state.getTurn()) {
             String team = (state.getTurn() == RED) ? "Black" : "Red";
-            skippedTurn.setText("Team " + team + "'s turn has been skipped!");
+            skippedTurn.setText("Team " + team + "'s turn \nhas been skipped!");
         } else {
             skippedTurn.setText("");
         }

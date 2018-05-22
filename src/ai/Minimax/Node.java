@@ -11,8 +11,6 @@ import static misc.Globals.RED;
 
 public class Node {
     private State state;
-
-    // Hashcode stuff
     private long hash;
 
     // Starting Root state
@@ -60,27 +58,11 @@ public class Node {
     public boolean equals(Object obj) {
         if (!(obj instanceof Node)) return false;
         return (((Node) obj).getHashCode() == getHashCode());
-/*
-        State state = (State) obj;
-        return this == state || turn == state.getTurn() &&
-                scoreLimit == state.scoreLimit() &&
-                Arrays.deepEquals(board, state.board) &&
-                //getPieces(RED).equals(state.getPieces(RED)) &&
-                //getPieces(BLACK).equals(state.getPieces(BLACK)) &&
-                redScore == state.getScore(RED) &&
-                blackScore == state.getScore(BLACK);
-*/
     }
 
     @Override
     public int hashCode() {
         return (int) hash;
-/*
-        int result = Objects.hash(turn, scoreLimit, redScore, blackScore);
-        //int result = Objects.hash(getPieces(RED), getPieces(BLACK), turn, redScore, blackScore, scoreLimit);
-        result = 31 * result + Arrays.deepHashCode(board);
-        return result;
-*/
     }
 
     public long getHashCode() {

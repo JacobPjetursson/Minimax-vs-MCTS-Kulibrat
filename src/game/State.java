@@ -201,7 +201,6 @@ public class State {
         if (!(obj instanceof State)) return false;
         State state = (State) obj;
         return this == state || turn == state.getTurn() &&
-                scoreLimit == state.getScoreLimit() &&
                 Arrays.deepEquals(board, state.board) &&
                 redScore == state.getScore(RED) &&
                 blackScore == state.getScore(BLACK);
@@ -209,7 +208,7 @@ public class State {
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(turn, scoreLimit, redScore, blackScore);
+        int result = Objects.hash(turn, redScore, blackScore);
         result = 31 * result + Arrays.deepHashCode(board);
         return result;
 

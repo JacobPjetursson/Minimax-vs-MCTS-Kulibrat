@@ -1,7 +1,6 @@
 package gui.board;
 
 import game.Controller;
-import gui.PlayArea;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import misc.Globals;
@@ -9,26 +8,26 @@ import misc.Globals;
 import static misc.Globals.*;
 
 public class BoardPiece extends Circle {
-    private int RADIUS = 20;
     private Controller cont;
 
     private Color color;
-    private Color yellow = new Color(0.2, 0.7, 0, 1);
+    private Color green = new Color(0.2, 0.7, 0, 1);
     private boolean selected;
     private boolean best;
     private int team;
     private int row;
     private int col;
+    private boolean clickable;
 
-
-    BoardPiece(int team, Controller cont) {
+    BoardPiece(int team, Controller cont, int radius, boolean clickable) {
+        this.clickable = clickable;
         this.cont = cont;
         this.team = team;
         this.row = -1;
         this.col = -1;
 
         color = (team == RED) ? Color.RED : Color.BLACK;
-        setRadius(RADIUS);
+        setRadius(radius);
         setStrokeWidth(3.5);
         setColor(color, color);
 
@@ -38,7 +37,7 @@ public class BoardPiece extends Circle {
             if (team == RED && !selected) {
                 Color lightRed = new Color(1.0, 0.5, 0.5, 1.0);
                 if(best) {
-                    setColor(lightRed, yellow);
+                    setColor(lightRed, green);
                 }
                 else {
                     setColor(lightRed, lightRed);
@@ -46,7 +45,7 @@ public class BoardPiece extends Circle {
             } else if (team == BLACK && !selected) {
                 Color gray = new Color(0.3, 0.3, 0.3, 1.0);
                 if(best) {
-                    setColor(gray, yellow);
+                    setColor(gray, green);
                 }
                 else {
                     setColor(gray, gray);
@@ -57,7 +56,7 @@ public class BoardPiece extends Circle {
         setOnMouseExited(me -> {
             if (!selected && isControllable()) {
                 if(best) {
-                    setColor(color, yellow);
+                    setColor(color, green);
                 }
                 else setColor(color, color);
             }
@@ -68,8 +67,8 @@ public class BoardPiece extends Circle {
         });
     }
 
-    BoardPiece(int team, Controller cont, int row, int col) {
-        this(team, cont);
+    BoardPiece(int team, Controller cont, int row, int col, int radius, boolean clickable) {
+        this(team, cont, radius, clickable);
         this.row = row;
         this.col = col;
 
@@ -84,7 +83,7 @@ public class BoardPiece extends Circle {
     public void setBest(boolean best) {
         this.best = best;
         if(best) {
-            setColor(color, yellow);
+            setColor(color, green);
         } else {
             setColor(color, color);
         }
@@ -93,7 +92,7 @@ public class BoardPiece extends Circle {
 
     private boolean isControllable() {
         return Globals.CUSTOMIZABLE || (cont.getPlayerInstance(team) == HUMAN &&
-                cont.getState().getTurn() == this.team);
+                cont.getState().getTurn() == this.team && clickable);
     }
 
     public int getCol() {
@@ -116,7 +115,7 @@ public class BoardPiece extends Circle {
     public void deselect() {
         selected = false;
         if(best) {
-            setColor(color, yellow);
+            setColor(color, green);
         } else {
             setColor(color, color);
         }

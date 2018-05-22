@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
+import static misc.Globals.RED;
+
 public class MCTS extends AI {
     public boolean debug = true;
     // PARAMETERS
@@ -93,8 +95,8 @@ public class MCTS extends AI {
             if (containsAll) {
                 double bestUCB = 0.0;
                 for (Node child : sim_node.getChildren()) {
-                    if (child.UCB() >= bestUCB) {
-                        bestUCB = child.UCB();
+                    if (child.UCB(1) >= bestUCB) {
+                        bestUCB = child.UCB(1);
                         bestNode = child;
                     }
                 }

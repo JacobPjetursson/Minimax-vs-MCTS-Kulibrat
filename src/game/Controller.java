@@ -3,7 +3,6 @@ package game;
 import ai.AI;
 import ai.MCTS.MCTS;
 import ai.Minimax.*;
-import ai.Minimax.Experimental.UltraWeak;
 import gui.*;
 import gui.board.BoardPiece;
 import gui.board.BoardTile;
@@ -40,7 +39,7 @@ public class Controller {
     private CheckBox helpHumanBox;
     private Thread aiThread;
     private NavPane navPane;
-    private Connection dbConnection;
+    public Connection dbConnection;
     private BoardPiece selected;
     private ArrayList<Move> curHighLights;
     private Stage primaryStage;
@@ -49,8 +48,7 @@ public class Controller {
     private Goal goalRed;
     private Goal goalBlack;
     private boolean endGamePopup;
-    private ArrayList<State> previousStates;
-    private ArrayList<Move> previousMoves;
+    private ArrayList<PrevState> previousStates;
     private Window window;
 
 
@@ -68,11 +66,9 @@ public class Controller {
         this.primaryStage = primaryStage;
         this.endGamePopup = false;
         this.curHighLights = new ArrayList<>();
-        this.previousMoves = new ArrayList<>();
         this.previousStates = new ArrayList<>();
 
         PlayPane playPane = new PlayPane(this);
-
         primaryStage.setScene(new Scene(playPane,
                 Globals.WIDTH, Globals.HEIGHT));
 
@@ -165,9 +161,9 @@ public class Controller {
             helpHumanBox.setDisable(true);
             deselect();
             if(newValue) {
-                if(getConnection(state.getScoreLimit())) {
+                if(connect(state.getScoreLimit())) {
                     helpHumanBox.setSelected(true);
-                    highlightBestPiece(true);
+                    highlightBestPieces(true);
                 } else {
                     helpHumanBox.setSelected(false);
                 }
@@ -180,12 +176,11 @@ public class Controller {
                 }
 
                 helpHumanBox.setSelected(false);
-                highlightBestPiece(false);
+                highlightBestPieces(false);
             }
             helpHumanBox.setDisable(false);
         });
 
-        playArea.update(this);
         if (mode == HUMAN_VS_AI && playerRedInstance != HUMAN) {
             aiThread = new Thread(this::doAITurn);
             aiThread.setDaemon(true);
@@ -194,8 +189,7 @@ public class Controller {
     }
 
     private void doHumanTurn(Move move) {
-        previousStates.add(new State(state));
-        previousMoves.add(new Move(move.oldRow, move.oldCol, move.newRow, move.newCol, move.team));
+        previousStates.add(new PrevState(state, move, turnNo));
         state = state.getNextState(move);
         turnNo++;
         if (aiRed != null) aiRed.update(state);
@@ -213,7 +207,7 @@ public class Controller {
             aiThread.start();
         } else {
             if(helpHumanBox.isSelected()) {
-                highlightBestPiece(true);
+                highlightBestPieces(true);
             }
             if (state.getTurn() == move.team) {
                 System.out.println("TEAM " + ((move.team == RED) ? "Black" : "Red") + "'s turn has been skipped!");
@@ -275,7 +269,7 @@ public class Controller {
                 System.out.println("TEAM " + ((turn == RED) ? "Black" : "Red") + "'s turn has been skipped!");
                 doAITurn();
             } else if(helpHumanBox.isSelected()) {
-                highlightBestPiece(true);
+                highlightBestPieces(true);
             }
         }
     }
@@ -292,7 +286,7 @@ public class Controller {
             newStage.show();
         }
     }
-    private boolean getConnection(int scoreLimit) {
+    public boolean connect(int scoreLimit) {
         String JDBC_URL = "jdbc:derby:lookupDB;create=true";
         System.out.println("Connecting to database. This might take some time");
         try {
@@ -323,36 +317,6 @@ public class Controller {
         return true;
     }
 
-    private void highlightBestPiece(boolean highlight) {
-        MinimaxPlay bestPlay = null;
-        if (highlight) bestPlay = queryPlay(new Node(state));
-        BoardTile[][] tiles = playArea.getBoard().getTiles();
-        for(int i = 0; i < tiles.length; i++) {
-            for(int j = 0; j < tiles[i].length; j++) {
-                BoardPiece p = tiles[i][j].getPiece();
-                if(p != null) {
-                    if (highlight && p.getRow() == bestPlay.move.oldRow && p.getCol() == bestPlay.move.oldCol) {
-                        p.setBest(true);
-                    } else {
-                        p.setBest(false);
-                    }
-                }
-            }
-        }
-        int player = state.getTurn();
-        int opponent = (player == RED) ? BLACK : RED;
-        for(BoardPiece p : playArea.getPlayer(player).getPieces()) {
-            if(highlight && bestPlay.move.oldRow == -1 && bestPlay.move.oldCol == -1) {
-                p.setBest(true);
-            } else {
-                p.setBest(false);
-            }
-        }
-        for(BoardPiece p : playArea.getPlayer(opponent).getPieces()) {
-            p.setBest(false);
-        }
-    }
-
     private MinimaxPlay queryPlay(Node n) {
         MinimaxPlay play = null;
         String tableName = "plays_" + state.getScoreLimit();
@@ -378,7 +342,6 @@ public class Controller {
     }
 
     private String turnsToTerminal(int score) {
-        // TODO - incorrect
         if(Math.abs(score) == 1000) {
         //if(score == 0) { // TODO - new version, update DB's
             return "∞";
@@ -414,9 +377,9 @@ public class Controller {
     private void highlightMoves(int row, int col, int team, boolean highlight) {
         if (highlight) curHighLights = Logic.legalMovesFromPiece(row,
                 col, team, state);
-        MinimaxPlay bestPlay = null;
+        ArrayList<Move> bestPlays = null;
         if(highlight && helpHumanBox.isSelected()) {
-            bestPlay = queryPlay(new Node(state));
+            bestPlays = bestPlays(new Node(state));
         }
 
         ArrayList<String> turnsToTerminalList = null;
@@ -432,7 +395,7 @@ public class Controller {
                 turns = turnsToTerminalList.get(i);
             }
             boolean bestMove = false;
-            if(bestPlay != null && m.equals(bestPlay.move)) {
+            if(bestPlays != null && bestPlays.contains(m)) {
                 bestMove = true;
             }
             if (m.newCol == -1 && m.newRow == -1) {
@@ -444,6 +407,60 @@ public class Controller {
             } else tiles[m.newRow][m.newCol].setHighlight(highlight, bestMove, turns);
         }
     }
+
+    public ArrayList<Move> bestPlays(Node n) {
+        ArrayList<Move> bestPlays = new ArrayList<>();
+        MinimaxPlay bestPlay = queryPlay(n);
+        int bestScore = 0;
+        if (!Logic.gameOver(n.getNextNode(bestPlay.move).getState())) {
+            bestScore = queryPlay(n.getNextNode(bestPlay.move)).score;
+        }
+
+        for (Node child : n.getChildren()) {
+            Move m = child.getState().getMove();
+            if(Logic.gameOver(n.getNextNode(m).getState())) {
+                bestPlays.add(m);
+            } else if(queryPlay(child).score == bestScore) {
+                bestPlays.add(m);
+            }
+        }
+        return bestPlays;
+    }
+
+    private void highlightBestPieces(boolean highlight) {
+        Node n = new Node(state);
+        ArrayList<Move> bestPlays = null;
+        if (highlight) bestPlays = bestPlays(n);
+        BoardTile[][] tiles = playArea.getBoard().getTiles();
+
+        for(int i = 0; i < tiles.length; i++) {
+            for(int j = 0; j < tiles[i].length; j++) {
+                BoardPiece p = tiles[i][j].getPiece();
+                if (p != null) p.setBest(false);
+                if(!highlight) continue;
+                for (Move m : bestPlays) {
+                    if (p != null && m.oldCol == p.getCol() && m.oldRow == p.getRow()) {
+                        p.setBest(true);
+                    }
+                }
+            }
+        }
+        int player = state.getTurn();
+        for(BoardPiece p : playArea.getPlayer(player).getPieces()) {
+            p.setBest(false);
+            if(!highlight) continue;
+            for (Move m : bestPlays) {
+                if (m.oldCol == p.getCol() && m.oldRow == p.getRow()) {
+                    p.setBest(true);
+                }
+            }
+        }
+        int opponent = (player == RED) ? BLACK : RED;
+        for(BoardPiece p : playArea.getPlayer(opponent).getPieces()) {
+            p.setBest(false);
+        }
+    }
+
     private ArrayList<String> getScores(ArrayList<Move> curHighLights) {
         ArrayList<String> turnsToTerminalList = new ArrayList<>();
         for(Move m : curHighLights) {
@@ -484,6 +501,13 @@ public class Controller {
         }
     }
 
+    public void setTurnNo(int turnNo) {
+        this.turnNo = turnNo;
+    }
+    public void setPreviousStates(ArrayList<PrevState> prevStates) {
+        this.previousStates = prevStates;
+    }
+
     public BoardPiece getSelected() {
         return selected;
     }
@@ -503,8 +527,10 @@ public class Controller {
     public boolean getOverwriteDB() {
         return overwriteDB;
     }
-    public ArrayList<State> getPreviousStates() { return previousStates; }
-    public ArrayList<Move> getPreviousMoves() { return previousMoves; }
+    public PlayArea getPlayArea() {
+        return playArea;
+    }
+    public ArrayList<PrevState> getPreviousStates() { return previousStates; }
     public Window getWindow() { return window; }
 
 

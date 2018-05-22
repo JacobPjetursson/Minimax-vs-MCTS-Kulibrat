@@ -21,30 +21,34 @@ public class Player extends VBox {
     private int team;
     private GridPane gridPaneBoard;
     private ArrayList<BoardPiece> pieces;
+    private boolean clickable;
+    private int pieceRadius;
 
 
-    public Player(int team, Controller cont) {
+    public Player(int team, Controller cont, int width, int pieceRadius, boolean clickable) {
         this.team = team;
+        this.clickable = clickable;
+        this.pieceRadius = pieceRadius;
         pieces = new ArrayList<>();
         int type = cont.getPlayerInstance(team);
         setAlignment(Pos.CENTER);
-        setSpacing(10);
-        int size = 60;
+        setSpacing(width/6);
+        setStyle("-fx-background-color: rgb(255, 255, 255);");
 
         gridPaneBoard = new GridPane();
         gridPaneBoard.setAlignment(Pos.CENTER);
-        gridPaneBoard.setPrefSize(size * 4, size);
-        gridPaneBoard.setMaxWidth(size * 4);
+        gridPaneBoard.setPrefSize(width * 4, width);
+        gridPaneBoard.setMaxWidth(width * 4);
         gridPaneBoard.setBorder(new Border(new BorderStroke(getColor(),
                 BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 
-        ColumnConstraints column = new ColumnConstraints(size);
+        ColumnConstraints column = new ColumnConstraints(width);
         for (int i = 0; i < 4; i++) {
             gridPaneBoard.getColumnConstraints().add(column);
         }
 
         for (int i = 0; i < 4; i++) {
-            BoardPiece bp = new BoardPiece(team, cont);
+            BoardPiece bp = new BoardPiece(team, cont, pieceRadius, clickable);
             pieces.add(bp);
             gridPaneBoard.add(pieceBox(bp), i, 0);
         }
@@ -55,32 +59,32 @@ public class Player extends VBox {
         ImageView imgView = new ImageView(img);
 
         imgView.setPreserveRatio(true);
-        imgView.setFitHeight(size);
-        imgView.setFitWidth(size);
+        imgView.setFitHeight(width);
+        imgView.setFitWidth(width);
         BorderPane imgPane = new BorderPane();
         imgPane.setCenter(imgView);
 
         GridPane gridPaneDisplay = new GridPane();
         gridPaneDisplay.setAlignment(Pos.CENTER);
-        gridPaneDisplay.setPrefSize((size * 4) / 3, size);
-        gridPaneDisplay.setMaxWidth((size * 4) / 3);
+        gridPaneDisplay.setPrefSize((width * 4) / 3, width);
+        gridPaneDisplay.setMaxWidth((width * 4) / 3);
 
         Label typeLabel = new Label((type == HUMAN) ? "Human" : (type == MINIMAX) ? "Minimax" : (type == LOOKUP_TABLE) ? "Lookup\n Table" : "MCTS");
-        typeLabel.setFont(Font.font("Verdana", 15));
-        ColumnConstraints column1 = new ColumnConstraints((size * 4) / 3);
+        typeLabel.setFont(Font.font("Verdana", width/4));
+        ColumnConstraints column1 = new ColumnConstraints((width * 4) / 3);
         for (int i = 0; i < 3; i++) {
             gridPaneDisplay.getColumnConstraints().add(column1);
         }
         gridPaneDisplay.add(imgPane, 1, 0);
         gridPaneDisplay.add(typeLabel, 2, 0);
 
-        if (team == RED) getChildren().addAll(gridPaneBoard, gridPaneDisplay);
-        else getChildren().addAll(gridPaneDisplay, gridPaneBoard);
+        getChildren().add(gridPaneBoard);
+        if (team == RED) getChildren().add(1, gridPaneDisplay);
+        else getChildren().add(0, gridPaneDisplay);
 
     }
 
-    public void update(Controller cont) {
-        State state = cont.getState();
+    public void update(Controller cont, State state) {
         if (gridPaneBoard.getChildren().size() > state.getUnplaced(team)) {
             if (cont.getSelected() != null) { //Human turn
                 BoardPiece bp = cont.getSelected();
@@ -102,7 +106,7 @@ public class Player extends VBox {
                     }
                 }
                 if (!occupied) {
-                    BoardPiece bp = new BoardPiece(team, cont);
+                    BoardPiece bp = new BoardPiece(team, cont, pieceRadius, clickable);
                     pieces.add(bp);
                     gridPaneBoard.add(pieceBox(bp), i, 0);
                     break;

@@ -11,9 +11,9 @@ public class Goal extends StackPane {
     private boolean bestMove;
     private Label turnsToTerminalLabel;
 
-    public Goal(int prefWidth) {
+    public Goal(int prefWidth, int prefHeight) {
         setAlignment(Pos.CENTER);
-        setPrefSize(prefWidth, 50);
+        setPrefSize(prefWidth, prefHeight);
         setMaxWidth(prefWidth);
         setStyle("-fx-background-color: rgb(200, 200, 200);");
         turnsToTerminalLabel = new Label("");

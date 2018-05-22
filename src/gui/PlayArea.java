@@ -31,29 +31,27 @@ public class PlayArea extends GridPane {
         setAlignment(Pos.CENTER);
 
 
-        board = new Board();
-        playerBlack = new Player(BLACK, cont);
-        playerRed = new Player(RED, cont);
-        goalRed = new Goal(3 * board.getTileSize());
-        goalBlack = new Goal(3 * board.getTileSize());
+        board = new Board(60, 20, true);
+        playerBlack = new Player(BLACK, cont, 60, 20, true);
+        playerRed = new Player(RED, cont, 60, 20, true);
+        goalRed = new Goal(3 * board.getTileSize(), 50);
+        goalBlack = new Goal(3 * board.getTileSize(), 50);
         info = new InfoPane(cont.getScoreLimit(), cont.getMode());
 
         ColumnConstraints column = new ColumnConstraints(WIDTH / 3);
         for (int i = 0; i < 2; i++)
             getColumnConstraints().add(column);
 
-        VBox playBox = new VBox(playerBlack, goalRed, board, goalBlack, playerRed);
-        playBox.setAlignment(Pos.CENTER);
-
+        VBox playBox = new PlayBox(playerBlack, goalRed, board, goalBlack, playerRed);
         add(playBox, 0, 0);
         add(info, 1, 0);
 
     }
 
     public void update(Controller cont) {
-        board.update(cont);
-        playerRed.update(cont);
-        playerBlack.update(cont);
+        board.update(cont, cont.getState());
+        playerRed.update(cont, cont.getState());
+        playerBlack.update(cont, cont.getState());
         info.update(cont);
     }
 
