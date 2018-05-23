@@ -63,7 +63,7 @@ public class EndGamePane extends VBox {
             Stage stage = (Stage) getScene().getWindow();
             stage.close();
             Stage newStage = new Stage();
-            newStage.setScene(new Scene(new ReviewPane(primaryStage, cont), Globals.WIDTH - 100, Globals.HEIGHT - 100));
+            newStage.setScene(new Scene(new ReviewPane(primaryStage, cont), 400, Globals.HEIGHT - 100));
             newStage.initModality(Modality.APPLICATION_MODAL);
             newStage.initOwner(cont.getWindow());
             newStage.setOnCloseRequest(Event::consume);

@@ -37,7 +37,7 @@ public class InfoPane extends VBox {
         HBox turn = new HBox(turnLabel, turnCircle);
         turn.setAlignment(Pos.CENTER);
 
-        turnNumberLabel = new Label("Turn number: 0");
+        turnNumberLabel = new Label("Turns Played: 0");
         turnNumberLabel.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
 
         Label scoreLimitLabel = new Label("Score limit: " + scoreLimit);

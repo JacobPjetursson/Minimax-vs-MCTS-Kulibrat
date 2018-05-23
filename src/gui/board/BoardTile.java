@@ -13,6 +13,7 @@ public class BoardTile extends StackPane {
     private int col;
     private boolean highlight;
     private boolean bestMove;
+    private boolean help;
     private Label turnsToTerminalLabel;
 
     BoardTile(int row, int col, int tilesize) {
@@ -33,7 +34,8 @@ public class BoardTile extends StackPane {
                 setStyle("-fx-background-color: rgb(0, 225, 0);");
             }
             else if (highlight) {
-                setStyle("-fx-background-color: rgb(255,200,0);");
+                if(help) setStyle("-fx-background-color: rgb(255,0,0);");
+                else setStyle("-fx-background-color: rgb(255,200,0);");
             }
         });
 
@@ -42,7 +44,8 @@ public class BoardTile extends StackPane {
                 setStyle("-fx-background-color: rgb(0, 150, 0);");
             }
             else if (highlight) {
-                setStyle("-fx-background-color: rgb(200,150,0);");
+                if (help) setStyle("-fx-background-color: rgb(180,0,0);");
+                    else setStyle("-fx-background-color: rgb(200,150,0);");
             }
         });
     }
@@ -51,15 +54,17 @@ public class BoardTile extends StackPane {
         return highlight;
     }
 
-    public void setHighlight(boolean highlight, boolean bestMove, String turns) {
+    public void setHighlight(boolean highlight, boolean help, boolean bestMove, String turns) {
         this.highlight = highlight;
         this.bestMove = bestMove;
+        this.help = help;
 
         if(highlight && bestMove) {
             setStyle("-fx-background-color: rgb(0, 150, 0);");
         }
         else if (highlight) {
-            setStyle("-fx-background-color: rgb(200,150,0);");
+            if(help) setStyle("-fx-background-color: rgb(180,0,0);");
+            else setStyle("-fx-background-color: rgb(200,150,0);");
         }
         else {
             setStyle("-fx-background-color: rgb(255, 255, 255);");

@@ -348,15 +348,15 @@ public class Controller {
         }
         if(score > 0) {
             if(state.getTurn() == BLACK) {
-                return "" + (-2000 + score);
+                return "" + (-2000 + score - 1);
             } else {
-                return "" + (2000 - score);
+                return "" + (2000 - score + 1);
             }
         } else {
             if(state.getTurn() == BLACK) {
-                return "" + (2000 + score);
+                return "" + (2000 + score + 1);
             } else {
-                return "" + (-2000 - score);
+                return "" + (-2000 - score - 1);
             }
         }
     }
@@ -400,11 +400,11 @@ public class Controller {
             }
             if (m.newCol == -1 && m.newRow == -1) {
                 if (team == RED) {
-                    goalRed.setHighlight(highlight, bestMove, turns);
+                    goalRed.setHighlight(highlight, helpHumanBox.isSelected(), bestMove, turns);
                 } else {
-                    goalBlack.setHighlight(highlight, bestMove, turns);
+                    goalBlack.setHighlight(highlight, helpHumanBox.isSelected(), bestMove, turns);
                 }
-            } else tiles[m.newRow][m.newCol].setHighlight(highlight, bestMove, turns);
+            } else tiles[m.newRow][m.newCol].setHighlight(highlight, helpHumanBox.isSelected(), bestMove, turns);
         }
     }
 
@@ -466,7 +466,10 @@ public class Controller {
         for(Move m : curHighLights) {
             Node n = new Node(state).getNextNode(m);
             if(Logic.gameOver(n.getState())) {
-                turnsToTerminalList.add("0");
+                int team = (n.getState().getTurn() == RED ? BLACK : RED);
+                if(Logic.getWinner(n.getState()) == team)
+                    turnsToTerminalList.add("1");
+                else turnsToTerminalList.add("-1");
             } else turnsToTerminalList.add(turnsToTerminal(queryPlay(n).score));
         }
         return turnsToTerminalList;
@@ -484,7 +487,7 @@ public class Controller {
 
     private void reviewGame() {
         Stage newStage = new Stage();
-        newStage.setScene(new Scene(new ReviewPane(primaryStage, this), Globals.WIDTH - 100, Globals.HEIGHT - 100));
+        newStage.setScene(new Scene(new ReviewPane(primaryStage, this), 325, Globals.HEIGHT - 100));
         newStage.initModality(Modality.APPLICATION_MODAL);
         newStage.initOwner(window);
         newStage.setOnCloseRequest(Event::consume);

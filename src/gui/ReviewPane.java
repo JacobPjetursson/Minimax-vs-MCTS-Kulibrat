@@ -18,7 +18,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -28,7 +30,7 @@ import java.util.ArrayList;
 import static misc.Globals.BLACK;
 import static misc.Globals.RED;
 
-public class ReviewPane extends StackPane {
+public class ReviewPane extends VBox {
     private ListView<HBox> lw;
     private boolean connected;
 
@@ -42,8 +44,8 @@ public class ReviewPane extends StackPane {
             e.printStackTrace();
         }
         HBox buttons = new HBox(10);
+        VBox.setMargin(buttons, new Insets(10));
         buttons.setAlignment(Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(buttons, new Insets(10));
         Button goToState = new Button("Go to State");
         goToState.setDisable(true);
         buttons.getChildren().add(goToState);
@@ -72,31 +74,40 @@ public class ReviewPane extends StackPane {
         });
 
         lw = new ListView<>();
+        lw.setPickOnBounds(false);
         ObservableList<HBox> prevStateBoxes = FXCollections.observableArrayList();
         for(PrevState ps : currCont.getPreviousStates()) {
-            HBox h = new HBox(25);
-
+            HBox h = new HBox(35);
+            VBox vBox = new VBox(18);
+            vBox.setAlignment(Pos.CENTER);
+            vBox.setFillWidth(true);
             PlayBox playBox = getPlayBox(currCont, ps.getState());
             Label turnL = new Label("Turn: " + (ps.getTurnNo()) );
+            turnL.setFont(Font.font("Verdana", 14));
+            turnL.setAlignment(Pos.TOP_CENTER);
+            vBox.getChildren().add(turnL);
 
-            String moveStr = String.format("Move (row, col): (%d, %d) -> (%d, %d)",
+            String moveStr = String.format("Move from state (row, col):\n" +
+                                           "         (%d, %d) -> (%d, %d)",
                     ps.getMove().oldRow+1, ps.getMove().oldCol+1, ps.getMove().newRow+1, ps.getMove().newCol+1);
             Label moveL = new Label(moveStr);
+            vBox.getChildren().add(moveL);
             Label performance;
             if(currCont.bestPlays(new Node(ps.getState())).contains(ps.getMove())) {
-                h.setStyle("-fx-background-color: rgb(0, 150, 0);");
+                h.setStyle("-fx-background-color: rgba(0, 255, 0, 0.5);");
                 performance = new Label("Perfect move");
             } else  {
                 performance = new Label("Imperfect move");
-                h.setStyle("-fx-background-color: rgb(150,0,0);");
+                h.setStyle("-fx-background-color: rgba(255,0,0, 0.5);");
             }
+            vBox.getChildren().add(performance);
 
-            h.getChildren().addAll(playBox, turnL, moveL, performance);
+            h.getChildren().addAll(playBox, vBox);
             prevStateBoxes.add(h);
         }
         lw.setItems(prevStateBoxes);
-        lw.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue)
-                -> goToState.setDisable(false));
+        lw.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+                goToState.setDisable(false));
 
         goToState.setOnMouseClicked(event -> {
             Stage stage = (Stage) getScene().getWindow();
@@ -121,7 +132,7 @@ public class ReviewPane extends StackPane {
 
 
         getChildren().addAll(lw, buttons);
-
+        setVgrow(lw, Priority.ALWAYS);
     }
 
     private PlayBox getPlayBox(Controller cont, State s) {

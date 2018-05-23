@@ -79,8 +79,8 @@ public class Player extends VBox {
         gridPaneDisplay.add(typeLabel, 2, 0);
 
         getChildren().add(gridPaneBoard);
-        if (team == RED) getChildren().add(1, gridPaneDisplay);
-        else getChildren().add(0, gridPaneDisplay);
+        if (clickable && team == RED) getChildren().add(1, gridPaneDisplay);
+        else if (clickable) getChildren().add(0, gridPaneDisplay);
 
     }
 

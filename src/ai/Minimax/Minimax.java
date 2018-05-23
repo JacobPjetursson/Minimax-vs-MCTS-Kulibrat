@@ -14,10 +14,8 @@ import static misc.Globals.RED;
 
 public class Minimax extends AI {
     private long calculationTime;
-    private boolean searchCutOff = false;
+    private boolean searchCutOff;
     private boolean moveOrdering = false;
-    private double transNodes;
-    private double nodes;
     private int CURR_MAX_DEPTH;
     private boolean useTranspo = true;
     private HashMap<Long, MinimaxPlay> transTable;
@@ -43,8 +41,6 @@ public class Minimax extends AI {
     }
 
     private MinimaxPlay iterativeDeepeningMinimax(State state, long startTime) {
-        nodes = 0;
-        transNodes = 0;
         resetVariables();
         MinimaxPlay bestPlay = null;
         boolean winCutOff = false;
@@ -60,7 +56,6 @@ public class Minimax extends AI {
             int r = new Random().nextInt(state.getLegalMoves().size());
             bestPlay = new MinimaxPlay(state.getLegalMoves().get(r), Integer.MIN_VALUE, 0);
         }
-        System.out.println("PERCENTAGE: " + (transNodes) / nodes);
         System.out.println("Score: " + bestPlay.score + ", Depth: " + CURR_MAX_DEPTH + ", Play:  oldRow: " + bestPlay.move.oldRow + ", oldCol: " +
                 bestPlay.move.oldCol + ", newRow: " + bestPlay.move.newRow + ", newCol: " + bestPlay.move.newCol + ", team: " + bestPlay.move.team);
 
@@ -76,12 +71,10 @@ public class Minimax extends AI {
             return new MinimaxPlay(null, heuristic(node.getState()), depth);
 
         }
-        nodes++;
         MinimaxPlay transpoPlay = null;
         if (useTranspo) {
             transpoPlay = transTable.get(node.getHashCode());
             if (transpoPlay != null && (depth <= transpoPlay.depth || Math.abs(transpoPlay.score) >= 1000) ) {
-                transNodes++;
                 return transpoPlay;
             }
         }
