@@ -67,7 +67,7 @@ public class InfoPane extends VBox {
         State state = cont.getState();
         scoreBoard.updateScore(state);
         updateTurn(state);
-        turnNumberLabel.setText("Turn number: " + cont.getTurnNo());
+        turnNumberLabel.setText("Turns Played: " + cont.getTurnNo());
 
         if (prevTurn == state.getTurn()) {
             String team = (state.getTurn() == RED) ? "Black" : "Red";

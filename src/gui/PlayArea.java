@@ -8,9 +8,11 @@ import gui.board.*;
 import gui.info.InfoPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
@@ -42,7 +44,7 @@ public class PlayArea extends GridPane {
         for (int i = 0; i < 2; i++)
             getColumnConstraints().add(column);
 
-        VBox playBox = new PlayBox(playerBlack, goalRed, board, goalBlack, playerRed);
+        Group playBox = new PlayBox(playerBlack, goalRed, board, goalBlack, playerRed);
         add(playBox, 0, 0);
         add(info, 1, 0);
 

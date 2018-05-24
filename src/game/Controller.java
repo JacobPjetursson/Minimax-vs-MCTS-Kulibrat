@@ -181,7 +181,7 @@ public class Controller {
             helpHumanBox.setDisable(false);
         });
 
-        if (mode == HUMAN_VS_AI && playerRedInstance != HUMAN) {
+        if (mode == HUMAN_VS_AI && playerRedInstance != HUMAN && state.getTurn() == RED) {
             aiThread = new Thread(this::doAITurn);
             aiThread.setDaemon(true);
             aiThread.start();
@@ -278,7 +278,11 @@ public class Controller {
         if (Logic.gameOver(state) && !endGamePopup) {
             endGamePopup = true;
             Stage newStage = new Stage();
-            newStage.setScene(new Scene(new EndGamePane(primaryStage, Logic.getWinner(state),
+            int winner = Logic.getWinner(state);
+            if(playerRedInstance == HUMAN) state.setTurn(RED);
+            else state.setTurn(BLACK);
+
+            newStage.setScene(new Scene(new EndGamePane(primaryStage, winner,
                     this), 400, 150));
             newStage.initModality(Modality.APPLICATION_MODAL);
             newStage.initOwner(window);
@@ -317,7 +321,7 @@ public class Controller {
         return true;
     }
 
-    private MinimaxPlay queryPlay(Node n) {
+    public MinimaxPlay queryPlay(Node n) {
         MinimaxPlay play = null;
         String tableName = "plays_" + state.getScoreLimit();
         Long key = n.getHashCode();
@@ -341,22 +345,22 @@ public class Controller {
         return play;
     }
 
-    private String turnsToTerminal(int score) {
+    public String turnsToTerminal(int score) {
         if(Math.abs(score) == 1000) {
         //if(score == 0) { // TODO - new version, update DB's
             return "∞";
         }
         if(score > 0) {
             if(state.getTurn() == BLACK) {
-                return "" + (-2000 + score - 1);
+                return "" + (-2000 + score);
             } else {
-                return "" + (2000 - score + 1);
+                return "" + (2000 - score);
             }
         } else {
             if(state.getTurn() == BLACK) {
-                return "" + (2000 + score + 1);
+                return "" + (2000 + score);
             } else {
-                return "" + (-2000 - score - 1);
+                return "" + (-2000 - score);
             }
         }
     }
@@ -466,10 +470,7 @@ public class Controller {
         for(Move m : curHighLights) {
             Node n = new Node(state).getNextNode(m);
             if(Logic.gameOver(n.getState())) {
-                int team = (n.getState().getTurn() == RED ? BLACK : RED);
-                if(Logic.getWinner(n.getState()) == team)
-                    turnsToTerminalList.add("1");
-                else turnsToTerminalList.add("-1");
+                turnsToTerminalList.add("0");
             } else turnsToTerminalList.add(turnsToTerminal(queryPlay(n).score));
         }
         return turnsToTerminalList;
@@ -487,7 +488,7 @@ public class Controller {
 
     private void reviewGame() {
         Stage newStage = new Stage();
-        newStage.setScene(new Scene(new ReviewPane(primaryStage, this), 325, Globals.HEIGHT - 100));
+        newStage.setScene(new Scene(new ReviewPane(primaryStage, this), 325, Globals.HEIGHT - 50));
         newStage.initModality(Modality.APPLICATION_MODAL);
         newStage.initOwner(window);
         newStage.setOnCloseRequest(Event::consume);

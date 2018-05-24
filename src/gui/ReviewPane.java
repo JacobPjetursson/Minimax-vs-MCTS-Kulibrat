@@ -3,8 +3,8 @@ package gui;
 import ai.Minimax.Node;
 import game.Controller;
 import game.Logic;
+import game.Move;
 import game.PrevState;
-import game.State;
 import gui.board.Board;
 import gui.board.Goal;
 import gui.board.Player;
@@ -20,6 +20,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -43,15 +44,15 @@ public class ReviewPane extends VBox {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        HBox buttons = new HBox(10);
-        VBox.setMargin(buttons, new Insets(10));
-        buttons.setAlignment(Pos.BOTTOM_RIGHT);
+        HBox bottomBox = new HBox(10);
+        VBox.setMargin(bottomBox, new Insets(10));
+        bottomBox.setAlignment(Pos.BOTTOM_RIGHT);
         Button goToState = new Button("Go to State");
         goToState.setDisable(true);
-        buttons.getChildren().add(goToState);
+        bottomBox.getChildren().add(goToState);
 
         Button cancel = new Button("Cancel");
-        buttons.getChildren().add(cancel);
+        bottomBox.getChildren().add(cancel);
         cancel.setOnMouseClicked(event -> {
             Stage stage = (Stage) getScene().getWindow();
             stage.close();
@@ -81,8 +82,10 @@ public class ReviewPane extends VBox {
             VBox vBox = new VBox(18);
             vBox.setAlignment(Pos.CENTER);
             vBox.setFillWidth(true);
-            PlayBox playBox = getPlayBox(currCont, ps.getState());
-            Label turnL = new Label("Turn: " + (ps.getTurnNo()) );
+            Node n = new Node(ps.getState());
+            ArrayList<Move> bestPlays = currCont.bestPlays(n);
+            PlayBox playBox = getPlayBox(currCont, ps, bestPlays);
+            Label turnL = new Label("Turns Played: " + (ps.getTurnNo()) );
             turnL.setFont(Font.font("Verdana", 14));
             turnL.setAlignment(Pos.TOP_CENTER);
             vBox.getChildren().add(turnL);
@@ -92,15 +95,34 @@ public class ReviewPane extends VBox {
                     ps.getMove().oldRow+1, ps.getMove().oldCol+1, ps.getMove().newRow+1, ps.getMove().newCol+1);
             Label moveL = new Label(moveStr);
             vBox.getChildren().add(moveL);
+
             Label performance;
-            if(currCont.bestPlays(new Node(ps.getState())).contains(ps.getMove())) {
+            if(bestPlays.contains(ps.getMove())) {
                 h.setStyle("-fx-background-color: rgba(0, 255, 0, 0.5);");
                 performance = new Label("Perfect move");
             } else  {
                 performance = new Label("Imperfect move");
                 h.setStyle("-fx-background-color: rgba(255,0,0, 0.5);");
             }
+            performance.setAlignment(Pos.CENTER);
             vBox.getChildren().add(performance);
+
+            Node nextNode = n.getNextNode(ps.getMove());
+            String scoreStr;
+            if (Logic.gameOver(nextNode.getState())) {
+                scoreStr = "0";
+            }
+            else {
+                scoreStr = currCont.turnsToTerminal(
+                        currCont.queryPlay(nextNode).score);
+            }
+            int score;
+            if(scoreStr.equals("∞")) score = 0;
+            else score = Integer.parseInt(scoreStr);
+            Label turnsToTerminal = new Label("Turns to " + ((score >= 0) ?
+                    "win " : "loss ") + "\nafter move: " + scoreStr);
+            turnsToTerminal.setAlignment(Pos.CENTER);
+            vBox.getChildren().add(turnsToTerminal);
 
             h.getChildren().addAll(playBox, vBox);
             prevStateBoxes.add(h);
@@ -131,20 +153,24 @@ public class ReviewPane extends VBox {
         });
 
 
-        getChildren().addAll(lw, buttons);
+        getChildren().addAll(lw, bottomBox);
         setVgrow(lw, Priority.ALWAYS);
     }
 
-    private PlayBox getPlayBox(Controller cont, State s) {
-        Board b = new Board(15, 5, false);
-        Player playerBlack = new Player(BLACK, cont, 15, 5, false);
-        Goal goalRed = new Goal(3 * b.getTileSize(), 12);
-        Goal goalBlack = new Goal(3 * b.getTileSize(), 12);
-        Player playerRed = new Player(RED, cont, 15, 5, false);
+    private PlayBox getPlayBox(Controller cont, PrevState ps, ArrayList<Move> bestPlays) {
+        Board b = new Board(20, 7, false);
+        Player playerBlack = new Player(BLACK, cont, 20, 7, false);
+        Goal goalRed = new Goal(3 * b.getTileSize(), 17);
+        Goal goalBlack = new Goal(3 * b.getTileSize(), 17);
+        Player playerRed = new Player(RED, cont, 20, 7, false);
 
         PlayBox pb = new PlayBox(playerBlack, goalRed, b, goalBlack, playerRed);
-        pb.update(cont, s);
-
-        return new PlayBox(playerBlack, goalRed, b, goalBlack, playerRed);
+        pb.update(cont, ps.getState());
+        pb.addArrow(ps.getMove(), Color.BLUE);
+        for(Move m : bestPlays) {
+            if(m.equals(ps.getMove())) continue;
+            pb.addArrow(m, Color.GREEN);
+        }
+        return pb;
     }
 }
