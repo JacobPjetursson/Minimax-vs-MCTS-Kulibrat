@@ -280,7 +280,7 @@ public class Controller {
             Stage newStage = new Stage();
             int winner = Logic.getWinner(state);
             if(playerRedInstance == HUMAN) state.setTurn(RED);
-            else state.setTurn(BLACK);
+            else if (playerBlackInstance == HUMAN) state.setTurn(BLACK);
 
             newStage.setScene(new Scene(new EndGamePane(primaryStage, winner,
                     this), 400, 150));
@@ -346,8 +346,8 @@ public class Controller {
     }
 
     public String turnsToTerminal(int score) {
-        if(Math.abs(score) == 1000) {
-        //if(score == 0) { // TODO - new version, update DB's
+        //if(Math.abs(score) == 1000) {
+        if(score == 0) { // TODO - new version, update DB's
             return "∞";
         }
         if(score > 0) {

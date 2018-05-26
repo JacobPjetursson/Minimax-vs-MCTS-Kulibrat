@@ -64,7 +64,7 @@ public class LookupTableMinimax extends AI {
         System.out.print("BEST PLAY:  " + "oldRow: " + move.oldRow +
                 ", oldCol: " + move.oldCol + ", newRow: " + move.newRow + ", newCol: " + move.newCol +
                 ", WINNER IS: " + winner);
-        System.out.println(" in " + (play.score >= 1000 ? 2000-play.score : -2000+play.score) + " moves!");
+        System.out.println(" in " + (play.score >= 1000 ? 2000-play.score : 2000+play.score) + " moves!");
         return move;
     }
 
