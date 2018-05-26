@@ -44,7 +44,7 @@ public class BoardTile extends StackPane {
                 setStyle("-fx-background-color: rgb(0, 150, 0);");
             }
             else if (highlight) {
-                if (help) setStyle("-fx-background-color: rgb(180,0,0);");
+                if (help) setStyle("-fx-background-color: rgb(150,0,0);");
                     else setStyle("-fx-background-color: rgb(200,150,0);");
             }
         });
@@ -63,7 +63,7 @@ public class BoardTile extends StackPane {
             setStyle("-fx-background-color: rgb(0, 150, 0);");
         }
         else if (highlight) {
-            if(help) setStyle("-fx-background-color: rgb(180,0,0);");
+            if(help) setStyle("-fx-background-color: rgb(150,0,0);");
             else setStyle("-fx-background-color: rgb(200,150,0);");
         }
         else {

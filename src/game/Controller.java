@@ -200,18 +200,19 @@ public class Controller {
         checkGameOver();
 
         if (Logic.gameOver(state)) return;
-
+        if (state.getTurn() == move.team) {
+            System.out.println("TEAM " + ((move.team == RED) ? "Black" : "Red") + "'s turn has been skipped!");
+            if(helpHumanBox.isSelected()) {
+                highlightBestPieces(true);
+            }
+            return;
+        }
         if (mode == HUMAN_VS_AI) {
             aiThread = new Thread(this::doAITurn);
             aiThread.setDaemon(true);
             aiThread.start();
-        } else {
-            if(helpHumanBox.isSelected()) {
-                highlightBestPieces(true);
-            }
-            if (state.getTurn() == move.team) {
-                System.out.println("TEAM " + ((move.team == RED) ? "Black" : "Red") + "'s turn has been skipped!");
-            }
+        } else if(helpHumanBox.isSelected()) {
+            highlightBestPieces(true);
         }
     }
 
