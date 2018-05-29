@@ -23,6 +23,8 @@ public class LookupTableMinimax extends AI {
     public LookupTableMinimax(int team, State state, boolean overwriteDB) {
         super(team);
         lookupTable = new HashMap<>();
+        if(!overwriteDB)
+            checkConnection(state);
 
         if (useDB) {
             conn = getConnection(state.getScoreLimit());
@@ -60,11 +62,11 @@ public class LookupTableMinimax extends AI {
             System.exit(0);
         }
         Move move = play.move;
-        String winner = (play.score >= 1000) ? "RED" : "BLACK";
+        String winner = (play.score >= 1000) ? "RED" : (play.score == 0) ? "DRAW" : "BLACK";
         System.out.print("BEST PLAY:  " + "oldRow: " + move.oldRow +
                 ", oldCol: " + move.oldCol + ", newRow: " + move.newRow + ", newCol: " + move.newCol +
                 ", WINNER IS: " + winner);
-        System.out.println(" in " + (play.score >= 1000 ? 2000-play.score : 2000+play.score) + " moves!");
+        System.out.println(" in " + (play.score >= 1000 ? 2000-play.score : (play.score == 0) ? "∞" : 2000+play.score) + " moves!");
         return move;
     }
 
@@ -220,5 +222,44 @@ public class LookupTableMinimax extends AI {
         }
         return play;
     }
+
+    private void checkConnection(State state) {
+        int scoreLimit = state.getScoreLimit();
+        String JDBC_URL = "jdbc:derby:lookupDB;create=true";
+        System.out.println("Connecting to database. This might take some time");
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(
+                    JDBC_URL);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Connection successful");
+
+        String tableName = "plays_" + scoreLimit;
+        long key = new Node(state).getHashCode();
+        boolean error = false;
+        // Try query to check for table existance
+        try {
+            Statement statement = conn.createStatement();
+            ResultSet resultSet = statement.executeQuery("select oldRow, oldCol, newRow, newCol, team, score from "
+                    + tableName + " where id=" + key);
+            if(!resultSet.next()) {
+                System.err.println("The database table '" + tableName + "' is incomplete.");
+                error = true;
+            }
+
+            statement.close();
+        } catch (SQLException e) {
+            System.err.println("Table '" + tableName + "' does not exist in the database.");
+            error = true;
+        }
+
+        if(error) {
+            System.err.println("Please rebuild the database. Exiting");
+            System.exit(-1);
+        }
+    }
+
 }
 
