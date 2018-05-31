@@ -141,7 +141,11 @@ public class Controller {
             stopAIButton.setDisable(true);
         });
         // Review button
-        reviewButton.setOnMouseClicked(event -> reviewGame());
+        reviewButton.setOnMouseClicked(event -> {
+            if(connect(state.getScoreLimit())) {
+                reviewGame();
+            }
+        });
         // Goal Red
         goalRed.setOnMouseClicked(event -> {
             if (goalRed.getHighlight() || Globals.CUSTOMIZABLE) {
@@ -304,19 +308,25 @@ public class Controller {
 
         String tableName = "plays_" + scoreLimit;
         long key = new Node(state).getHashCode();
+        boolean error = false;
         // Try query to check for table existance
         try {
             Statement statement = dbConnection.createStatement();
             ResultSet resultSet = statement.executeQuery("select oldRow, oldCol, newRow, newCol, team, score from "
                     + tableName + " where id=" + key);
             if(!resultSet.next()) {
-                System.err.println("This state was not found in the database!");
-                return false;
+                System.err.println("The database table '" + tableName + "' is incomplete.");
+                error = true;
             }
 
             statement.close();
         } catch (SQLException e) {
             System.out.println("Table '" + tableName + "' does not exist in the database!");
+            error = true;
+        }
+
+        if(error) {
+            showOverwritePane();
             return false;
         }
         return true;
@@ -347,8 +357,7 @@ public class Controller {
     }
 
     public String turnsToTerminal(int score) {
-        //if(Math.abs(score) == 1000) {
-        if(score == 0) { // TODO - new version, update DB's
+        if(score == 0) {
             return "∞";
         }
         if(score > 0) {
@@ -494,6 +503,17 @@ public class Controller {
         newStage.initOwner(window);
         newStage.setOnCloseRequest(Event::consume);
         newStage.show();
+    }
+    private void showOverwritePane() {
+        Stage newStage = new Stage();
+        newStage.setScene(new Scene(new OverwriteDBPane(this), 500, 150));
+        newStage.initModality(Modality.APPLICATION_MODAL);
+        newStage.initOwner(window);
+        newStage.setOnCloseRequest(Event::consume);
+        newStage.show();
+    }
+    public void buildDB() {
+        LookupTableMinimax lt = new LookupTableMinimax(RED, state, true);
     }
 
     private int setMode(int playerRedInstance, int playerBlackInstance) {

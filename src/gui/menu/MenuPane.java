@@ -55,13 +55,20 @@ public class MenuPane extends AnchorPane {
 
         });
 
+        Button readme = new Button("README");
+        buttons.add(readme);
+        readme.setOnMouseClicked(event -> {
+            Stage stage = (Stage) getScene().getWindow();
+            stage.setScene(new Scene(new ReadMePane(), Globals.WIDTH, Globals.HEIGHT));
+        });
+
         Button exit = new Button("Exit");
         buttons.add(exit);
         exit.setOnMouseClicked(event -> System.exit(0));
         for (Button button : buttons) {
             button.setMinWidth(Globals.WIDTH / 4);
         }
-        VBox box = new VBox(newGame, continueGame, rules, exit);
+        VBox box = new VBox(newGame, continueGame, rules, readme, exit);
         box.setAlignment(Pos.CENTER);
         box.setSpacing(30);
         AnchorPane.setTopAnchor(box, 0.0);
