@@ -15,11 +15,9 @@ public class FindWinnerStrategy {
     private static int team = RED;
     private static HashMap<Long, MinimaxPlay> transTable = new HashMap<>();
     private static int CURR_MAX_DEPTH;
-    private static Node prevBestNode;
 
     private static void iterativeDeepeningMinimax(State state) {
         CURR_MAX_DEPTH = 0;
-        prevBestNode = null;
         boolean done = false;
         MinimaxPlay bestPlay = null;
         long startTime = System.currentTimeMillis();
@@ -51,27 +49,10 @@ public class FindWinnerStrategy {
         }
         MinimaxPlay transpoPlay;
         transpoPlay = transTable.get(node.getHashCode());
-        if (transpoPlay != null && (depth <= transpoPlay.depth || Math.abs(transpoPlay.score) == 1000)) {
+        if (transpoPlay != null && depth <= transpoPlay.depth) {
             return transpoPlay;
         }
-        if (depth == CURR_MAX_DEPTH && prevBestNode != null) {
-            score = minimax(prevBestNode, depth - 1, alpha, beta).score;
-            if (node.getState().getTurn() == team) {
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestMove = prevBestNode.getState().getMove();
-                }
-                alpha = Math.max(score, alpha);
-            } else {
-                if (score < bestScore) {
-                    bestScore = score;
-                    bestMove = prevBestNode.getState().getMove();
-                }
-                beta = Math.min(score, beta);
-            }
-        }
         for (Node child : node.getChildren()) {
-            if (depth == CURR_MAX_DEPTH) if (child.equals(prevBestNode)) continue;
             score = minimax(child, depth - 1, alpha, beta).score;
             if (node.getState().getTurn() == team) {
                 if (score > bestScore) {
@@ -87,9 +68,6 @@ public class FindWinnerStrategy {
                 beta = Math.min(score, beta);
             }
             if (beta <= alpha) break;
-        }
-        if (depth == CURR_MAX_DEPTH) {
-            prevBestNode = node.getNextNode(bestMove);
         }
         if (transpoPlay == null || depth > transpoPlay.depth) {
             transTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
@@ -110,7 +88,7 @@ public class FindWinnerStrategy {
 
     public static void main(String[] args) {
         Zobrist.initialize();
-        int scoreLimit = 2;
+        int scoreLimit = 7;
         System.out.println("Finding the optimal strategy when playing to " + scoreLimit + " points");
         State state = new State(scoreLimit);
         iterativeDeepeningMinimax(state);
