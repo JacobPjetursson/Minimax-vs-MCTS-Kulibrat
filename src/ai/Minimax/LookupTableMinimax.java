@@ -89,6 +89,9 @@ public class LookupTableMinimax extends AI {
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH + ", LOOKUP TABLE SIZE: " + lookupTable.size());
             if (lookupTable.size() == prevSize) {
                 doneCounter++;
+                if (state.getScoreLimit() > 5) {
+                    CURR_MAX_DEPTH+=15;
+                }
             } else doneCounter = 0;
 
             if(doneCounter == 3) done = true;
