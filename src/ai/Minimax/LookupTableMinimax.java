@@ -15,6 +15,7 @@ import static misc.Globals.RED;
 public class LookupTableMinimax extends AI {
     private boolean useDB = true;
     private int CURR_MAX_DEPTH;
+    private int unevaluatedNodes = 0;
     private HashMap<Long, MinimaxPlay> lookupTable;
 
     private String JDBC_URL = "jdbc:derby:lookupDB;create=true";
@@ -79,22 +80,24 @@ public class LookupTableMinimax extends AI {
     private MinimaxPlay iterativeDeepeningMinimax(State state) {
         CURR_MAX_DEPTH =0;
         boolean done = false;
-        int doneCounter = 0;
         MinimaxPlay play = null;
+        int doneCounter = 0;
         while (!done) {
             Node simNode = new Node(state); // Start from fresh (Don't reuse previous game tree in new iterations)
             int prevSize = lookupTable.size();
+            int prevUnevaluatedNodes = unevaluatedNodes;
+            unevaluatedNodes = 0;
             CURR_MAX_DEPTH += 1;
             play = minimax(simNode, CURR_MAX_DEPTH);
-            System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH + ", LOOKUP TABLE SIZE: " + lookupTable.size());
-            if (lookupTable.size() == prevSize) {
+            System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH + ", LOOKUP TABLE SIZE: " + lookupTable.size() + ", UNEVALUATED NODES: " + unevaluatedNodes);
+            if (lookupTable.size() == prevSize && unevaluatedNodes == prevUnevaluatedNodes) {
+                System.out.println("State space explored, and unevaluated nodes unchanged between runs. I'm done");
                 doneCounter++;
-                if (state.getScoreLimit() > 5) {
-                    CURR_MAX_DEPTH+=15;
-                }
-            } else doneCounter = 0;
+            } else
+                doneCounter = 0;
 
-            if(doneCounter == 3) done = true;
+            if (doneCounter == 2) done = true;
+
 
             if(Math.abs(play.score) >= 1000) {
                 String player = (team == RED) ? "RED" : "BLACK";
@@ -118,10 +121,13 @@ public class LookupTableMinimax extends AI {
         if (transpoPlay != null && depth <= transpoPlay.depth) {
             return transpoPlay;
         }
+        boolean evaluated = true;
         for (Node child : node.getChildren()) {
             score = minimax(child, depth - 1).score;
             if(score > 1000) score--;
             else if (score < -1000) score++;
+            else evaluated = false;
+
             if (node.getState().getTurn() == team) {
                 if (score > bestScore) {
                     bestScore = score;
@@ -138,6 +144,7 @@ public class LookupTableMinimax extends AI {
             lookupTable.put(node.getHashCode(),
                    new MinimaxPlay(bestMove, bestScore, depth));
         }
+        if(!evaluated) unevaluatedNodes++;
         return new MinimaxPlay(bestMove, bestScore, depth);
     }
 
