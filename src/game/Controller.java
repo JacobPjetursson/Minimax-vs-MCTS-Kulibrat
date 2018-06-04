@@ -192,7 +192,8 @@ public class Controller {
             aiThread.start();
         }
     }
-
+    // Is called when a tile is pressed by the user. If vs. the AI, it calls the doAITurn after. This function also highlights
+    // the best pieces for the opponent, if it is human vs human.
     private void doHumanTurn(Move move) {
         previousStates.add(new PrevState(state, move, turnNo));
         state = state.getNextState(move);
@@ -220,7 +221,8 @@ public class Controller {
             highlightBestPieces(true);
         }
     }
-
+    // This function is called when two AI's are matched against each other. It can be interrupted by the user.
+    // For the lookup table, a delay can be set
     private void startAI() {
         // For the AI vs. AI mode. New thread is needed to update the gui while running the AI
         navPane.getRestartButton().setDisable(true);
@@ -249,7 +251,7 @@ public class Controller {
         aiThread.setDaemon(true);
         aiThread.start();
     }
-
+    // The AI makes its turn, and the GUI is updated while doing so
     private void doAITurn() {
         int turn = state.getTurn();
         Move move;
@@ -279,7 +281,7 @@ public class Controller {
             }
         }
     }
-
+    // Checks if the game is over and shows a popup. Popup allows a restart, go to menu, or review game
     private void checkGameOver() {
         if (Logic.gameOver(state) && !endGamePopup) {
             endGamePopup = true;
@@ -296,6 +298,7 @@ public class Controller {
             newStage.show();
         }
     }
+    // Connects to the database. If the table in question is incomplete or missing, show a pane to allow creating the DB on the spot.
     public boolean connect(int scoreLimit) {
         String JDBC_URL;
         File f = new File("useAltDB");
@@ -339,7 +342,7 @@ public class Controller {
         }
         return true;
     }
-
+    // Fetches the best play corresponding to the input node
     public MinimaxPlay queryPlay(Node n) {
         MinimaxPlay play = null;
         String tableName = "plays_" + state.getScoreLimit();
@@ -363,7 +366,7 @@ public class Controller {
         }
         return play;
     }
-
+    // Outputs a string which is the amount of turns to a terminal node, based on a score from the database entry
     public String turnsToTerminal(int score) {
         if(score == 0) {
             return "∞";
@@ -382,7 +385,7 @@ public class Controller {
             }
         }
     }
-
+    // Deselects the selected piece
     private void deselect() {
         if (selected != null) {
             highlightMoves(selected.getRow(), selected.getCol(), selected.getTeam(), false);
@@ -395,7 +398,7 @@ public class Controller {
         selected = piece;
         highlightMoves(piece.getRow(), piece.getCol(), piece.getTeam(), true);
     }
-
+    // Shows the red/green/yellow highlight on the tiles when a piece has been selected
     private void highlightMoves(int row, int col, int team, boolean highlight) {
         if (highlight) curHighLights = Logic.legalMovesFromPiece(row,
                 col, team, state);
@@ -429,7 +432,8 @@ public class Controller {
             } else tiles[m.newRow][m.newCol].setHighlight(highlight, helpHumanBox.isSelected(), bestMove, turns);
         }
     }
-
+    // Outputs a list of the best plays from a given node. Checks through the children of a node to find the ones
+    // which have the least amount of turns to terminal for win, or most for loss.
     public ArrayList<Move> bestPlays(Node n) {
         ArrayList<Move> bestPlays = new ArrayList<>();
         MinimaxPlay bestPlay = queryPlay(n);
@@ -448,7 +452,7 @@ public class Controller {
         }
         return bestPlays;
     }
-
+    // Highlights the best pieces found above
     private void highlightBestPieces(boolean highlight) {
         Node n = new Node(state);
         ArrayList<Move> bestPlays = null;
@@ -482,7 +486,7 @@ public class Controller {
             p.setBest(false);
         }
     }
-
+    // Adds sting scores to all moves from a piece
     private ArrayList<String> getScores(ArrayList<Move> curHighLights) {
         ArrayList<String> turnsToTerminalList = new ArrayList<>();
         for(Move m : curHighLights) {
@@ -503,7 +507,7 @@ public class Controller {
             return playerBlackInstance;
         }
     }
-
+    // Opens the review pane
     private void reviewGame() {
         Stage newStage = new Stage();
         newStage.setScene(new Scene(new ReviewPane(primaryStage, this), 325, Globals.HEIGHT - 50));
@@ -512,6 +516,7 @@ public class Controller {
         newStage.setOnCloseRequest(Event::consume);
         newStage.show();
     }
+    // Opens the overwrite pane for DB
     private void showOverwritePane() {
         Stage newStage = new Stage();
         newStage.setScene(new Scene(new OverwriteDBPane(this), 500, 150));
@@ -520,10 +525,11 @@ public class Controller {
         newStage.setOnCloseRequest(Event::consume);
         newStage.show();
     }
+    // Builds the DB
     public void buildDB() {
         LookupTableMinimax lt = new LookupTableMinimax(RED, state, true);
     }
-
+    // Sets the mode based on the red and black player types
     private int setMode(int playerRedInstance, int playerBlackInstance) {
         if (playerRedInstance == HUMAN && playerBlackInstance == HUMAN) {
             return HUMAN_VS_HUMAN;

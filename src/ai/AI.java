@@ -1,4 +1,8 @@
+/**
+ * Template for all AI's
+ */
 package ai;
+
 
 import game.Move;
 import game.State;

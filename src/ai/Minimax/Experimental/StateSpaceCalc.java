@@ -1,3 +1,6 @@
+/**
+ * This class calculates the state space of Kulibrat using Minimax
+ */
 package ai.Minimax.Experimental;
 
 import ai.Minimax.MinimaxPlay;

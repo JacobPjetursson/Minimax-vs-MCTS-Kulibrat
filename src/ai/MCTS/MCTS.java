@@ -16,9 +16,8 @@ public class MCTS extends AI {
     public boolean debug = true;
     // PARAMETERS
     private long calculationTime;
-    private int max_moves = 300; // todo - replace with while loop?
+    private int max_moves = 300;
     private boolean useMinimax = false;
-    private boolean preplay = false;
     private int minimaxDepth = 2;
     private Minimax minimax;
     private int simulationDepth = 0;
@@ -31,11 +30,8 @@ public class MCTS extends AI {
         minimax = new Minimax(team, calculationTime);
         minimax.setUseTranspo(false);
         curr_node = new Node(startState);
-        if (preplay) {
-            initialize(curr_node, 15000);
-        }
     }
-
+    // Main function for MCTS, which consist of all four steps in the algorithm.
     private void run(Node startNode) {
         Node sim_node = startNode;
         Node terminalNode = null;
@@ -123,7 +119,7 @@ public class MCTS extends AI {
         return move;
 
     }
-
+    // Called when MCTS makes its final move based on the move with the highest chances of winning
     private Move getBestMove(Node node) {
         Move bestMove = null;
         double best_val = Integer.MIN_VALUE;
@@ -148,7 +144,7 @@ public class MCTS extends AI {
         System.out.println();
         return bestMove;
     }
-
+    // Main loop of MCTS for statistic gathering
     private void initialize(Node startNode, long calculationTime) {
         int games = 0;
         simulationDepth = 0;

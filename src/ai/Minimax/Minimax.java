@@ -26,7 +26,7 @@ public class Minimax extends AI {
         this.calculationTime = calculationTime;
         transTable = new HashMap<>();
     }
-
+    // Runs the iterative deepening minimax with a set timelimit
     public Move makeMove(State state) {
         long startTime = System.currentTimeMillis();
         if (state.getLegalMoves().size() == 1) {
@@ -39,7 +39,7 @@ public class Minimax extends AI {
         return move;
 
     }
-
+    // Iteratively increases the depth limit while called minimax continuously. Stops when win is ensured or time is up.
     private MinimaxPlay iterativeDeepeningMinimax(State state, long startTime) {
         resetVariables();
         MinimaxPlay bestPlay = null;
@@ -61,7 +61,7 @@ public class Minimax extends AI {
 
         return bestPlay;
     }
-
+    // Minimax with pruning, move ordering and a detailed heuristic
     public MinimaxPlay minimax(Node node, int depth, int alpha, int beta, long startTime) {
         Move bestMove = null;
         int bestScore = (node.getState().getTurn() == team) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
@@ -137,13 +137,15 @@ public class Minimax extends AI {
         this.team = team;
     }
 
+    // These variables are reset inbetween turns of the minimax
     private void resetVariables() {
         CURR_MAX_DEPTH = 0;
         prevBestNode = null;
         searchCutOff = false;
 
     }
-
+    // Either returns 1000 or -1000 if terminal, or the material of a state, if intermediate.
+    // The material is the objective value of a state
     private int heuristic(State state) {
         int opponent = (team == BLACK) ? BLACK : RED;
         if (Logic.gameOver(state)) {
@@ -152,10 +154,10 @@ public class Minimax extends AI {
                 return 1000;
             } else if (winner == opponent) return -1000;
         }
-        if(state.getTurn() == team) return state.getMaterial(team);
-        else return -state.getMaterial(team);
+        if(state.getTurn() == team) return state.getMaterial();
+        else return -state.getMaterial();
     }
-
+    // Used if a win has been ensured, to make sure the algorithm fulfills all its allocated time.
     private void chill(long startTime) {
         while (!outOfTime(startTime)) {
             //chill

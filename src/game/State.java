@@ -33,7 +33,7 @@ public class State {
         this.scoreLimit = scoreLimit;
     }
 
-    // Duplicate constructor, for "root" state
+    // Duplicate constructor
     public State(State state) {
         board = new int[state.board.length][];
         for (int i = 0; i < state.board.length; i++) {
@@ -53,7 +53,7 @@ public class State {
         return board;
     }
 
-    public void setBoardEntry(int row, int col, int team) {
+    void setBoardEntry(int row, int col, int team) {
         board[row][col] = team;
     }
 
@@ -87,12 +87,11 @@ public class State {
         return scoreLimit;
     }
 
-    public void addUnPlaced(int team) {
+    void addUnPlaced(int team) {
         if (team == RED) unplacedRed++;
         else unplacedBlack++;
     }
-
-    public void removeUnPlaced(int team) {
+    void removeUnPlaced(int team) {
         if (team == RED) unplacedRed--;
         else unplacedBlack--;
     }
@@ -101,8 +100,8 @@ public class State {
         if (team == RED) return unplacedRed;
         else return unplacedBlack;
     }
-
-    public ArrayList<Point> getPieces(int team) {
+    // Get a list of pieces/points from this state
+    ArrayList<Point> getPieces(int team) {
         ArrayList<Point> entries = new ArrayList<>();
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
@@ -121,12 +120,8 @@ public class State {
         return (team == RED) ? redScore : blackScore;
     }
 
-    public void setScore(int team, int score) {
-        if (team == RED) redScore = score;
-        else blackScore = score;
-    }
-
-    public State getNextState(Move m) {
+    // Get the next state based on the input move
+    State getNextState(Move m) {
         State state = new State(this);
         Logic.doTurn(m, state);
         state.move = m;
@@ -140,10 +135,10 @@ public class State {
         legalMoves = Logic.legalMoves(turn, this);
         return legalMoves;
     }
-
-    public int getMaterial(int team) {
+    // Returns the material of a state, which is the value of the state based on various heuristics.
+    // It checks the current turn, and outputs a positive number if it is good, or negative if bad
+    public int getMaterial() {
         int score = 0;
-        int opponent = (turn == BLACK) ? BLACK : RED;
 
         // Bonus for legal moves
         score += (getLegalMoves().size() * 2);

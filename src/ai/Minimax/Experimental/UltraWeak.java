@@ -1,3 +1,6 @@
+/**
+ * This class attempts to find a winning strategy by focing a winning cycle. It fails to find it
+ */
 package ai.Minimax.Experimental;
 
 import ai.Minimax.MinimaxPlay;
