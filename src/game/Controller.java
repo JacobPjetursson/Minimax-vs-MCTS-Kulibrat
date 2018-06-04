@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import misc.Globals;
 
+import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -296,7 +297,14 @@ public class Controller {
         }
     }
     public boolean connect(int scoreLimit) {
-        String JDBC_URL = "jdbc:derby:lookupDB;create=true";
+        String JDBC_URL;
+        File f = new File("useAltDB");
+        if (f.exists() && !f.isDirectory()) {
+            JDBC_URL = "jdbc:derby:altDB;create=true";
+        } else {
+            JDBC_URL = "jdbc:derby:lookupDB;create=true";
+        }
+        
         System.out.println("Connecting to database. This might take some time");
         try {
             dbConnection = DriverManager.getConnection(

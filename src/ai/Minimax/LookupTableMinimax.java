@@ -5,6 +5,7 @@ import game.Logic;
 import game.Move;
 import game.State;
 
+import java.io.File;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,12 +19,18 @@ public class LookupTableMinimax extends AI {
     private int unevaluatedNodes = 0;
     private HashMap<Long, MinimaxPlay> lookupTable;
 
-    private String JDBC_URL = "jdbc:derby:lookupDB;create=true";
+    private String JDBC_URL;
     private Connection conn;
 
     public LookupTableMinimax(int team, State state, boolean overwriteDB) {
         super(team);
         lookupTable = new HashMap<>();
+        File f = new File("useAltDB");
+        if (f.exists() && !f.isDirectory()) {
+            JDBC_URL = "jdbc:derby:altDB;create=true";
+        } else {
+            JDBC_URL = "jdbc:derby:lookupDB;create=true";
+        }
         if(!overwriteDB)
             checkConnection(state);
 
@@ -235,7 +242,6 @@ public class LookupTableMinimax extends AI {
 
     private void checkConnection(State state) {
         int scoreLimit = state.getScoreLimit();
-        String JDBC_URL = "jdbc:derby:lookupDB;create=true";
         System.out.println("Connecting to database. This might take some time");
         Connection conn = null;
         try {
