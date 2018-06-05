@@ -439,8 +439,9 @@ public class Controller {
 
         for (Node child : n.getChildren()) {
             Move m = child.getState().getMove();
-            if(Logic.gameOver(n.getNextNode(m).getState())) {
-                bestPlays.add(m);
+            State state = n.getNextNode(m).getState();
+            if(Logic.gameOver(state)) {
+                if (Logic.getWinner(state) == m.team) bestPlays.add(m);
             } else if(queryPlay(child).score == bestScore) {
                 bestPlays.add(m);
             }
