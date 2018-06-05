@@ -21,6 +21,13 @@ public class Globals {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 650;
 
+    // BOARD CONFIG AND RULES
+    public static final int bWidth = 3;
+    public static final int bHeight = 4;
+    public static final int piece_amount = 2;
+    public static final boolean losePieces = true;
+
     // MISC
     public static final boolean CUSTOMIZABLE = false;
+    public static final String JDBC_URL = "jdbc:derby:altDB;create=true";
 }

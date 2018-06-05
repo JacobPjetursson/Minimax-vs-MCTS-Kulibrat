@@ -11,6 +11,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import misc.Globals;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -25,29 +26,44 @@ public class Player extends VBox {
     private int pieceRadius;
 
 
-    public Player(int team, Controller cont, int width, int pieceRadius, boolean clickable) {
+    public Player(int team, Controller cont, int tileWidth, int pieceRadius, boolean clickable) {
         this.team = team;
         this.clickable = clickable;
         this.pieceRadius = pieceRadius;
         pieces = new ArrayList<>();
         int type = cont.getPlayerInstance(team);
         setAlignment(Pos.CENTER);
-        setSpacing(width/6);
+        setSpacing(tileWidth/6);
         setStyle("-fx-background-color: rgb(255, 255, 255);");
+
+        int amount_of_pieces;
+        if (Globals.losePieces) {
+            if(cont.getState().getScoreLimit() <= 4) {
+                amount_of_pieces = cont.getState().getScoreLimit();
+            } else {
+                amount_of_pieces = 4;
+            }
+        } else {
+            if (Globals.piece_amount <=4) {
+                amount_of_pieces = Globals.piece_amount;
+            } else {
+                amount_of_pieces = 4;
+            }
+        }
 
         gridPaneBoard = new GridPane();
         gridPaneBoard.setAlignment(Pos.CENTER);
-        gridPaneBoard.setPrefSize(width * 4, width);
-        gridPaneBoard.setMaxWidth(width * 4);
+        gridPaneBoard.setPrefSize(tileWidth * 4, tileWidth);
+        gridPaneBoard.setMaxWidth(tileWidth * 4);
         gridPaneBoard.setBorder(new Border(new BorderStroke(getColor(),
                 BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 
-        ColumnConstraints column = new ColumnConstraints(width);
+        ColumnConstraints column = new ColumnConstraints(tileWidth);
         for (int i = 0; i < 4; i++) {
             gridPaneBoard.getColumnConstraints().add(column);
         }
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < amount_of_pieces; i++) {
             BoardPiece bp = new BoardPiece(team, cont, pieceRadius, clickable);
             pieces.add(bp);
             gridPaneBoard.add(pieceBox(bp), i, 0);
@@ -59,19 +75,20 @@ public class Player extends VBox {
         ImageView imgView = new ImageView(img);
 
         imgView.setPreserveRatio(true);
-        imgView.setFitHeight(width);
-        imgView.setFitWidth(width);
+        imgView.setFitHeight(tileWidth);
+        imgView.setFitWidth(tileWidth);
         BorderPane imgPane = new BorderPane();
         imgPane.setCenter(imgView);
 
         GridPane gridPaneDisplay = new GridPane();
         gridPaneDisplay.setAlignment(Pos.CENTER);
-        gridPaneDisplay.setPrefSize((width * 4) / 3, width);
-        gridPaneDisplay.setMaxWidth((width * 4) / 3);
+        gridPaneDisplay.setPrefSize((tileWidth * 4) / 3, tileWidth);
+        gridPaneDisplay.setMaxWidth((tileWidth * 4) / 3);
 
-        Label typeLabel = new Label((type == HUMAN) ? "Human" : (type == MINIMAX) ? "Minimax" : (type == LOOKUP_TABLE) ? "Lookup\n Table" : "MCTS");
-        typeLabel.setFont(Font.font("Verdana", width/4));
-        ColumnConstraints column1 = new ColumnConstraints((width * 4) / 3);
+        Label typeLabel = new Label((type == HUMAN) ? "Human" : (type == MINIMAX) ?
+                "Minimax" : (type == LOOKUP_TABLE) ? "Lookup\n Table" : "MCTS");
+        typeLabel.setFont(Font.font("Verdana", tileWidth/4));
+        ColumnConstraints column1 = new ColumnConstraints((tileWidth * 4) / 3);
         for (int i = 0; i < 3; i++) {
             gridPaneDisplay.getColumnConstraints().add(column1);
         }
@@ -87,6 +104,7 @@ public class Player extends VBox {
     public void update(Controller cont, State state) {
         if (gridPaneBoard.getChildren().size() > state.getUnplaced(team)) {
             if (cont.getSelected() != null) { //Human turn
+                System.out.println("HUMAN TURN");
                 BoardPiece bp = cont.getSelected();
                 pieces.remove(bp);
                 gridPaneBoard.getChildren().remove(bp.getParent());

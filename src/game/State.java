@@ -1,5 +1,7 @@
 package game;
 
+import misc.Globals;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,13 +24,18 @@ public class State {
 
     // Starting state
     public State(int scoreLimit) {
-        int rows = 4;
-        int columns = 3;
-        board = new int[rows][columns]; // Initializes to 0 (Java standard)
+        int rows = Globals.bHeight;
+        int columns = Globals.bWidth;
+        board = new int[rows][columns];
         redScore = 0;
         blackScore = 0;
-        unplacedRed = 4;
-        unplacedBlack = 4;
+        if (Globals.losePieces) {
+            unplacedRed = scoreLimit;
+            unplacedBlack = scoreLimit;
+        } else {
+            unplacedRed = Globals.piece_amount;
+            unplacedBlack = Globals.piece_amount;
+        }
         turn = RED;
         this.scoreLimit = scoreLimit;
     }
@@ -60,10 +67,10 @@ public class State {
     public void addPoint(int team) {
         if (team == RED) {
             redScore++;
-            unplacedRed++;
+            if (!Globals.losePieces) unplacedRed++;
         } else {
             blackScore++;
-            unplacedBlack++;
+            if (!Globals.losePieces) unplacedBlack++;
         }
     }
 

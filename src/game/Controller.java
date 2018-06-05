@@ -300,13 +300,7 @@ public class Controller {
     }
     // Connects to the database. If the table in question is incomplete or missing, show a pane to allow creating the DB on the spot.
     public boolean connect(int scoreLimit) {
-        String JDBC_URL;
-        File f = new File("useAltDB");
-        if (f.exists() && !f.isDirectory()) {
-            JDBC_URL = "jdbc:derby:altDB;create=true";
-        } else {
-            JDBC_URL = "jdbc:derby:lookupDB;create=true";
-        }
+        String JDBC_URL = Globals.JDBC_URL;
         
         System.out.println("Connecting to database. This might take some time");
         try {
@@ -390,6 +384,7 @@ public class Controller {
         if (selected != null) {
             highlightMoves(selected.getRow(), selected.getCol(), selected.getTeam(), false);
             selected.deselect();
+            selected = null;
         }
     }
 

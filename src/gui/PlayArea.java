@@ -14,6 +14,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import misc.Globals;
 
 import java.util.ArrayList;
 
@@ -36,8 +37,8 @@ public class PlayArea extends GridPane {
         board = new Board(60, 20, true);
         playerBlack = new Player(BLACK, cont, 60, 20, true);
         playerRed = new Player(RED, cont, 60, 20, true);
-        goalRed = new Goal(3 * board.getTileSize(), 50);
-        goalBlack = new Goal(3 * board.getTileSize(), 50);
+        goalRed = new Goal(Globals.bWidth * board.getTileSize(), 50);
+        goalBlack = new Goal(Globals.bWidth * board.getTileSize(), 50);
         info = new InfoPane(cont.getScoreLimit(), cont.getMode());
 
         ColumnConstraints column = new ColumnConstraints(WIDTH / 3);

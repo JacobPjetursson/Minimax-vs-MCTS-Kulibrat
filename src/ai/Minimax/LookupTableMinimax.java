@@ -4,6 +4,7 @@ import ai.AI;
 import game.Logic;
 import game.Move;
 import game.State;
+import misc.Globals;
 
 import java.io.File;
 import java.sql.*;
@@ -25,12 +26,7 @@ public class LookupTableMinimax extends AI {
     public LookupTableMinimax(int team, State state, boolean overwriteDB) {
         super(team);
         lookupTable = new HashMap<>();
-        File f = new File("useAltDB");
-        if (f.exists() && !f.isDirectory()) {
-            JDBC_URL = "jdbc:derby:altDB;create=true";
-        } else {
-            JDBC_URL = "jdbc:derby:lookupDB;create=true";
-        }
+        JDBC_URL = Globals.JDBC_URL;
         if(!overwriteDB)
             checkConnection(state);
 

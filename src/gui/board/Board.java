@@ -5,10 +5,11 @@ import game.State;
 import gui.PlayArea;
 import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
+import misc.Globals;
 
 public class Board extends GridPane {
-    private static final int boardRows = 4;
-    private static final int boardColumns = 3;
+    private static final int boardRows = Globals.bHeight;
+    private static final int boardColumns = Globals.bWidth;
     private BoardTile[][] tiles;
     private int tilesize;
     private int pieceRadius;
