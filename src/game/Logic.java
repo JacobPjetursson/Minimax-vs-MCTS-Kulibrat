@@ -1,5 +1,7 @@
 package game;
 
+import misc.Globals;
+
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -58,6 +60,9 @@ public abstract class Logic {
                         list.add(new Move(oldRow, oldCol, oldRow - jump, oldCol, team));
                         break;
                     }
+                    if (Globals.attackJump && board[oldRow - jump][oldCol] == BLACK) {
+                        list.add(new Move(oldRow, oldCol, oldRow - jump, oldCol, team));
+                    }
                 }
             }
         } else {
@@ -94,6 +99,9 @@ public abstract class Logic {
                     if (board[oldRow + jump][oldCol] == 0) {
                         list.add(new Move(oldRow, oldCol, oldRow + jump, oldCol, team));
                         break;
+                    }
+                    if (Globals.attackJump && board[oldRow + jump][oldCol] == RED) {
+                        list.add(new Move(oldRow, oldCol, oldRow + jump, oldCol, team));
                     }
                 }
             }
