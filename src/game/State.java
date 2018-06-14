@@ -144,13 +144,17 @@ public class State {
     }
     // Returns the material of a state, which is the value of the state based on various heuristics.
     // It checks the current turn, and outputs a positive number if it is good, or negative if bad
-    public int getMaterial() {
+    public int getMaterial(int team) {
         int score = 0;
 
-        // Bonus for legal moves
-        score += (getLegalMoves().size() * 2);
+        if(team == BLACK) score += getScore(team) * 5;
 
-        // Bonus for being in front of opponent on your turn
+
+        // Bonus for legal moves
+        //if(team == BLACK) score += (getLegalMoves().size() * 2);
+
+        // Bonus for being in front of opponent on your turn (attack position)
+        if(team == RED) {
         for (Point pR : getPieces(RED)) {
             for (Point pB : getPieces(BLACK)) {
                 if (pR.x == pB.x && (pR.y-1) == pB.y) {
@@ -158,6 +162,8 @@ public class State {
                 }
             }
         }
+        }
+        /*
         // Win cycle bonus
         boolean bot = false;
         boolean mid = false;
@@ -194,7 +200,7 @@ public class State {
         }
         if (top && mid && bot) tempScore += 100;
         score += (turn == BLACK) ? tempScore : -tempScore;
-
+*/
         return score;
     }
 

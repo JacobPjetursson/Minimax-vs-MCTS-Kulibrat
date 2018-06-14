@@ -95,67 +95,49 @@ public class StateSpaceCalc {
 
     private static HashSet<BoardConfig> produceStateSpace() {
         HashSet<BoardConfig> fullSpace = new HashSet<>();
-        int statespace = 170019 * 2;
-        System.out.println("calculated statespace: " + statespace);
         int[] board = new int[12];
+        // Empty board
+        saveBoardConfig(board, RED, fullSpace);
+        saveBoardConfig(board, BLACK, fullSpace);
+        // Only black pieces
+        placeBlackPieces(board, RED, fullSpace);
+        placeBlackPieces(board, BLACK, fullSpace);
+        // Mix of red and black pieces
         for(int turn = 1; turn <= 2; turn++) {
-            saveBoard(board, turn, fullSpace);
-            fillColor(RED, board, turn, fullSpace);
-            fillColor(BLACK, board, turn, fullSpace);
-        }
-
-        for(int turn = 1; turn <= 2; turn++) {
-            for(int r1 = 0; r1 < board.length; r1++) {
-                for(int r2 = r1; r2 < board.length; r2++) {
-                    for(int r3 = r2; r3 < board.length; r3++) {
-                        for(int r4 = r3; r4 < board.length; r4++) {
+            for(int p1 = 0; p1 < board.length; p1++) {
+                for(int p2 = p1; p2 < board.length; p2++) {
+                    for(int p3 = p2; p3 < board.length; p3++) {
+                        for(int p4 = p3; p4 < board.length; p4++) {
                             board = new int[12];
-                            board[r1] = RED; board[r2] = RED; board[r3] = RED; board[r4] = RED;
-                            saveBoard(board, turn, fullSpace);
-                            fillColor(BLACK, board, turn, fullSpace);
+                            board[p1] = RED; board[p2] = RED; board[p3] = RED; board[p4] = RED;
+                            saveBoardConfig(board, turn, fullSpace);
+                            placeBlackPieces( board, turn, fullSpace);
                         }
                     }
                 }
             }
         }
-
-        board = new int[12];
-        for(int turn = 1; turn <= 2; turn++) {
-            for(int b1 = 0; b1 < board.length; b1++) {
-                for(int b2 = b1; b2 < board.length; b2++) {
-                    for(int b3 = b2; b3 < board.length; b3++) {
-                        for(int b4 = b3; b4 < board.length; b4++) {
-                            board = new int[12];
-                            board[b1] = BLACK; board[b2] = BLACK; board[b3] = BLACK; board[b4] = BLACK;
-                            saveBoard(board, turn, fullSpace);
-                            fillColor(RED, board, turn, fullSpace);
-                        }
-                    }
-                }
-            }
-        }
-        System.out.println("produced statespace: " + fullSpace.size());
         return fullSpace;
     }
-    private static void fillColor(int team, int[] orgBoard, int turn, HashSet<BoardConfig> fullSpace) {
-        int[] board = Arrays.copyOf(orgBoard, orgBoard.length);
+    private static void placeBlackPieces(int[] origBoard, int turn, HashSet<BoardConfig> fullSpace) {
+        int[] board = Arrays.copyOf(origBoard, origBoard.length);
         for(int b1 = 0; b1 < board.length; b1++) {
             for(int b2 = b1; b2 < board.length; b2++) {
                 for(int b3 = b2; b3 < board.length; b3++) {
                     for(int b4 = b3; b4 < board.length; b4++) {
-                        board = Arrays.copyOf(orgBoard, orgBoard.length);
-                        if(board[b1] == 0) board[b1] = team;
-                        if(board[b2] == 0) board[b2] = team;
-                        if(board[b3] == 0) board[b3] = team;
-                        if(board[b4] == 0) board[b4] = team;
+                        board = Arrays.copyOf(origBoard, origBoard.length);
+                        if(board[b1] == 0) board[b1] = BLACK;
+                        if(board[b2] == 0) board[b2] = BLACK;
+                        if(board[b3] == 0) board[b3] = BLACK;
+                        if(board[b4] == 0) board[b4] = BLACK;
 
-                        saveBoard(board, turn, fullSpace);
+                        saveBoardConfig(board, turn, fullSpace);
                     }
                 }
             }
         }
     }
-    private static void saveBoard(int[] board, int turn, HashSet<BoardConfig> fullSpace) {
+    private static void saveBoardConfig(int[] board, int turn, HashSet<BoardConfig> fullSpace) {
         int[][] gameBoard = new int[4][3];
 
         for(int i = 0; i < board.length; i++) {

@@ -104,7 +104,6 @@ public class Player extends VBox {
     public void update(Controller cont, State state) {
         if (gridPaneBoard.getChildren().size() > state.getUnplaced(team)) {
             if (cont.getSelected() != null) { //Human turn
-                System.out.println("HUMAN TURN");
                 BoardPiece bp = cont.getSelected();
                 pieces.remove(bp);
                 gridPaneBoard.getChildren().remove(bp.getParent());
