@@ -15,8 +15,8 @@ import static misc.Globals.RED;
 public class Minimax extends AI {
     private long calculationTime;
     private boolean searchCutOff;
-    private boolean moveOrdering = false;
     private int CURR_MAX_DEPTH;
+    private boolean moveOrdering = true;
     private boolean useTranspo = true;
     private HashMap<Long, MinimaxPlay> transTable;
     private Node prevBestNode;
@@ -154,8 +154,8 @@ public class Minimax extends AI {
                 return 1000;
             } else if (winner == opponent) return -1000;
         }
-        if(state.getTurn() == team) return state.getMaterial(team);
-        else return -state.getMaterial(team);
+        if(state.getTurn() == team) return state.getMaterial();
+        else return -state.getMaterial();
     }
     // Used if a win has been ensured, to make sure the algorithm fulfills all its allocated time.
     private void chill(long startTime) {

@@ -22,15 +22,15 @@ public class Globals {
     public static final int HEIGHT = 650;
 
     // BOARD CONFIG
-    public static final int bWidth = 3;
+    public static final int bWidth = 4;
     public static final int bHeight = 4;
-    public static final int piece_amount = 3;
+    public static final int piece_amount = 4;
 
     // RULES
-    public static final boolean losePieces = true;
-    public static final boolean attackJump = true;
+    public static final boolean losePieces = false;
+    public static final boolean attackJump = false;
 
     // MISC
     public static final boolean CUSTOMIZABLE = false;
-    public static final String JDBC_URL = "jdbc:derby:exp_losePieceAttackJumpDB;create=true";
+    public static final String JDBC_URL = "jdbc:derby:exp_4x4;create=true";
 }
