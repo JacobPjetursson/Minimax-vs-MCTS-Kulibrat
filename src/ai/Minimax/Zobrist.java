@@ -1,5 +1,7 @@
 package ai.Minimax;
 
+import misc.Globals;
+
 import java.util.Random;
 
 import static misc.Globals.RED;
@@ -15,8 +17,8 @@ public class Zobrist {
         Random r = new Random();
         r.setSeed(0);
         // board keys
-        int rows = 4;
-        int cols = 3;
+        int rows = Globals.bHeight;
+        int cols = Globals.bWidth;
         int unique_pieces = 3;
         board = new long[rows][cols][unique_pieces];
         for (int i = 0; i < board.length; i++) {
