@@ -49,8 +49,6 @@ public class FindWinningCycles {
         int score;
         if (loops.contains(node.getHashCode())) {
             int eval = (node.getState().getTurn() == team) ? 1 : -1;
-            //System.out.println("LOOP FOUND: " + Arrays.deepToString(node.getState().getBoard()) + ", SCORE RED: " + node.getState().getScore(RED) +
-            //", SCORE BLACK: " + node.getState().getScore(BLACK));
             return new MinimaxPlay(bestMove, eval, depth);
         }
 
@@ -83,7 +81,7 @@ public class FindWinningCycles {
                 }
                 beta = Math.min(score, beta);
             }
-            //if (beta <= alpha) break;
+            if (beta <= alpha) break;
         }
         if (transpoPlay == null || depth > transpoPlay.depth) {
             transpoTable.put(node.getHashCode(),
@@ -100,4 +98,3 @@ public class FindWinningCycles {
         System.out.println(winner + " is able to force a winning cycle");
     }
 }
-

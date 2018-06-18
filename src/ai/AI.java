@@ -1,6 +1,5 @@
 package ai;
 
-
 import game.Move;
 import game.State;
 
@@ -9,7 +8,6 @@ public abstract class AI {
 
     protected AI(int team) {
         this.team = team;
-
     }
 
     public abstract Move makeMove(State state);

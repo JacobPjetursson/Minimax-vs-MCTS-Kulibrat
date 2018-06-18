@@ -2,7 +2,6 @@ package game;
 
 import java.awt.*;
 import java.util.ArrayList;
-
 import static misc.Globals.*;
 
 public abstract class Logic {
@@ -99,7 +98,6 @@ public abstract class Logic {
         }
         return list;
     }
-
 
     // Do a turn based on a move from a given state. Checks if the move is from the correct player, but does not check for illegal moves.
     // It also adds the points and changes the board based on the move

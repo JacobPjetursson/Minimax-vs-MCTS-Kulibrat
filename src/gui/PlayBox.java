@@ -38,7 +38,6 @@ public class PlayBox extends Group {
         vbox.getChildren().addAll(playerBlack, goalRed, board, goalBlack, playerRed);
         getChildren().add(vbox);
         updateBounds();
-
     }
 
     void update(Controller cont, State s) {

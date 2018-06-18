@@ -9,7 +9,6 @@ public class Move {
     public int newCol;
     public int team;
 
-
     public Move(int oldRow, int oldCol, int newRow, int newCol, int team) {
         this.oldRow = oldRow;
         this.oldCol = oldCol;

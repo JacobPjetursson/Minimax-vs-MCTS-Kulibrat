@@ -12,12 +12,10 @@ public class PlayPane extends GridPane {
 
     public PlayPane(Controller cont) {
         setup();
-
         playArea = new PlayArea(cont);
         navPane = new NavPane(cont);
         add(playArea, 1, 0);
         add(navPane, 0, 0);
-
     }
 
     private void setup() {

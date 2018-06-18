@@ -56,15 +56,12 @@ public class ReadMePane extends VBox {
         setPadding(new Insets(0, 0, 10, 0));
         back.setBorder(new Border(new BorderStroke(Color.BLACK,
                 BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-
         back.setOnMouseClicked(event -> {
             Stage stage = (Stage) getScene().getWindow();
             stage.setScene(new Scene(new MenuPane(),
                     Globals.WIDTH, Globals.HEIGHT));
         });
 
-
         getChildren().addAll(readme, back);
     }
-
 }

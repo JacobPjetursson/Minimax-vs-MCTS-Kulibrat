@@ -7,8 +7,8 @@ import java.util.Random;
 public class Zobrist {
     public static long[][][] board;
     public static long[] turn;
-    public static long[] redPoints;
-    public static long[] blackPoints;
+    static long[] redPoints;
+    static long[] blackPoints;
 
     public static void initialize() {
         long range = Long.MAX_VALUE;

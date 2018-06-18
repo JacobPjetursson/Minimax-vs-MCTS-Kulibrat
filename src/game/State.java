@@ -51,7 +51,6 @@ public class State {
         unplacedBlack = state.unplacedBlack;
         turn = state.turn;
         scoreLimit = state.scoreLimit;
-
         move = state.move;
     }
 
@@ -135,7 +134,6 @@ public class State {
         state.move = m;
         return state;
     }
-
 
     // Creates and/or returns a list of new state objects which correspond to the children of the given state.
     public ArrayList<Move> getLegalMoves() {

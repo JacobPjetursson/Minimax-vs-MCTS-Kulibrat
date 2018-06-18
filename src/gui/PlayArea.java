@@ -27,7 +27,6 @@ public class PlayArea extends GridPane {
         setPadding(new Insets(10, 10, 10, 10));
         setAlignment(Pos.CENTER);
 
-
         board = new Board(60, 20, true);
         playerBlack = new Player(BLACK, cont, 60, 20, true);
         playerRed = new Player(RED, cont, 60, 20, true);
@@ -42,7 +41,6 @@ public class PlayArea extends GridPane {
         Group playBox = new PlayBox(playerBlack, goalRed, board, goalBlack, playerRed);
         add(playBox, 0, 0);
         add(info, 1, 0);
-
     }
 
     public void update(Controller cont) {
@@ -68,5 +66,4 @@ public class PlayArea extends GridPane {
             return playerBlack;
         }
     }
-
 }

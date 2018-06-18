@@ -6,7 +6,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import misc.Globals;
 
-
 public class Main extends Application {
 
     public static void main(String[] args) {
@@ -21,5 +20,4 @@ public class Main extends Application {
 
         primaryStage.show();
     }
-
 }

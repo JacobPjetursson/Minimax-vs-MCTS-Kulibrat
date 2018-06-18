@@ -9,7 +9,6 @@ import static misc.Globals.*;
 
 public class BoardPiece extends Circle {
     private Controller cont;
-
     private Color color;
     private Color green = new Color(0.2, 0.7, 0, 1);
     private boolean selected;
@@ -25,15 +24,13 @@ public class BoardPiece extends Circle {
         this.team = team;
         this.row = -1;
         this.col = -1;
-
-        color = (team == RED) ? Color.RED : Color.BLACK;
+        this.color = (team == RED) ? Color.RED : Color.BLACK;
         setRadius(radius);
         setStrokeWidth(3.5);
         setColor(color, color);
 
         setOnMouseEntered(me -> {
             if (!isControllable()) return;
-
             if (team == RED && !selected) {
                 Color lightRed = new Color(1.0, 0.5, 0.5, 1.0);
                 if (best) {
@@ -68,7 +65,6 @@ public class BoardPiece extends Circle {
         this(team, cont, radius, clickable);
         this.row = row;
         this.col = col;
-
     }
 
     private void select() {
@@ -85,7 +81,6 @@ public class BoardPiece extends Circle {
         } else {
             setColor(color, color);
         }
-
     }
 
     private boolean isControllable() {

@@ -24,7 +24,6 @@ public class MCTS extends AI {
     public MCTS(State startState, int team, int calculationTime) {
         super(team);
         this.calculationTime = calculationTime;
-
         minimax = new Minimax(team, calculationTime);
         minimax.setUseTranspo(false);
         curr_node = new Node(startState);
@@ -37,7 +36,6 @@ public class MCTS extends AI {
         int winner = 0; // 1 is red, 2 is black
         boolean playOut = false;
         sim_node.incrementPlays();
-
         for (int i = 0; i < max_moves; i++) {
             if (i > simulationDepth) {
                 simulationDepth = i;
@@ -62,7 +60,6 @@ public class MCTS extends AI {
                 if (useMinimax) {
                     // Shallow minimax search as rollout
                     minimax.setTeam(sim_node.getState().getTurn());
-
                     ai.Minimax.Node node = new ai.Minimax.Node(sim_node.getState());
                     Move move = minimax.minimax(node, minimaxDepth, Integer.MIN_VALUE,
                             Integer.MAX_VALUE, System.currentTimeMillis()).move;
@@ -73,10 +70,8 @@ public class MCTS extends AI {
                     int r = new Random().nextInt(sim_node.getState().getLegalMoves().size());
                     Move m = sim_node.getState().getLegalMoves().get(r);
                     sim_node = sim_node.getNextNode(m);
-
                 }
                 continue;
-
             }
             ArrayList<Node> unexplored = new ArrayList<>();
             boolean containsAll = true;
@@ -116,7 +111,6 @@ public class MCTS extends AI {
         } else move = getBestMove(curr_node);
 
         return move;
-
     }
 
     // Called when MCTS makes its final move based on the move with the highest chances of winning
@@ -125,7 +119,6 @@ public class MCTS extends AI {
         double best_val = Integer.MIN_VALUE;
         for (Node child : node.getChildren()) {
             double payOff = (child.getPlays() == 0) ? 0 : (child.getWins() / child.getPlays());
-
             if (child.getPlays() == 0) {
                 System.out.println("No records for play: " + "oldRow: " + child.getState().getMove().oldRow + ", oldCol: "
                         + child.getState().getMove().oldCol + ", newRow: " + child.getState().getMove().newRow + ", newCol: " +
@@ -135,7 +128,6 @@ public class MCTS extends AI {
                         + child.getState().getMove().oldCol + ", newRow: " + child.getState().getMove().newRow + ", newCol: " +
                         child.getState().getMove().newCol + ", plays: " + child.getPlays() + ", wins: " + child.getWins());
             }
-
             if (payOff > best_val) {
                 best_val = payOff;
                 bestMove = child.getState().getMove();

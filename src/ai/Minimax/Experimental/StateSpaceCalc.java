@@ -58,7 +58,6 @@ public class StateSpaceCalc {
         BoardConfig bc = new BoardConfig(node.getState());
         fullSpace.remove(bc);
         MinimaxPlay transpoPlay = transTable.get(bc);
-
         if (transpoPlay != null && depth <= transpoPlay.depth) {
             return transpoPlay;
         }
@@ -77,7 +76,6 @@ public class StateSpaceCalc {
                 }
             }
         }
-
         if (transpoPlay == null || depth > transpoPlay.depth) {
             if (transpoPlay == null) if (findBranchFactor) legalMoves += node.getState().getLegalMoves().size();
             transTable.put(bc, new MinimaxPlay(bestMove, bestScore, depth));
@@ -173,7 +171,6 @@ public class StateSpaceCalc {
     public static void main(String[] args) {
         Zobrist.initialize();
         int scoreLimit = 15;
-
         State state = new State(scoreLimit);
         calcBoardPositions(state);
     }
@@ -204,7 +201,6 @@ public class StateSpaceCalc {
             return turn;
         }
 
-
         @Override
         public boolean equals(Object obj) {
             if (!(obj instanceof BoardConfig)) return false;
@@ -215,9 +211,7 @@ public class StateSpaceCalc {
 
         @Override
         public int hashCode() {
-
             return Arrays.deepHashCode(board) + turn;
-
         }
     }
 }

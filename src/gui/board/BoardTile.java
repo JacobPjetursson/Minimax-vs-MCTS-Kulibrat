@@ -22,13 +22,11 @@ public class BoardTile extends StackPane {
         setBorder(new Border(new BorderStroke(Color.BLACK,
                 BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         setAlignment(Pos.CENTER);
-
         setPrefSize(tilesize, tilesize);
         setStyle("-fx-background-color: rgb(255, 255, 255);");
         turnsToTerminalLabel = new Label("");
         turnsToTerminalLabel.setFont(Font.font("Verdana", 15));
         turnsToTerminalLabel.setTextFill(Color.BLACK);
-
         setOnMouseEntered(me -> {
             if (highlight && bestMove) {
                 setStyle("-fx-background-color: rgb(0, 225, 0);");
@@ -56,7 +54,6 @@ public class BoardTile extends StackPane {
         this.highlight = highlight;
         this.bestMove = bestMove;
         this.help = help;
-
         if (highlight && bestMove) {
             setStyle("-fx-background-color: rgb(0, 150, 0);");
         } else if (highlight) {
@@ -77,7 +74,6 @@ public class BoardTile extends StackPane {
                 if (bp.getTeam() == BLACK) {
                     turnsToTerminalLabel.setTextFill(Color.WHITE);
                 }
-
             }
         }
     }
@@ -91,9 +87,8 @@ public class BoardTile extends StackPane {
     }
 
     public BoardPiece getPiece() {
-        if (!getChildren().isEmpty()) {
+        if (!getChildren().isEmpty())
             return (BoardPiece) getChildren().get(0);
-        }
         return null;
     }
 }

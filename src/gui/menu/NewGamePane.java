@@ -25,7 +25,6 @@ public class NewGamePane extends AnchorPane {
     private String mcts = "Monte Carlo Tree Search";
     private String minimax = "Minimax";
     private String lookup = "Lookup Table";
-
     private TextField blackDelayField;
     private TextField redDelayField;
     private HBox blackDelayBox;
@@ -35,10 +34,9 @@ public class NewGamePane extends AnchorPane {
     private CheckBox overwriteDB;
     private TextField lookupDelayField;
     private HBox lookupDelayBox;
-
     private VBox finalBox;
 
-    public NewGamePane() {
+    NewGamePane() {
         setPrefSize(Globals.WIDTH, Globals.HEIGHT);
         setPadding(new Insets(30, 0, 0, 0));
         setStyle("-fx-background-color: black;");
@@ -124,7 +122,6 @@ public class NewGamePane extends AnchorPane {
                     finalBox.getChildren().add(4, lookupDelayBox);
                 }
             }
-
         });
 
         Label playerRedLabel = new Label("Player Red: ");
@@ -146,7 +143,6 @@ public class NewGamePane extends AnchorPane {
         scoreLimitLabel.setTextFill(Color.WHITE);
         HBox scoreLimitBox = new HBox(scoreLimitLabel, scoreLimitChoices);
         scoreLimitBox.setAlignment(Pos.CENTER);
-
 
         blackDelayField = new TextField("1000");
         blackDelayField.setMinWidth(textFieldWidth);
@@ -171,7 +167,6 @@ public class NewGamePane extends AnchorPane {
         AIDelayLabelBlack.setAlignment(Pos.CENTER);
         blackDelayBox = new HBox(AIDelayLabelBlack, blackDelayField);
         blackDelayBox.setAlignment(Pos.CENTER);
-
         redDelayField = new TextField("1000");
         redDelayField.setMinWidth(textFieldWidth);
         redDelayField.setMaxWidth(textFieldWidth);
@@ -224,7 +219,6 @@ public class NewGamePane extends AnchorPane {
         lookupDelayBox = new HBox(lookupDelayLabel, lookupDelayField);
         lookupDelayBox.setAlignment(Pos.CENTER);
 
-
         Button startGame = new Button("Start Game");
         startGame.setMinWidth(Globals.WIDTH / 4);
         startGame.setOnMouseClicked(event -> {
@@ -234,15 +228,12 @@ public class NewGamePane extends AnchorPane {
 
             int playerBlackMode = (blackValue.equals(human)) ? Globals.HUMAN :
                     (blackValue.equals(minimax)) ? Globals.MINIMAX : (blackValue.equals(mcts)) ? Globals.MONTE_CARLO : Globals.LOOKUP_TABLE;
-
             int playerRedMode = (redValue.equals(human)) ? Globals.HUMAN :
                     (redValue.equals(minimax)) ? Globals.MINIMAX : (redValue.equals(mcts)) ? Globals.MONTE_CARLO : Globals.LOOKUP_TABLE;
-
             if (playerBlackMode == Globals.LOOKUP_TABLE && playerRedMode == Globals.LOOKUP_TABLE) {
                 blackDelayField.setText(lookupDelayField.getText());
                 redDelayField.setText(lookupDelayField.getText());
             }
-
             new Controller(stage, playerRedMode,
                     playerBlackMode, new State(scoreLimitChoices.getValue()),
                     Integer.parseInt(redDelayField.getText()),
@@ -264,7 +255,6 @@ public class NewGamePane extends AnchorPane {
         finalBox = new VBox(playerBlack, playerRed, scoreLimitBox, btnBox);
         finalBox.setAlignment(Pos.CENTER);
         finalBox.setSpacing(30);
-
 
         AnchorPane.setTopAnchor(finalBox, 0.0);
         AnchorPane.setRightAnchor(finalBox, 0.0);

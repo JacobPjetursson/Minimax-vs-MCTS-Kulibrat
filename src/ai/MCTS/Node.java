@@ -9,7 +9,6 @@ import java.util.ArrayList;
 class Node {
     private State state;
     private ArrayList<Node> children;
-
     // UCB stuff
     private double plays = 0;
     private double wins = 0;
@@ -24,7 +23,6 @@ class Node {
     private Node(Node parent, Move m) {
         this.state = new State(parent.getState());
         this.parent = parent;
-
         Logic.doTurn(m, this.state);
         this.state.setMove(m);
     }

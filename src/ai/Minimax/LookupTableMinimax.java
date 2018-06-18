@@ -18,7 +18,6 @@ public class LookupTableMinimax extends AI {
     private int CURR_MAX_DEPTH;
     private int unevaluatedNodes = 0;
     private HashMap<Long, MinimaxPlay> lookupTable;
-
     private String JDBC_URL;
     private Connection conn;
 
@@ -28,7 +27,6 @@ public class LookupTableMinimax extends AI {
         JDBC_URL = Globals.JDBC_URL;
         if (!overwriteDB)
             checkConnection(state);
-
         if (useDB) {
             conn = getConnection(state.getScoreLimit());
             if (overwriteDB) {
@@ -43,7 +41,6 @@ public class LookupTableMinimax extends AI {
                 this.team = team;
             }
         }
-
     }
 
     // This function fetches the best move from the DB, if it exists
@@ -100,9 +97,7 @@ public class LookupTableMinimax extends AI {
                 doneCounter++;
             } else
                 doneCounter = 0;
-
             if (doneCounter == 2) done = true;
-
 
             if (Math.abs(play.score) >= 1000) {
                 String player = (team == RED) ? "RED" : "BLACK";
@@ -119,7 +114,6 @@ public class LookupTableMinimax extends AI {
         Move bestMove = null;
         int bestScore = (node.getState().getTurn() == team) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         int score;
-
         if (Logic.gameOver(node.getState()) || depth == 0) {
             return new MinimaxPlay(bestMove, heuristic(node.getState()), depth);
         }
@@ -178,7 +172,6 @@ public class LookupTableMinimax extends AI {
             e.printStackTrace();
         }
         System.out.println("Connection successful");
-
         // Creating the table, if it does not exist already
         String tableName = "plays_" + scoreLimit;
         try {
@@ -269,18 +262,14 @@ public class LookupTableMinimax extends AI {
                 System.err.println("The database table '" + tableName + "' is incomplete.");
                 error = true;
             }
-
             statement.close();
         } catch (SQLException e) {
             System.err.println("Table '" + tableName + "' does not exist in the database.");
             error = true;
         }
-
         if (error) {
             System.err.println("Please rebuild the database. Exiting");
             System.exit(-1);
         }
     }
-
 }
-

@@ -53,7 +53,6 @@ public class Node {
         return state;
     }
 
-
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Node)) return false;

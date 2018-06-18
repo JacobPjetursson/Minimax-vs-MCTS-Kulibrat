@@ -20,7 +20,6 @@ import static misc.Globals.*;
 
 public class EndGamePane extends VBox {
 
-
     public EndGamePane(Stage primaryStage, int team, Controller cont) {
         setAlignment(Pos.CENTER);
         setSpacing(20);
@@ -40,11 +39,9 @@ public class EndGamePane extends VBox {
             stage.close();
             primaryStage.setScene(new Scene(new MenuPane(),
                     Globals.WIDTH, Globals.HEIGHT));
-
         });
         menuBtn.setPrefWidth(110);
         hBox.getChildren().add(menuBtn);
-
         Button restartGameBtn = new Button("Restart Game");
         restartGameBtn.setOnMouseClicked(event -> {
             Stage stage = (Stage) getScene().getWindow();

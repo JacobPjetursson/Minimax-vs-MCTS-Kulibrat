@@ -36,7 +36,6 @@ class RestartGamePane extends AnchorPane {
             new Controller(primaryStage, cont.getPlayerInstance(RED),
                     cont.getPlayerInstance(BLACK), new State(cont.getScoreLimit()), cont.getTime(RED), cont.getTime(BLACK), cont.getOverwriteDB());
         });
-
         Button noBtn = new Button("No");
         HBox no = new HBox(noBtn);
         no.setAlignment(Pos.CENTER);

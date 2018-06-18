@@ -37,7 +37,6 @@ public class Minimax extends AI {
         // This happens when the minimax returns faster after having found a winning move
         chill(startTime);
         return move;
-
     }
 
     // Iteratively increases the depth limit while called minimax continuously. Stops when win is ensured or time is up.
@@ -59,7 +58,6 @@ public class Minimax extends AI {
         }
         System.out.println("Score: " + bestPlay.score + ", Depth: " + CURR_MAX_DEPTH + ", Play:  oldRow: " + bestPlay.move.oldRow + ", oldCol: " +
                 bestPlay.move.oldCol + ", newRow: " + bestPlay.move.newRow + ", newCol: " + bestPlay.move.newCol + ", team: " + bestPlay.move.team);
-
         return bestPlay;
     }
 
@@ -69,10 +67,8 @@ public class Minimax extends AI {
         int bestScore = (node.getState().getTurn() == team) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         int score;
         if (outOfTime(startTime)) searchCutOff = true;
-        if (Logic.gameOver(node.getState()) || depth <= 0 || searchCutOff) {
+        if (Logic.gameOver(node.getState()) || depth <= 0 || searchCutOff)
             return new MinimaxPlay(null, heuristic(node.getState()), depth);
-
-        }
         MinimaxPlay transpoPlay = null;
         if (useTranspo) {
             transpoPlay = transTable.get(node.getHashCode());
@@ -80,7 +76,6 @@ public class Minimax extends AI {
                 return transpoPlay;
             }
         }
-
         if (moveOrdering && depth == CURR_MAX_DEPTH && prevBestNode != null) {
             score = minimax(prevBestNode, depth - 1, alpha, beta, startTime).score;
             if (node.getState().getTurn() == team) {
@@ -99,7 +94,6 @@ public class Minimax extends AI {
         }
         for (Node child : node.getChildren()) {
             if (moveOrdering && depth == CURR_MAX_DEPTH) if (child.equals(prevBestNode)) continue;
-
             score = minimax(child, depth - 1, alpha, beta, startTime).score;
             if (node.getState().getTurn() == team) {
                 if (score > bestScore) {
@@ -116,12 +110,9 @@ public class Minimax extends AI {
             }
             if (beta <= alpha) break;
         }
-
-
         if (moveOrdering && depth == CURR_MAX_DEPTH) {
             prevBestNode = node.getNextNode(bestMove);
         }
-
         if (useTranspo && !searchCutOff) {
             if (transpoPlay == null || depth > transpoPlay.depth) {
                 transTable.put(node.getHashCode(), new MinimaxPlay(bestMove, bestScore, depth));
@@ -146,7 +137,6 @@ public class Minimax extends AI {
         searchCutOff = false;
 
     }
-
     // Either returns 1000 or -1000 if terminal, or the material of a state, if intermediate.
     // The material is the objective value of a state
     private int heuristic(State state) {

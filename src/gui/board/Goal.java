@@ -63,7 +63,5 @@ public class Goal extends StackPane {
             turnsToTerminalLabel.setText(turns);
             getChildren().add(turnsToTerminalLabel);
         }
-
-
     }
 }

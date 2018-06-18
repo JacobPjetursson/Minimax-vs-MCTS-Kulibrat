@@ -22,13 +22,10 @@ public class InfoPane extends VBox {
     private int prevTurn = 0;
 
     public InfoPane(int scoreLimit, int mode) {
-
         setPrefSize(Globals.WIDTH / 3, Globals.HEIGHT);
         setSpacing(40);
         setAlignment(Pos.CENTER);
-
         scoreBoard = new ScoreBoard();
-
         Label turnLabel = new Label("Turn: ");
         turnLabel.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
         turnCircle = new Circle(15);
@@ -36,7 +33,6 @@ public class InfoPane extends VBox {
 
         HBox turn = new HBox(turnLabel, turnCircle);
         turn.setAlignment(Pos.CENTER);
-
         turnNumberLabel = new Label("Turns Played: 0");
         turnNumberLabel.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
 
@@ -50,7 +46,6 @@ public class InfoPane extends VBox {
 
         skippedTurn = new Label();
         skippedTurn.setFont(Font.font("Verdana", 15));
-
         VBox turnBox = new VBox(turn, turnNumberLabel);
         turnBox.setAlignment(Pos.CENTER);
         turnBox.setSpacing(15);
@@ -58,7 +53,6 @@ public class InfoPane extends VBox {
         VBox infoBox = new VBox(scoreLimitLabel, modeLabel, skippedTurn);
         infoBox.setAlignment(Pos.CENTER);
         infoBox.setSpacing(15);
-
 
         getChildren().addAll(scoreBoard, turnBox, infoBox);
     }
@@ -81,7 +75,6 @@ public class InfoPane extends VBox {
     private void updateTurn(State state) {
         if (state.getTurn() == RED) {
             turnCircle.setFill(Color.RED);
-
         } else {
             turnCircle.setFill(Color.BLACK);
         }

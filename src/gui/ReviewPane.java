@@ -150,10 +150,9 @@ public class ReviewPane extends VBox {
             }
             selectedCont.setPreviousStates(prevStates);
         });
-
+        setVgrow(lw, Priority.ALWAYS);
 
         getChildren().addAll(lw, bottomBox);
-        setVgrow(lw, Priority.ALWAYS);
     }
 
     private PlayBox getPlayBox(Controller cont, PrevState ps, ArrayList<Move> bestPlays) {

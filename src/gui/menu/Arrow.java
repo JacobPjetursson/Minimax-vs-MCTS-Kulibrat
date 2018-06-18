@@ -42,7 +42,5 @@ public class Arrow extends Group {
         a2.setStartY(endY + dy - ox);
 
         getChildren().addAll(line, a1, a2);
-
-
     }
 }

@@ -24,7 +24,6 @@ public class Player extends VBox {
     private boolean clickable;
     private int pieceRadius;
 
-
     public Player(int team, Controller cont, int tileWidth, int pieceRadius, boolean clickable) {
         this.team = team;
         this.clickable = clickable;
@@ -34,7 +33,6 @@ public class Player extends VBox {
         setAlignment(Pos.CENTER);
         setSpacing(tileWidth / 6);
         setStyle("-fx-background-color: rgb(255, 255, 255);");
-
         int amount_of_pieces;
         if (Globals.losePieces) {
             if (cont.getState().getScoreLimit() <= 4) {
@@ -49,7 +47,6 @@ public class Player extends VBox {
                 amount_of_pieces = 4;
             }
         }
-
         gridPaneBoard = new GridPane();
         gridPaneBoard.setAlignment(Pos.CENTER);
         gridPaneBoard.setPrefSize(tileWidth * 4, tileWidth);
@@ -61,7 +58,6 @@ public class Player extends VBox {
         for (int i = 0; i < 4; i++) {
             gridPaneBoard.getColumnConstraints().add(column);
         }
-
         for (int i = 0; i < amount_of_pieces; i++) {
             BoardPiece bp = new BoardPiece(team, cont, pieceRadius, clickable);
             pieces.add(bp);
@@ -93,7 +89,6 @@ public class Player extends VBox {
         }
         gridPaneDisplay.add(imgPane, 1, 0);
         gridPaneDisplay.add(typeLabel, 2, 0);
-
         getChildren().add(gridPaneBoard);
         if (clickable && team == RED) getChildren().add(1, gridPaneDisplay);
         else if (clickable) getChildren().add(0, gridPaneDisplay);
@@ -127,7 +122,6 @@ public class Player extends VBox {
                     gridPaneBoard.add(pieceBox(bp), i, 0);
                     break;
                 }
-
             }
         }
     }

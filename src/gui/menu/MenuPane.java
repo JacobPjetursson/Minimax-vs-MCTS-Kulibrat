@@ -54,14 +54,12 @@ public class MenuPane extends AnchorPane {
             stage.setScene(new Scene(new RulesPane(), Globals.WIDTH, Globals.HEIGHT));
 
         });
-
         Button readme = new Button("README");
         buttons.add(readme);
         readme.setOnMouseClicked(event -> {
             Stage stage = (Stage) getScene().getWindow();
             stage.setScene(new Scene(new ReadMePane(), Globals.WIDTH, Globals.HEIGHT));
         });
-
         Button exit = new Button("Exit");
         buttons.add(exit);
         exit.setOnMouseClicked(event -> System.exit(0));

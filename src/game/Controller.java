@@ -51,7 +51,6 @@ public class Controller {
     private ArrayList<PrevState> previousStates;
     private Window window;
 
-
     public Controller(Stage primaryStage, int playerRedInstance, int playerBlackInstance,
                       State state, int redTime, int blackTime, boolean overwriteDB) {
         Zobrist.initialize(); // Generate random numbers for state configs
@@ -71,7 +70,6 @@ public class Controller {
         PlayPane playPane = new PlayPane(this);
         primaryStage.setScene(new Scene(playPane,
                 Globals.WIDTH, Globals.HEIGHT));
-
         navPane = playPane.getNavPane();
         playArea = playPane.getPlayArea();
         window = playArea.getScene().getWindow();
@@ -83,7 +81,6 @@ public class Controller {
         } else if (playerRedInstance == MONTE_CARLO) {
             aiRed = new MCTS(state, RED, redTime);
         }
-
         if (playerBlackInstance == MINIMAX) {
             aiBlack = new Minimax(BLACK, blackTime);
         } else if (playerBlackInstance == LOOKUP_TABLE) {
@@ -103,7 +100,6 @@ public class Controller {
         goalRed = playArea.getGoal(RED);
         goalBlack = playArea.getGoal(BLACK);
 
-
         if (mode == AI_VS_AI) navPane.addAIWidgets();
         if (mode == HUMAN_VS_AI) navPane.addReviewButton();
         if (mode != AI_VS_AI) navPane.addHelpHumanBox();
@@ -116,7 +112,6 @@ public class Controller {
                 deselect();
             }
         });
-
         // Tiles
         BoardTile[][] tiles = playArea.getBoard().getTiles();
         for (int i = 0; i < tiles.length; i++) {
@@ -171,7 +166,6 @@ public class Controller {
                 } else {
                     helpHumanBox.setSelected(false);
                 }
-
             } else {
                 try {
                     dbConnection.close();
@@ -191,7 +185,6 @@ public class Controller {
             aiThread.start();
         }
     }
-
     // Is called when a tile is pressed by the user. If vs. the AI, it calls the doAITurn after. This function also highlights
     // the best pieces for the opponent, if it is human vs human.
     private void doHumanTurn(Move move) {
@@ -200,11 +193,9 @@ public class Controller {
         turnNo++;
         if (aiRed != null) aiRed.update(state);
         if (aiBlack != null) aiBlack.update(state);
-
         deselect();
         playArea.update(this);
         checkGameOver();
-
         if (Logic.gameOver(state)) return;
         if (state.getTurn() == move.team) {
             System.out.println("TEAM " + ((move.team == RED) ? "Black" : "Red") + "'s turn has been skipped!");
@@ -240,14 +231,12 @@ public class Controller {
                         Thread.sleep(0); // To allow thread interruption
                     }
                 }
-
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 startAIButton.setDisable(false);
                 navPane.getMenuButton().setDisable(false);
                 navPane.getRestartButton().setDisable(false);
             }
-
         });
         aiThread.setDaemon(true);
         aiThread.start();
@@ -273,7 +262,6 @@ public class Controller {
             checkGameOver();
         });
         if (Logic.gameOver(state)) return;
-
         if (mode == HUMAN_VS_AI) {
             if (turn == state.getTurn()) {
                 System.out.println("TEAM " + ((turn == RED) ? "Black" : "Red") + "'s turn has been skipped!");
@@ -305,7 +293,6 @@ public class Controller {
     // Connects to the database. If the table in question is incomplete or missing, show a pane to allow creating the DB on the spot.
     public boolean connect(int scoreLimit) {
         String JDBC_URL = Globals.JDBC_URL;
-
         System.out.println("Connecting to database. This might take some time");
         try {
             dbConnection = DriverManager.getConnection(
@@ -327,13 +314,11 @@ public class Controller {
                 System.err.println("The database table '" + tableName + "' is incomplete.");
                 error = true;
             }
-
             statement.close();
         } catch (SQLException e) {
             System.out.println("Table '" + tableName + "' does not exist in the database!");
             error = true;
         }
-
         if (error) {
             showOverwritePane();
             return false;
@@ -403,12 +388,10 @@ public class Controller {
         if (highlight && helpHumanBox.isSelected()) {
             bestPlays = bestPlays(new Node(state));
         }
-
         ArrayList<String> turnsToTerminalList = null;
         if (highlight && helpHumanBox.isSelected()) {
             turnsToTerminalList = getScores(curHighLights);
         }
-
         BoardTile[][] tiles = playArea.getBoard().getTiles();
         for (int i = 0; i < curHighLights.size(); i++) {
             Move m = curHighLights.get(i);
@@ -439,7 +422,6 @@ public class Controller {
         if (!Logic.gameOver(n.getNextNode(bestPlay.move).getState())) {
             bestScore = queryPlay(n.getNextNode(bestPlay.move)).score;
         }
-
         for (Node child : n.getChildren()) {
             Move m = child.getState().getMove();
             State state = n.getNextNode(m).getState();
@@ -597,6 +579,5 @@ public class Controller {
     public Window getWindow() {
         return window;
     }
-
 
 }

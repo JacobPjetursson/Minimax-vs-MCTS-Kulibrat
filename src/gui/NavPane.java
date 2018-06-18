@@ -21,7 +21,6 @@ import java.util.ArrayList;
 public class NavPane extends VBox {
     private int buttonWidth = Globals.WIDTH / 6 + 20;
     private ArrayList<Button> buttons;
-
     private Button startAIButton;
     private Button stopAIButton;
     private Button restartButton;
@@ -36,7 +35,6 @@ public class NavPane extends VBox {
         setAlignment(Pos.CENTER);
         setSpacing(40);
         buttons = new ArrayList<Button>();
-
         restartButton = new Button("Restart Game");
         buttons.add(restartButton);
         restartButton.setOnMouseClicked(event -> restartGame(cont));
@@ -58,14 +56,12 @@ public class NavPane extends VBox {
         helpHumanBox = new HBox(helpHuman, helpHumanLabel);
         helpHumanBox.setAlignment(Pos.CENTER);
 
-
         menuButton = new Button("Menu");
         buttons.add(menuButton);
         menuButton.setOnMouseClicked(event -> goToMenu());
 
         reviewButton = new Button("Review Game");
         buttons.add(reviewButton);
-
 
         for (Button button : buttons) {
             button.setMinWidth(buttonWidth);
@@ -77,7 +73,6 @@ public class NavPane extends VBox {
 
     private void restartGame(Controller cont) {
         Stage prevStage = (Stage) getScene().getWindow();
-
         Stage newStage = new Stage();
         newStage.setScene(new Scene(new RestartGamePane(prevStage, cont), 400, 150));
         newStage.initModality(Modality.APPLICATION_MODAL);

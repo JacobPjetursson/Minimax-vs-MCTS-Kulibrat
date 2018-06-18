@@ -26,16 +26,14 @@ public class ScoreBoard extends VBox {
         blackLabel = new Label("Black: " + 0);
         blackLabel.setTextFill(Color.BLACK);
         blackLabel.setFont(Font.font("Verdana", 15));
-
         redLabel = new Label("Red: " + 0);
         redLabel.setTextFill(Color.RED);
         redLabel.setFont(Font.font("Verdana", 15));
 
-
         getChildren().addAll(score, blackLabel, redLabel);
     }
 
-    public void updateScore(State state) {
+    void updateScore(State state) {
         redLabel.setText("Red: " + state.getScore(RED));
         blackLabel.setText("Black: " + state.getScore(BLACK));
     }
