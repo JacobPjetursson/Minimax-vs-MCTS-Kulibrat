@@ -1,14 +1,10 @@
 package gui;
 
 import game.Controller;
-import gui.board.BoardPiece;
 import javafx.geometry.Pos;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import misc.Globals;
-
-import static misc.Globals.*;
 
 public class PlayPane extends GridPane {
     private PlayArea playArea;

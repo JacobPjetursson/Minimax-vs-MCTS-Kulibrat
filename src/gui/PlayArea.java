@@ -1,22 +1,16 @@
 package gui;
 
 import game.Controller;
-import game.Logic;
-import game.Move;
-import game.State;
-import gui.board.*;
+import gui.board.Board;
+import gui.board.Goal;
+import gui.board.Player;
 import gui.info.InfoPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import misc.Globals;
-
-import java.util.ArrayList;
 
 import static misc.Globals.*;
 
@@ -66,8 +60,9 @@ public class PlayArea extends GridPane {
         if (team == RED) return goalRed;
         else return goalBlack;
     }
+
     public Player getPlayer(int team) {
-        if(team == RED) {
+        if (team == RED) {
             return playerRed;
         } else {
             return playerBlack;

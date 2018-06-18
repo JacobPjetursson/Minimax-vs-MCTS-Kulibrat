@@ -46,6 +46,7 @@ public class PlayBox extends Group {
         playerRed.update(cont, s);
         playerBlack.update(cont, s);
     }
+
     protected void layoutChildren() {
         super.layoutChildren();
         isRendered.setValue(true);

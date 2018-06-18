@@ -18,13 +18,13 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import misc.Globals;
 
-import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 
 import static misc.Globals.*;
 
 public class Controller {
+    public Connection dbConnection;
     private int mode;
     private int playerRedInstance;
     private int playerBlackInstance;
@@ -40,7 +40,6 @@ public class Controller {
     private CheckBox helpHumanBox;
     private Thread aiThread;
     private NavPane navPane;
-    public Connection dbConnection;
     private BoardPiece selected;
     private ArrayList<Move> curHighLights;
     private Stage primaryStage;
@@ -88,7 +87,7 @@ public class Controller {
         if (playerBlackInstance == MINIMAX) {
             aiBlack = new Minimax(BLACK, blackTime);
         } else if (playerBlackInstance == LOOKUP_TABLE) {
-            if(playerRedInstance == LOOKUP_TABLE) {
+            if (playerRedInstance == LOOKUP_TABLE) {
                 overwriteDB = false;
             }
             aiBlack = new LookupTableMinimax(BLACK, state, overwriteDB);
@@ -143,7 +142,7 @@ public class Controller {
         });
         // Review button
         reviewButton.setOnMouseClicked(event -> {
-            if(connect(state.getScoreLimit())) {
+            if (connect(state.getScoreLimit())) {
                 reviewGame();
             }
         });
@@ -165,8 +164,8 @@ public class Controller {
         helpHumanBox.selectedProperty().addListener((observableValue, oldValue, newValue) -> {
             helpHumanBox.setDisable(true);
             deselect();
-            if(newValue) {
-                if(connect(state.getScoreLimit())) {
+            if (newValue) {
+                if (connect(state.getScoreLimit())) {
                     helpHumanBox.setSelected(true);
                     highlightBestPieces(true);
                 } else {
@@ -192,6 +191,7 @@ public class Controller {
             aiThread.start();
         }
     }
+
     // Is called when a tile is pressed by the user. If vs. the AI, it calls the doAITurn after. This function also highlights
     // the best pieces for the opponent, if it is human vs human.
     private void doHumanTurn(Move move) {
@@ -208,7 +208,7 @@ public class Controller {
         if (Logic.gameOver(state)) return;
         if (state.getTurn() == move.team) {
             System.out.println("TEAM " + ((move.team == RED) ? "Black" : "Red") + "'s turn has been skipped!");
-            if(helpHumanBox.isSelected()) {
+            if (helpHumanBox.isSelected()) {
                 highlightBestPieces(true);
             }
             return;
@@ -217,10 +217,11 @@ public class Controller {
             aiThread = new Thread(this::doAITurn);
             aiThread.setDaemon(true);
             aiThread.start();
-        } else if(helpHumanBox.isSelected()) {
+        } else if (helpHumanBox.isSelected()) {
             highlightBestPieces(true);
         }
     }
+
     // This function is called when two AI's are matched against each other. It can be interrupted by the user.
     // For the lookup table, a delay can be set
     private void startAI() {
@@ -233,7 +234,7 @@ public class Controller {
             try {
                 while (!Logic.gameOver(state)) {
                     doAITurn();
-                    if(playerRedInstance == LOOKUP_TABLE && playerBlackInstance == LOOKUP_TABLE) {
+                    if (playerRedInstance == LOOKUP_TABLE && playerBlackInstance == LOOKUP_TABLE) {
                         Thread.sleep(redTime);
                     } else {
                         Thread.sleep(0); // To allow thread interruption
@@ -251,6 +252,7 @@ public class Controller {
         aiThread.setDaemon(true);
         aiThread.start();
     }
+
     // The AI makes its turn, and the GUI is updated while doing so
     private void doAITurn() {
         int turn = state.getTurn();
@@ -276,18 +278,19 @@ public class Controller {
             if (turn == state.getTurn()) {
                 System.out.println("TEAM " + ((turn == RED) ? "Black" : "Red") + "'s turn has been skipped!");
                 doAITurn();
-            } else if(helpHumanBox.isSelected()) {
+            } else if (helpHumanBox.isSelected()) {
                 highlightBestPieces(true);
             }
         }
     }
+
     // Checks if the game is over and shows a popup. Popup allows a restart, go to menu, or review game
     private void checkGameOver() {
         if (Logic.gameOver(state) && !endGamePopup) {
             endGamePopup = true;
             Stage newStage = new Stage();
             int winner = Logic.getWinner(state);
-            if(playerRedInstance == HUMAN) state.setTurn(RED);
+            if (playerRedInstance == HUMAN) state.setTurn(RED);
             else if (playerBlackInstance == HUMAN) state.setTurn(BLACK);
 
             newStage.setScene(new Scene(new EndGamePane(primaryStage, winner,
@@ -298,10 +301,11 @@ public class Controller {
             newStage.show();
         }
     }
+
     // Connects to the database. If the table in question is incomplete or missing, show a pane to allow creating the DB on the spot.
     public boolean connect(int scoreLimit) {
         String JDBC_URL = Globals.JDBC_URL;
-        
+
         System.out.println("Connecting to database. This might take some time");
         try {
             dbConnection = DriverManager.getConnection(
@@ -319,7 +323,7 @@ public class Controller {
             Statement statement = dbConnection.createStatement();
             ResultSet resultSet = statement.executeQuery("select oldRow, oldCol, newRow, newCol, team, score from "
                     + tableName + " where id=" + key);
-            if(!resultSet.next()) {
+            if (!resultSet.next()) {
                 System.err.println("The database table '" + tableName + "' is incomplete.");
                 error = true;
             }
@@ -330,12 +334,13 @@ public class Controller {
             error = true;
         }
 
-        if(error) {
+        if (error) {
             showOverwritePane();
             return false;
         }
         return true;
     }
+
     // Fetches the best play corresponding to the input node
     public MinimaxPlay queryPlay(Node n) {
         MinimaxPlay play = null;
@@ -345,7 +350,7 @@ public class Controller {
             Statement statement = dbConnection.createStatement();
             ResultSet resultSet = statement.executeQuery("select oldRow, oldCol, newRow, newCol, team, score from "
                     + tableName + " where id=" + key);
-            while(resultSet.next()) {
+            while (resultSet.next()) {
                 Move move = new Move(resultSet.getInt(1), resultSet.getInt(2),
                         resultSet.getInt(3), resultSet.getInt(4), resultSet.getInt(5));
                 int score = resultSet.getInt(6);
@@ -355,30 +360,32 @@ public class Controller {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        if(play == null) {
+        if (play == null) {
             System.err.println("PLAY DOES NOT EXIST IN DATABASE!");
         }
         return play;
     }
+
     // Outputs a string which is the amount of turns to a terminal node, based on a score from the database entry
     public String turnsToTerminal(int score) {
-        if(score == 0) {
+        if (score == 0) {
             return "∞";
         }
-        if(score > 0) {
-            if(state.getTurn() == BLACK) {
+        if (score > 0) {
+            if (state.getTurn() == BLACK) {
                 return "" + (-2000 + score);
             } else {
                 return "" + (2000 - score);
             }
         } else {
-            if(state.getTurn() == BLACK) {
+            if (state.getTurn() == BLACK) {
                 return "" + (2000 + score);
             } else {
                 return "" + (-2000 - score);
             }
         }
     }
+
     // Deselects the selected piece
     private void deselect() {
         if (selected != null) {
@@ -388,22 +395,17 @@ public class Controller {
         }
     }
 
-    public void setSelected(BoardPiece piece) {
-        deselect();
-        selected = piece;
-        highlightMoves(piece.getRow(), piece.getCol(), piece.getTeam(), true);
-    }
     // Shows the red/green/yellow highlight on the tiles when a piece has been selected
     private void highlightMoves(int row, int col, int team, boolean highlight) {
         if (highlight) curHighLights = Logic.legalMovesFromPiece(row,
                 col, team, state);
         ArrayList<Move> bestPlays = null;
-        if(highlight && helpHumanBox.isSelected()) {
+        if (highlight && helpHumanBox.isSelected()) {
             bestPlays = bestPlays(new Node(state));
         }
 
         ArrayList<String> turnsToTerminalList = null;
-        if(highlight && helpHumanBox.isSelected()) {
+        if (highlight && helpHumanBox.isSelected()) {
             turnsToTerminalList = getScores(curHighLights);
         }
 
@@ -411,11 +413,11 @@ public class Controller {
         for (int i = 0; i < curHighLights.size(); i++) {
             Move m = curHighLights.get(i);
             String turns = "";
-            if(turnsToTerminalList != null) {
+            if (turnsToTerminalList != null) {
                 turns = turnsToTerminalList.get(i);
             }
             boolean bestMove = false;
-            if(bestPlays != null && bestPlays.contains(m)) {
+            if (bestPlays != null && bestPlays.contains(m)) {
                 bestMove = true;
             }
             if (m.newCol == -1 && m.newRow == -1) {
@@ -427,6 +429,7 @@ public class Controller {
             } else tiles[m.newRow][m.newCol].setHighlight(highlight, helpHumanBox.isSelected(), bestMove, turns);
         }
     }
+
     // Outputs a list of the best plays from a given node. Checks through the children of a node to find the ones
     // which have the least amount of turns to terminal for win, or most for loss.
     public ArrayList<Move> bestPlays(Node n) {
@@ -440,14 +443,15 @@ public class Controller {
         for (Node child : n.getChildren()) {
             Move m = child.getState().getMove();
             State state = n.getNextNode(m).getState();
-            if(Logic.gameOver(state)) {
+            if (Logic.gameOver(state)) {
                 if (Logic.getWinner(state) == m.team) bestPlays.add(m);
-            } else if(queryPlay(child).score == bestScore) {
+            } else if (queryPlay(child).score == bestScore) {
                 bestPlays.add(m);
             }
         }
         return bestPlays;
     }
+
     // Highlights the best pieces found above
     private void highlightBestPieces(boolean highlight) {
         Node n = new Node(state);
@@ -455,11 +459,11 @@ public class Controller {
         if (highlight) bestPlays = bestPlays(n);
         BoardTile[][] tiles = playArea.getBoard().getTiles();
 
-        for(int i = 0; i < tiles.length; i++) {
-            for(int j = 0; j < tiles[i].length; j++) {
+        for (int i = 0; i < tiles.length; i++) {
+            for (int j = 0; j < tiles[i].length; j++) {
                 BoardPiece p = tiles[i][j].getPiece();
                 if (p != null) p.setBest(false);
-                if(!highlight) continue;
+                if (!highlight) continue;
                 for (Move m : bestPlays) {
                     if (p != null && m.oldCol == p.getCol() && m.oldRow == p.getRow()) {
                         p.setBest(true);
@@ -468,9 +472,9 @@ public class Controller {
             }
         }
         int player = state.getTurn();
-        for(BoardPiece p : playArea.getPlayer(player).getPieces()) {
+        for (BoardPiece p : playArea.getPlayer(player).getPieces()) {
             p.setBest(false);
-            if(!highlight) continue;
+            if (!highlight) continue;
             for (Move m : bestPlays) {
                 if (m.oldCol == p.getCol() && m.oldRow == p.getRow()) {
                     p.setBest(true);
@@ -478,31 +482,35 @@ public class Controller {
             }
         }
         int opponent = (player == RED) ? BLACK : RED;
-        for(BoardPiece p : playArea.getPlayer(opponent).getPieces()) {
+        for (BoardPiece p : playArea.getPlayer(opponent).getPieces()) {
             p.setBest(false);
         }
     }
+
     // Adds sting scores to all moves from a piece
     private ArrayList<String> getScores(ArrayList<Move> curHighLights) {
         ArrayList<String> turnsToTerminalList = new ArrayList<>();
-        for(Move m : curHighLights) {
+        for (Move m : curHighLights) {
             Node n = new Node(state).getNextNode(m);
-            if(Logic.gameOver(n.getState())) {
+            if (Logic.gameOver(n.getState())) {
                 turnsToTerminalList.add("0");
             } else turnsToTerminalList.add(turnsToTerminal(queryPlay(n).score));
         }
         return turnsToTerminalList;
     }
+
     public State getState() {
         return state;
     }
+
     public int getPlayerInstance(int team) {
-        if(team == RED) {
+        if (team == RED) {
             return playerRedInstance;
         } else {
             return playerBlackInstance;
         }
     }
+
     // Opens the review pane
     private void reviewGame() {
         Stage newStage = new Stage();
@@ -512,6 +520,7 @@ public class Controller {
         newStage.setOnCloseRequest(Event::consume);
         newStage.show();
     }
+
     // Opens the overwrite pane for DB
     private void showOverwritePane() {
         Stage newStage = new Stage();
@@ -521,10 +530,12 @@ public class Controller {
         newStage.setOnCloseRequest(Event::consume);
         newStage.show();
     }
+
     // Builds the DB
     public void buildDB() {
         LookupTableMinimax lt = new LookupTableMinimax(RED, state, true);
     }
+
     // Sets the mode based on the red and black player types
     private int setMode(int playerRedInstance, int playerBlackInstance) {
         if (playerRedInstance == HUMAN && playerBlackInstance == HUMAN) {
@@ -536,37 +547,56 @@ public class Controller {
         }
     }
 
+    public BoardPiece getSelected() {
+        return selected;
+    }
+
+    public void setSelected(BoardPiece piece) {
+        deselect();
+        selected = piece;
+        highlightMoves(piece.getRow(), piece.getCol(), piece.getTeam(), true);
+    }
+
+    public int getTurnNo() {
+        return turnNo;
+    }
+
     public void setTurnNo(int turnNo) {
         this.turnNo = turnNo;
     }
+
+    public int getScoreLimit() {
+        return state.getScoreLimit();
+    }
+
+    public int getMode() {
+        return mode;
+    }
+
+    public int getTime(int team) {
+        if (team == RED) return redTime;
+        else return blackTime;
+    }
+
+    public boolean getOverwriteDB() {
+        return overwriteDB;
+    }
+
+    public PlayArea getPlayArea() {
+        return playArea;
+    }
+
+    public ArrayList<PrevState> getPreviousStates() {
+        return previousStates;
+    }
+
     public void setPreviousStates(ArrayList<PrevState> prevStates) {
         this.previousStates = prevStates;
     }
 
-    public BoardPiece getSelected() {
-        return selected;
+    public Window getWindow() {
+        return window;
     }
-    public int getTurnNo() {
-        return turnNo;
-    }
-    public int getScoreLimit() {
-        return state.getScoreLimit();
-    }
-    public int getMode() {
-        return mode;
-    }
-    public int getTime(int team) {
-        if(team == RED) return redTime;
-        else return blackTime;
-    }
-    public boolean getOverwriteDB() {
-        return overwriteDB;
-    }
-    public PlayArea getPlayArea() {
-        return playArea;
-    }
-    public ArrayList<PrevState> getPreviousStates() { return previousStates; }
-    public Window getWindow() { return window; }
 
 
 }

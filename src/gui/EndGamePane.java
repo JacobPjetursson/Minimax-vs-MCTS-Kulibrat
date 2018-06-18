@@ -3,22 +3,20 @@ package gui;
 import game.Controller;
 import game.State;
 import gui.menu.MenuPane;
-import gui.menu.NewGamePane;
 import javafx.event.Event;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import misc.Globals;
 
-import static misc.Globals.BLACK;
-import static misc.Globals.HUMAN_VS_AI;
-import static misc.Globals.RED;
+import static misc.Globals.*;
 
 public class EndGamePane extends VBox {
 
@@ -71,7 +69,7 @@ public class EndGamePane extends VBox {
 
         });
         reviewGameBtn.setPrefWidth(120);
-        if(cont.getMode() == HUMAN_VS_AI)
+        if (cont.getMode() == HUMAN_VS_AI)
             getChildren().add(reviewGameBtn);
     }
 }

@@ -9,12 +9,13 @@ import ai.Minimax.Zobrist;
 import game.Logic;
 import game.Move;
 import game.State;
-import java.sql.*;
+
 import java.util.HashMap;
 import java.util.HashSet;
+
 import static misc.Globals.RED;
 
-public class UltraWeak {
+public class FindWinningCycles {
     private static HashMap<Long, MinimaxPlay> transpoTable = new HashMap<>();
     private static int team = RED;
 
@@ -28,25 +29,25 @@ public class UltraWeak {
             int prevSize = transpoTable.size();
             MinimaxPlay play = minimax(simNode, loops, CURR_MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH + ", LOOKUP TABLE SIZE: " + transpoTable.size() +
-            ", SCORE: " + play.score);
+                    ", SCORE: " + play.score);
 
-            if(Math.abs(play.score) >= 1) {
+            if (Math.abs(play.score) >= 1) {
                 String player = (team == RED) ? "RED" : "BLACK";
                 String opponent = (player.equals("RED")) ? "BLACK" : "RED";
                 return (play.score >= 1) ? player : opponent;
             }
-            if(prevSize == transpoTable.size()) {
+            if (prevSize == transpoTable.size()) {
                 done = true;
             }
         }
         return "None";
     }
 
-    public static MinimaxPlay minimax(Node node, HashSet<Long> loops, int depth, int alpha, int beta) {
+    private static MinimaxPlay minimax(Node node, HashSet<Long> loops, int depth, int alpha, int beta) {
         Move bestMove = null;
         int bestScore = (node.getState().getTurn() == team) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         int score;
-        if(loops.contains(node.getHashCode())) {
+        if (loops.contains(node.getHashCode())) {
             int eval = (node.getState().getTurn() == team) ? 1 : -1;
             //System.out.println("LOOP FOUND: " + Arrays.deepToString(node.getState().getBoard()) + ", SCORE RED: " + node.getState().getScore(RED) +
             //", SCORE BLACK: " + node.getState().getScore(BLACK));
@@ -54,10 +55,10 @@ public class UltraWeak {
         }
 
         if (Logic.gameOver(node.getState()) || depth == 0) {
-            return new MinimaxPlay(bestMove,0, depth);
+            return new MinimaxPlay(bestMove, 0, depth);
         }
         State state = new State(node.getState());
-        for(int i = 0; i < state.getScoreLimit() - state.getScore(state.getTurn()); i++) {
+        for (int i = 0; i < state.getScoreLimit() - state.getScore(state.getTurn()); i++) {
             state.addPoint(state.getTurn());
             Node addPoint = new Node(state);
             loops.add(addPoint.getHashCode());
@@ -90,6 +91,7 @@ public class UltraWeak {
         }
         return new MinimaxPlay(bestMove, bestScore, depth);
     }
+
     public static void main(String args[]) {
         Zobrist.initialize();
         State state = new State(5);

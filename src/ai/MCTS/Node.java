@@ -6,7 +6,7 @@ import game.State;
 
 import java.util.ArrayList;
 
-public class Node {
+class Node {
     private State state;
     private ArrayList<Node> children;
 
@@ -21,7 +21,7 @@ public class Node {
     }
 
     // Non-root state
-    public Node(Node parent, Move m) {
+    private Node(Node parent, Move m) {
         this.state = new State(parent.getState());
         this.parent = parent;
 
@@ -30,7 +30,7 @@ public class Node {
     }
 
     // Duplicate constructor
-    public Node(Node node) {
+    private Node(Node node) {
         this.state = new State(node.getState());
     }
 

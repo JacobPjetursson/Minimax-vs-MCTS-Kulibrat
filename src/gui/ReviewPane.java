@@ -37,7 +37,7 @@ public class ReviewPane extends VBox {
 
     public ReviewPane(Stage primaryStage, Controller currCont) {
         try {
-            if(currCont.dbConnection == null || currCont.dbConnection.isClosed()) {
+            if (currCont.dbConnection == null || currCont.dbConnection.isClosed()) {
                 currCont.connect(currCont.getScoreLimit());
                 connected = true;
             }
@@ -56,14 +56,14 @@ public class ReviewPane extends VBox {
         cancel.setOnMouseClicked(event -> {
             Stage stage = (Stage) getScene().getWindow();
             stage.close();
-            if(connected) {
+            if (connected) {
                 try {
                     currCont.dbConnection.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
-            if(Logic.gameOver(currCont.getState())) {
+            if (Logic.gameOver(currCont.getState())) {
                 Stage newStage = new Stage();
                 newStage.setScene(new Scene(new EndGamePane(primaryStage, Logic.getWinner(currCont.getState()),
                         currCont), 400, 150));
@@ -77,7 +77,7 @@ public class ReviewPane extends VBox {
         lw = new ListView<>();
         lw.setPickOnBounds(false);
         ObservableList<HBox> prevStateBoxes = FXCollections.observableArrayList();
-        for(PrevState ps : currCont.getPreviousStates()) {
+        for (PrevState ps : currCont.getPreviousStates()) {
             HBox h = new HBox(35);
             VBox vBox = new VBox(18);
             vBox.setAlignment(Pos.CENTER);
@@ -85,22 +85,22 @@ public class ReviewPane extends VBox {
             Node n = new Node(ps.getState());
             ArrayList<Move> bestPlays = currCont.bestPlays(n);
             PlayBox playBox = getPlayBox(currCont, ps, bestPlays);
-            Label turnL = new Label("Turns Played: " + (ps.getTurnNo()) );
+            Label turnL = new Label("Turns Played: " + (ps.getTurnNo()));
             turnL.setFont(Font.font("Verdana", 14));
             turnL.setAlignment(Pos.TOP_CENTER);
             vBox.getChildren().add(turnL);
 
             String moveStr = String.format("Move from state (row, col):\n" +
-                                           "         (%d, %d) -> (%d, %d)",
-                    ps.getMove().oldRow+1, ps.getMove().oldCol+1, ps.getMove().newRow+1, ps.getMove().newCol+1);
+                            "         (%d, %d) -> (%d, %d)",
+                    ps.getMove().oldRow + 1, ps.getMove().oldCol + 1, ps.getMove().newRow + 1, ps.getMove().newCol + 1);
             Label moveL = new Label(moveStr);
             vBox.getChildren().add(moveL);
 
             Label performance;
-            if(bestPlays.contains(ps.getMove())) {
+            if (bestPlays.contains(ps.getMove())) {
                 h.setStyle("-fx-background-color: rgba(0, 255, 0, 0.5);");
                 performance = new Label("Perfect move");
-            } else  {
+            } else {
                 performance = new Label("Imperfect move");
                 h.setStyle("-fx-background-color: rgba(255,0,0, 0.5);");
             }
@@ -111,13 +111,12 @@ public class ReviewPane extends VBox {
             String scoreStr;
             if (Logic.gameOver(nextNode.getState())) {
                 scoreStr = "0";
-            }
-            else {
+            } else {
                 scoreStr = currCont.turnsToTerminal(
                         currCont.queryPlay(nextNode).score);
             }
             int score;
-            if(scoreStr.equals("∞")) score = 0;
+            if (scoreStr.equals("∞")) score = 0;
             else score = Integer.parseInt(scoreStr);
             Label turnsToTerminal = new Label("Turns to " + ((score >= 0) ?
                     "win " : "loss ") + "\nafter move: " + scoreStr);
@@ -144,8 +143,8 @@ public class ReviewPane extends VBox {
             selectedCont.getPlayArea().update(selectedCont);
 
             ArrayList<PrevState> prevStates = new ArrayList<>();
-            for(PrevState ps : currCont.getPreviousStates()) {
-                if(ps.getTurnNo() < selectedCont.getTurnNo()) {
+            for (PrevState ps : currCont.getPreviousStates()) {
+                if (ps.getTurnNo() < selectedCont.getTurnNo()) {
                     prevStates.add(ps);
                 }
             }
@@ -167,8 +166,8 @@ public class ReviewPane extends VBox {
         PlayBox pb = new PlayBox(playerBlack, goalRed, b, goalBlack, playerRed);
         pb.update(cont, ps.getState());
         pb.addArrow(ps.getMove(), Color.BLUE);
-        for(Move m : bestPlays) {
-            if(m.equals(ps.getMove())) continue;
+        for (Move m : bestPlays) {
+            if (m.equals(ps.getMove())) continue;
             pb.addArrow(m, Color.GREEN);
         }
         return pb;

@@ -26,8 +26,8 @@ public class Arrow extends Group {
         a1.setEndY(endY);
         a2.setEndX(endX);
         a2.setEndY(endY);
-        double factor = width / Math.hypot(startX-endX, startY-endY);
-        double factorO = width / Math.hypot(startX-endX, startY-endY);
+        double factor = width / Math.hypot(startX - endX, startY - endY);
+        double factorO = width / Math.hypot(startX - endX, startY - endY);
         // part in direction of main line
         double dx = (startX - endX) * factor;
         double dy = (startY - endY) * factor;
@@ -42,7 +42,6 @@ public class Arrow extends Group {
         a2.setStartY(endY + dy - ox);
 
         getChildren().addAll(line, a1, a2);
-
 
 
     }

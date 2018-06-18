@@ -4,8 +4,6 @@ import misc.Globals;
 
 import java.util.Random;
 
-import static misc.Globals.RED;
-
 public class Zobrist {
     public static long[][][] board;
     public static long[] turn;

@@ -67,19 +67,19 @@ public class NewGamePane extends AnchorPane {
                     finalBox.getChildren().remove(overwriteDB);
 
                 }
-            } else if(playerBlackChoices.getItems().get((Integer) newValue).equals(human)) {
+            } else if (playerBlackChoices.getItems().get((Integer) newValue).equals(human)) {
                 finalBox.getChildren().remove(blackDelayBox);
                 finalBox.getChildren().remove(lookupDelayBox);
                 if (!playerRedChoices.getValue().equals(lookup)) {
                     finalBox.getChildren().remove(overwriteDB);
                 }
-            } else if(playerBlackChoices.getItems().get((Integer) newValue).equals(lookup)) {
+            } else if (playerBlackChoices.getItems().get((Integer) newValue).equals(lookup)) {
                 finalBox.getChildren().remove(blackDelayBox);
                 if (!finalBox.getChildren().contains(overwriteDB)) {
                     int index = finalBox.getChildren().contains(redDelayBox) ? 4 : 3;
                     finalBox.getChildren().add(index, overwriteDB);
                 }
-                if(playerRedChoices.getValue().equals(lookup)) {
+                if (playerRedChoices.getValue().equals(lookup)) {
                     finalBox.getChildren().add(4, lookupDelayBox);
                 }
             }
@@ -108,19 +108,19 @@ public class NewGamePane extends AnchorPane {
                 if (!playerBlackChoices.getValue().equals(lookup)) {
                     finalBox.getChildren().remove(overwriteDB);
                 }
-            } else if(playerRedChoices.getItems().get((Integer) newValue).equals(human)) {
+            } else if (playerRedChoices.getItems().get((Integer) newValue).equals(human)) {
                 finalBox.getChildren().remove(redDelayBox);
                 finalBox.getChildren().remove(lookupDelayBox);
                 if (!playerBlackChoices.getValue().equals(lookup)) {
                     finalBox.getChildren().remove(overwriteDB);
                 }
-            } else if(playerRedChoices.getItems().get((Integer) newValue).equals(lookup)) {
+            } else if (playerRedChoices.getItems().get((Integer) newValue).equals(lookup)) {
                 finalBox.getChildren().remove(redDelayBox);
                 if (!finalBox.getChildren().contains(overwriteDB)) {
                     int index = finalBox.getChildren().contains(blackDelayBox) ? 4 : 3;
                     finalBox.getChildren().add(index, overwriteDB);
                 }
-                if(playerBlackChoices.getValue().equals(lookup)) {
+                if (playerBlackChoices.getValue().equals(lookup)) {
                     finalBox.getChildren().add(4, lookupDelayBox);
                 }
             }
@@ -155,7 +155,7 @@ public class NewGamePane extends AnchorPane {
             if (!newValue.matches("\\d*")) {
                 blackDelayField.setText(newValue.replaceAll("[^\\d]", ""));
             }
-            if(newValue.isEmpty()) {
+            if (newValue.isEmpty()) {
                 blackDelayField.setText(newValue.replaceAll("", "0"));
             }
         });
@@ -179,7 +179,7 @@ public class NewGamePane extends AnchorPane {
             if (!newValue.matches("\\d*")) {
                 redDelayField.setText(newValue.replaceAll("[^\\d]", ""));
             }
-            if(newValue.isEmpty()) {
+            if (newValue.isEmpty()) {
                 redDelayField.setText(newValue.replaceAll("", "0"));
             }
         });
@@ -212,7 +212,7 @@ public class NewGamePane extends AnchorPane {
             if (!newValue.matches("\\d*")) {
                 lookupDelayField.setText(newValue.replaceAll("[^\\d]", ""));
             }
-            if(newValue.isEmpty()) {
+            if (newValue.isEmpty()) {
                 lookupDelayField.setText(newValue.replaceAll("", "0"));
             }
         });
@@ -238,7 +238,7 @@ public class NewGamePane extends AnchorPane {
             int playerRedMode = (redValue.equals(human)) ? Globals.HUMAN :
                     (redValue.equals(minimax)) ? Globals.MINIMAX : (redValue.equals(mcts)) ? Globals.MONTE_CARLO : Globals.LOOKUP_TABLE;
 
-            if(playerBlackMode == Globals.LOOKUP_TABLE && playerRedMode == Globals.LOOKUP_TABLE) {
+            if (playerBlackMode == Globals.LOOKUP_TABLE && playerRedMode == Globals.LOOKUP_TABLE) {
                 blackDelayField.setText(lookupDelayField.getText());
                 redDelayField.setText(lookupDelayField.getText());
             }

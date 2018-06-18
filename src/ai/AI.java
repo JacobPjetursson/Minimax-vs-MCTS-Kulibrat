@@ -1,6 +1,3 @@
-/**
- * Template for all AI's
- */
 package ai;
 
 
@@ -10,7 +7,7 @@ import game.State;
 public abstract class AI {
     public int team;
 
-    public AI(int team) {
+    protected AI(int team) {
         this.team = team;
 
     }

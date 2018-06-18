@@ -30,22 +30,20 @@ public class BoardTile extends StackPane {
         turnsToTerminalLabel.setTextFill(Color.BLACK);
 
         setOnMouseEntered(me -> {
-            if(highlight && bestMove) {
+            if (highlight && bestMove) {
                 setStyle("-fx-background-color: rgb(0, 225, 0);");
-            }
-            else if (highlight) {
-                if(help) setStyle("-fx-background-color: rgb(255,0,0);");
+            } else if (highlight) {
+                if (help) setStyle("-fx-background-color: rgb(255,0,0);");
                 else setStyle("-fx-background-color: rgb(255,200,0);");
             }
         });
 
         setOnMouseExited(me -> {
-            if(highlight && bestMove) {
+            if (highlight && bestMove) {
                 setStyle("-fx-background-color: rgb(0, 150, 0);");
-            }
-            else if (highlight) {
+            } else if (highlight) {
                 if (help) setStyle("-fx-background-color: rgb(150,0,0);");
-                    else setStyle("-fx-background-color: rgb(200,150,0);");
+                else setStyle("-fx-background-color: rgb(200,150,0);");
             }
         });
     }
@@ -59,26 +57,24 @@ public class BoardTile extends StackPane {
         this.bestMove = bestMove;
         this.help = help;
 
-        if(highlight && bestMove) {
+        if (highlight && bestMove) {
             setStyle("-fx-background-color: rgb(0, 150, 0);");
-        }
-        else if (highlight) {
-            if(help) setStyle("-fx-background-color: rgb(150,0,0);");
+        } else if (highlight) {
+            if (help) setStyle("-fx-background-color: rgb(150,0,0);");
             else setStyle("-fx-background-color: rgb(200,150,0);");
-        }
-        else {
+        } else {
             setStyle("-fx-background-color: rgb(255, 255, 255);");
         }
 
-        if(turns.isEmpty()) {
+        if (turns.isEmpty()) {
             getChildren().remove(turnsToTerminalLabel);
         } else {
             turnsToTerminalLabel.setText(turns);
             turnsToTerminalLabel.setTextFill(Color.BLACK);
             getChildren().add(turnsToTerminalLabel);
-            if(getChildren().size() > 1) {
+            if (getChildren().size() > 1) {
                 BoardPiece bp = (BoardPiece) getChildren().get(0);
-                if(bp.getTeam() == BLACK) {
+                if (bp.getTeam() == BLACK) {
                     turnsToTerminalLabel.setTextFill(Color.WHITE);
                 }
 
@@ -93,8 +89,9 @@ public class BoardTile extends StackPane {
     public int getRow() {
         return row;
     }
+
     public BoardPiece getPiece() {
-        if(!getChildren().isEmpty()) {
+        if (!getChildren().isEmpty()) {
             return (BoardPiece) getChildren().get(0);
         }
         return null;

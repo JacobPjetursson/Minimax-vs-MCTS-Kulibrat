@@ -2,7 +2,6 @@ package gui.board;
 
 import game.Controller;
 import game.State;
-import gui.PlayArea;
 import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
 import misc.Globals;

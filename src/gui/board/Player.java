@@ -2,7 +2,6 @@ package gui.board;
 
 import game.Controller;
 import game.State;
-import gui.PlayArea;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -33,18 +32,18 @@ public class Player extends VBox {
         pieces = new ArrayList<>();
         int type = cont.getPlayerInstance(team);
         setAlignment(Pos.CENTER);
-        setSpacing(tileWidth/6);
+        setSpacing(tileWidth / 6);
         setStyle("-fx-background-color: rgb(255, 255, 255);");
 
         int amount_of_pieces;
         if (Globals.losePieces) {
-            if(cont.getState().getScoreLimit() <= 4) {
+            if (cont.getState().getScoreLimit() <= 4) {
                 amount_of_pieces = cont.getState().getScoreLimit();
             } else {
                 amount_of_pieces = 4;
             }
         } else {
-            if (Globals.piece_amount <=4) {
+            if (Globals.piece_amount <= 4) {
                 amount_of_pieces = Globals.piece_amount;
             } else {
                 amount_of_pieces = 4;
@@ -87,7 +86,7 @@ public class Player extends VBox {
 
         Label typeLabel = new Label((type == HUMAN) ? "Human" : (type == MINIMAX) ?
                 "Minimax" : (type == LOOKUP_TABLE) ? "Lookup\n Table" : "MCTS");
-        typeLabel.setFont(Font.font("Verdana", tileWidth/4));
+        typeLabel.setFont(Font.font("Verdana", tileWidth / 4));
         ColumnConstraints column1 = new ColumnConstraints((tileWidth * 4) / 3);
         for (int i = 0; i < 3; i++) {
             gridPaneDisplay.getColumnConstraints().add(column1);

@@ -36,18 +36,16 @@ public class BoardPiece extends Circle {
 
             if (team == RED && !selected) {
                 Color lightRed = new Color(1.0, 0.5, 0.5, 1.0);
-                if(best) {
+                if (best) {
                     setColor(lightRed, green);
-                }
-                else {
+                } else {
                     setColor(lightRed, lightRed);
                 }
             } else if (team == BLACK && !selected) {
                 Color gray = new Color(0.3, 0.3, 0.3, 1.0);
-                if(best) {
+                if (best) {
                     setColor(gray, green);
-                }
-                else {
+                } else {
                     setColor(gray, gray);
                 }
             }
@@ -55,10 +53,9 @@ public class BoardPiece extends Circle {
 
         setOnMouseExited(me -> {
             if (!selected && isControllable()) {
-                if(best) {
+                if (best) {
                     setColor(color, green);
-                }
-                else setColor(color, color);
+                } else setColor(color, color);
             }
         });
 
@@ -80,9 +77,10 @@ public class BoardPiece extends Circle {
         setStroke(Color.BLUE);
         cont.setSelected(this);
     }
+
     public void setBest(boolean best) {
         this.best = best;
-        if(best) {
+        if (best) {
             setColor(color, green);
         } else {
             setColor(color, color);
@@ -114,7 +112,7 @@ public class BoardPiece extends Circle {
 
     public void deselect() {
         selected = false;
-        if(best) {
+        if (best) {
             setColor(color, green);
         } else {
             setColor(color, color);

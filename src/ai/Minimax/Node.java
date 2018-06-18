@@ -11,18 +11,18 @@ import static misc.Globals.RED;
 
 public class Node {
     private State state;
-    private long hash;
+    private long zobrist_key;
 
     // Starting Root state
     public Node(State startState) {
         this.state = new State(startState);
-        this.hash = initHashCode();
+        this.zobrist_key = initHashCode();
     }
 
     // Non-root state
-    public Node(Node parent, Move m) {
+    private Node(Node parent, Move m) {
         this.state = new State(parent.state);
-        hash = parent.hash;
+        zobrist_key = parent.zobrist_key;
 
         this.state.setMove(m);
         Logic.doTurn(m, this.state);
@@ -32,7 +32,7 @@ public class Node {
     // Duplicate constructor, for "root" state
     public Node(Node node) {
         this.state = new State(node.state);
-        hash = node.hash;
+        zobrist_key = node.zobrist_key;
         this.state.setMove(node.state.getMove());
     }
 
@@ -62,11 +62,11 @@ public class Node {
 
     @Override
     public int hashCode() {
-        return (int) hash;
+        return (int) zobrist_key;
     }
 
     public long getHashCode() {
-        return this.hash;
+        return this.zobrist_key;
     }
 
 
@@ -87,29 +87,29 @@ public class Node {
         return hash;
     }
 
-    public void updateHashCode(State parent) {
+    private void updateHashCode(State parent) {
         int[][] board = state.getBoard();
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 if (board[i][j] != parent.getBoard()[i][j]) {
                     int k_parent = parent.getBoard()[i][j]; // team occupying spot
                     int k = board[i][j];
-                    if (k_parent != 0) hash ^= Zobrist.board[i][j][k_parent];
-                    if (k != 0) hash ^= Zobrist.board[i][j][k];
+                    if (k_parent != 0) zobrist_key ^= Zobrist.board[i][j][k_parent];
+                    if (k != 0) zobrist_key ^= Zobrist.board[i][j][k];
                 }
             }
         }
         if (state.getTurn() != parent.getTurn()) {
-            hash ^= Zobrist.turn[parent.getTurn()];
-            hash ^= Zobrist.turn[state.getTurn()];
+            zobrist_key ^= Zobrist.turn[parent.getTurn()];
+            zobrist_key ^= Zobrist.turn[state.getTurn()];
         }
         if (state.getScore(RED) != parent.getScore(RED)) {
-            hash ^= Zobrist.redPoints[parent.getScore(RED)];
-            hash ^= Zobrist.redPoints[state.getScore(RED)];
+            zobrist_key ^= Zobrist.redPoints[parent.getScore(RED)];
+            zobrist_key ^= Zobrist.redPoints[state.getScore(RED)];
         }
         if (state.getScore(BLACK) != parent.getScore(BLACK)) {
-            hash ^= Zobrist.blackPoints[parent.getScore(BLACK)];
-            hash ^= Zobrist.blackPoints[state.getScore(BLACK)];
+            zobrist_key ^= Zobrist.blackPoints[parent.getScore(BLACK)];
+            zobrist_key ^= Zobrist.blackPoints[state.getScore(BLACK)];
         }
     }
 }

@@ -15,10 +15,9 @@ public class State {
     private int turn;
     private int redScore;
     private int blackScore;
+    private int scoreLimit;
     private int unplacedRed;
     private int unplacedBlack;
-    private int scoreLimit;
-
     private ArrayList<Move> legalMoves;
     private Move move;
 
@@ -98,6 +97,7 @@ public class State {
         if (team == RED) unplacedRed++;
         else unplacedBlack++;
     }
+
     void removeUnPlaced(int team) {
         if (team == RED) unplacedRed--;
         else unplacedBlack--;
@@ -107,6 +107,7 @@ public class State {
         if (team == RED) return unplacedRed;
         else return unplacedBlack;
     }
+
     // Get a list of pieces/points from this state
     ArrayList<Point> getPieces(int team) {
         ArrayList<Point> entries = new ArrayList<>();
@@ -142,6 +143,7 @@ public class State {
         legalMoves = Logic.legalMoves(turn, this);
         return legalMoves;
     }
+
     // Returns the material of a state, which is the value of the state based on various heuristics.
     // It checks the current turn, and outputs a positive number if it is good, or negative if bad
     public int getMaterial() {
@@ -154,7 +156,7 @@ public class State {
         for (Point pR : getPieces(RED)) {
             for (Point pB : getPieces(BLACK)) {
 
-                if (pR.x == pB.x && (pR.y-1) == pB.y) {
+                if (pR.x == pB.x && (pR.y - 1) == pB.y) {
                     score += 2;
                 }
             }

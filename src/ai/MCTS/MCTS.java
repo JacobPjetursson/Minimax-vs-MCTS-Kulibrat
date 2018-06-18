@@ -10,10 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-import static misc.Globals.RED;
-
 public class MCTS extends AI {
-    public boolean debug = true;
+    private boolean debug = true;
     // PARAMETERS
     private long calculationTime;
     private int max_moves = 300;
@@ -31,6 +29,7 @@ public class MCTS extends AI {
         minimax.setUseTranspo(false);
         curr_node = new Node(startState);
     }
+
     // Main function for MCTS, which consist of all four steps in the algorithm.
     private void run(Node startNode) {
         Node sim_node = startNode;
@@ -119,6 +118,7 @@ public class MCTS extends AI {
         return move;
 
     }
+
     // Called when MCTS makes its final move based on the move with the highest chances of winning
     private Move getBestMove(Node node) {
         Move bestMove = null;
@@ -144,6 +144,7 @@ public class MCTS extends AI {
         System.out.println();
         return bestMove;
     }
+
     // Main loop of MCTS for statistic gathering
     private void initialize(Node startNode, long calculationTime) {
         int games = 0;

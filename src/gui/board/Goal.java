@@ -22,20 +22,18 @@ public class Goal extends StackPane {
         turnsToTerminalLabel.setTextFill(Color.BLACK);
 
         setOnMouseEntered(me -> {
-            if(highlight && bestMove) {
+            if (highlight && bestMove) {
                 setStyle("-fx-background-color: rgb(0, 225, 0);");
-            }
-            else if (highlight) {
-                if(help) setStyle("-fx-background-color: rgb(255,0,0);");
+            } else if (highlight) {
+                if (help) setStyle("-fx-background-color: rgb(255,0,0);");
                 else setStyle("-fx-background-color: rgb(255,200,0);");
             }
         });
 
         setOnMouseExited(me -> {
-            if(highlight && bestMove) {
+            if (highlight && bestMove) {
                 setStyle("-fx-background-color: rgb(0, 150, 0);");
-            }
-            else if (highlight) {
+            } else if (highlight) {
                 if (help) setStyle("-fx-background-color: rgb(150,0,0);");
                 else setStyle("-fx-background-color: rgb(200,150,0);");
             }
@@ -51,16 +49,15 @@ public class Goal extends StackPane {
         this.highlight = highlight;
         this.bestMove = bestMove;
         this.help = help;
-        if(highlight && bestMove) {
+        if (highlight && bestMove) {
             setStyle("-fx-background-color: rgb(0, 150, 0);");
-        }
-        else if (highlight) {
+        } else if (highlight) {
             if (help) setStyle("-fx-background-color: rgb(150, 0, 0);");
             else setStyle("-fx-background-color: rgb(200, 150, 0);");
         } else {
             setStyle("-fx-background-color: rgb(200, 200, 200);");
         }
-        if(turns.isEmpty()) {
+        if (turns.isEmpty()) {
             getChildren().remove(turnsToTerminalLabel);
         } else {
             turnsToTerminalLabel.setText(turns);

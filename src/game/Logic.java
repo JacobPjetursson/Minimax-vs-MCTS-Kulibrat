@@ -1,13 +1,9 @@
 package game;
 
-import misc.Globals;
-
 import java.awt.*;
 import java.util.ArrayList;
 
-import static misc.Globals.BLACK;
-import static misc.Globals.CUSTOMIZABLE;
-import static misc.Globals.RED;
+import static misc.Globals.*;
 
 public abstract class Logic {
     // Outputs a list of legal moves from a state
@@ -18,6 +14,7 @@ public abstract class Logic {
         }
         return moves;
     }
+
     // Outputs a list of legal moves from a single piece
     static ArrayList<Move> legalMovesFromPiece(int oldRow, int oldCol, int team, State state) {
         ArrayList<Move> list = new ArrayList<>();
@@ -60,9 +57,6 @@ public abstract class Logic {
                         list.add(new Move(oldRow, oldCol, oldRow - jump, oldCol, team));
                         break;
                     }
-                    if (Globals.attackJump && board[oldRow - jump][oldCol] == BLACK) {
-                        list.add(new Move(oldRow, oldCol, oldRow - jump, oldCol, team));
-                    }
                 }
             }
         } else {
@@ -100,14 +94,13 @@ public abstract class Logic {
                         list.add(new Move(oldRow, oldCol, oldRow + jump, oldCol, team));
                         break;
                     }
-                    if (Globals.attackJump && board[oldRow + jump][oldCol] == RED) {
-                        list.add(new Move(oldRow, oldCol, oldRow + jump, oldCol, team));
-                    }
                 }
             }
         }
         return list;
     }
+
+
     // Do a turn based on a move from a given state. Checks if the move is from the correct player, but does not check for illegal moves.
     // It also adds the points and changes the board based on the move
     public static void doTurn(Move m, State state) {
@@ -141,6 +134,7 @@ public abstract class Logic {
             Logic.passTurn(state);
         }
     }
+
     // Passes the turn for the current player
     public static boolean gameOver(State state) {
         return state.getScore(RED) == state.getScoreLimit() ||
@@ -151,6 +145,7 @@ public abstract class Logic {
         if (state.getTurn() == RED) state.setTurn(BLACK);
         else state.setTurn(RED);
     }
+
     // Finds the winner, granted that the game is over
     public static int getWinner(State state) {
         if (gameOver(state)) {
@@ -159,6 +154,7 @@ public abstract class Logic {
         }
         return 0;
     }
+
     // This is called when checking for game over, and checks if no agents can move
     private static boolean locked(State state) {
         return legalMoves(RED, state).isEmpty() && legalMoves(BLACK, state).isEmpty();

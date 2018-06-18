@@ -99,7 +99,9 @@ public class NavPane extends VBox {
         getChildren().add(helpHumanBox);
     }
 
-    public void addReviewButton() { getChildren().add(reviewButton); }
+    public void addReviewButton() {
+        getChildren().add(reviewButton);
+    }
 
     public Button getStartAIButton() {
         return startAIButton;
@@ -121,5 +123,7 @@ public class NavPane extends VBox {
         return helpHuman;
     }
 
-    public Button getReviewButton() { return reviewButton; }
+    public Button getReviewButton() {
+        return reviewButton;
+    }
 }

@@ -3,7 +3,6 @@ package gui;
 import game.Controller;
 import game.State;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
@@ -11,7 +10,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import misc.Globals;
 
 import static misc.Globals.BLACK;
 import static misc.Globals.RED;

@@ -5,7 +5,6 @@ import game.Logic;
 import game.Move;
 import game.State;
 
-import java.awt.*;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -26,6 +25,7 @@ public class Minimax extends AI {
         this.calculationTime = calculationTime;
         transTable = new HashMap<>();
     }
+
     // Runs the iterative deepening minimax with a set timelimit
     public Move makeMove(State state) {
         long startTime = System.currentTimeMillis();
@@ -39,6 +39,7 @@ public class Minimax extends AI {
         return move;
 
     }
+
     // Iteratively increases the depth limit while called minimax continuously. Stops when win is ensured or time is up.
     private MinimaxPlay iterativeDeepeningMinimax(State state, long startTime) {
         resetVariables();
@@ -49,7 +50,7 @@ public class Minimax extends AI {
             CURR_MAX_DEPTH++;
             MinimaxPlay play = minimax(simNode, CURR_MAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, startTime);
             if (!searchCutOff) bestPlay = play;
-            if(Math.abs(play.score) >= 1000) winCutOff = true;
+            if (Math.abs(play.score) >= 1000) winCutOff = true;
         }
         // random move if null (No time to calculate minimax)
         if (bestPlay == null) {
@@ -61,6 +62,7 @@ public class Minimax extends AI {
 
         return bestPlay;
     }
+
     // Minimax with pruning, move ordering and a detailed heuristic
     public MinimaxPlay minimax(Node node, int depth, int alpha, int beta, long startTime) {
         Move bestMove = null;
@@ -74,7 +76,7 @@ public class Minimax extends AI {
         MinimaxPlay transpoPlay = null;
         if (useTranspo) {
             transpoPlay = transTable.get(node.getHashCode());
-            if (transpoPlay != null && (depth <= transpoPlay.depth || Math.abs(transpoPlay.score) >= 1000) ) {
+            if (transpoPlay != null && (depth <= transpoPlay.depth || Math.abs(transpoPlay.score) >= 1000)) {
                 return transpoPlay;
             }
         }
@@ -112,7 +114,7 @@ public class Minimax extends AI {
                 }
                 beta = Math.min(score, beta);
             }
-            if(beta <= alpha) break;
+            if (beta <= alpha) break;
         }
 
 
@@ -144,6 +146,7 @@ public class Minimax extends AI {
         searchCutOff = false;
 
     }
+
     // Either returns 1000 or -1000 if terminal, or the material of a state, if intermediate.
     // The material is the objective value of a state
     private int heuristic(State state) {
@@ -154,9 +157,10 @@ public class Minimax extends AI {
                 return 1000;
             } else if (winner == opponent) return -1000;
         }
-        if(state.getTurn() == team) return state.getMaterial();
+        if (state.getTurn() == team) return state.getMaterial();
         else return -state.getMaterial();
     }
+
     // Used if a win has been ensured, to make sure the algorithm fulfills all its allocated time.
     private void chill(long startTime) {
         while (!outOfTime(startTime)) {
