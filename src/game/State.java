@@ -1,5 +1,6 @@
 package game;
 
+import ai.Minimax.Node;
 import misc.Globals;
 
 import java.awt.*;
@@ -58,7 +59,7 @@ public class State {
         return board;
     }
 
-    void setBoardEntry(int row, int col, int team) {
+    public void setBoardEntry(int row, int col, int team) {
         board[row][col] = team;
     }
 
@@ -135,6 +136,15 @@ public class State {
         return state;
     }
 
+    public ArrayList<State> getChildren() {
+        ArrayList<State> children = new ArrayList<>();
+        for (Move m : getLegalMoves()) {
+            State child = new State(this).getNextState(m);
+            children.add(child);
+        }
+        return children;
+    }
+
     // Creates and/or returns a list of new state objects which correspond to the children of the given state.
     public ArrayList<Move> getLegalMoves() {
         if (legalMoves != null) return legalMoves;
@@ -203,7 +213,7 @@ public class State {
         if (!(obj instanceof State)) return false;
         State state = (State) obj;
         return this == state || turn == state.getTurn() &&
-                Arrays.deepEquals(board, state.board) &&
+                (Arrays.deepEquals(board, state.board) || Arrays.deepEquals(this.reflect().board, state.board)) &&
                 redScore == state.getScore(RED) &&
                 blackScore == state.getScore(BLACK);
     }
@@ -211,8 +221,29 @@ public class State {
     @Override
     public int hashCode() {
         int result = Objects.hash(turn, redScore, blackScore);
-        result = 31 * result + Arrays.deepHashCode(board);
+        result += Arrays.deepHashCode(board);
+        result += Arrays.deepHashCode(this.reflect().board);
         return result;
 
     }
+
+    public State reflect() {
+        State copy = new State(this);
+        for (int i = 0; i < copy.board.length; i++) {
+            for (int j = 0; j < copy.board[i].length; j++) {
+                copy.board[i][j] = board[i][copy.board.length - 1 - j];
+            }
+        }
+        return copy;
+    }
+
+    public void printBoard() {
+        for (int[] aBoard : board) {
+            for (int anABoard : aBoard) {
+                System.out.print(anABoard + " ");
+            }
+            System.out.println();
+        }
+    }
+
 }
