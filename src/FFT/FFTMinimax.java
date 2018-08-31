@@ -13,48 +13,39 @@ public class FFTMinimax {
     private int team;
     private HashMap<State, MinimaxPlay> lookupTable;
     private HashMap<Integer, ArrayList<Statement>> statements;
+    private HashMap<Integer, ArrayList<ArrayList<Statement>>> similars;
+    private HashMap<Integer, ArrayList<Statement>> commons;
 
-    private static int OUTCOME_RED_WIN = 0;
-    private static int OUTCOME_BLACK_WIN = 1;
-    private static int OUTCOME_DRAW = 2;
-    private static int OUTCOME_RED_WIN_DRAW = 3;
-    private static int OUTCOME_BLACK_WIN_DRAW = 3;
+    private static final int OUTCOME_RED_WIN = 0;
+    private static final int OUTCOME_BLACK_WIN = 1;
+    private static final int OUTCOME_DRAW = 2;
+    private static final int OUTCOME_RED_WIN_DRAW = 3;
+    private static final int OUTCOME_BLACK_WIN_DRAW = 4;
     private int CURR_MAX_DEPTH;
-    private int COMMON_PIECES = 1;
     private int unevaluatedNodes = 0;
+
+    // Configuration
+    private int COMMON_PIECES = 1;
+    private boolean PRINTCOMMON = true;
+    private int selected = OUTCOME_BLACK_WIN;
 
     FFTMinimax(int team) {
         this.team = team;
         lookupTable = new HashMap<>();
         statements = new HashMap<>();
+        similars = new HashMap<>();
+        commons = new HashMap<>();
 
     }
 
     void makeFFT(State state) {
         iterativeDeepeningMinimax(state);
-
-
-
         System.out.println("LOOKUP SIZE: " + lookupTable.size());
+        populateStatements();
 
-        for (Map.Entry<State, MinimaxPlay> entry : lookupTable.entrySet()) {
-            State key = entry.getKey();
-            MinimaxPlay value = entry.getValue();
-            if (value.score < -1000) {
-                int moves = movesFromTerminal(value.score, OUTCOME_BLACK_WIN);
-                if (statements.get(moves) == null) {
-                    ArrayList<Statement> list = new ArrayList<>();
-                    list.add(new Statement(key, value.move));
-                    statements.put(moves, list);
-                } else {
-                    statements.get(moves).add(new Statement(key, value.move));
-                }
-            }
-        }
         // Sort the statements, so those with few clauses appear first in the list.
         // This is to reduce the amount of unimportant clauses when grouping the statements
         sortStatements();
-        HashMap<Integer, ArrayList<ArrayList<Statement>>> similars = new HashMap<>();
 
         // Finding similiarities in statements and grouping them together
         for (Map.Entry<Integer, ArrayList<Statement>> entry : statements.entrySet()) {
@@ -84,25 +75,8 @@ public class FFTMinimax {
 
             }
         }
-        System.out.println("SIMILARS SIZE: " + similars.size());
-/*
-        boolean done1 = false;
-        int i1 = 1;
-        while (!done1) {
-            System.out.println("STEP: " + (i1/2 + 1) );
-            for (ArrayList<Statement> sList : similars.get(i1)) {
-                Statement s = sList.get(0);
-                //s.printStatement();
-                s.printBoard();
-            }
-            if (similars.get(i1 + 2) == null)
-                done1= true;
-            else
-                i1+=2;
-        }
-*/
+
         // Finding the common clauses in all statements, and making new statements with only these clauses
-        HashMap<Integer, ArrayList<Statement>> commons = new HashMap<>();
         for (Map.Entry<Integer, ArrayList<ArrayList<Statement>>> entry : similars.entrySet()) {
             for (ArrayList<Statement> sims : entry.getValue()) {
                 // The statement that shares the most with all other statements, and no more
@@ -117,22 +91,80 @@ public class FFTMinimax {
             }
         }
 
+        printFFT();
 
-        System.out.println("COMMONS SIZE: " + commons.size());
-        boolean done = false;
-        int i = 1;
-        while (!done) {
-            System.out.println("STEP: " + (i/2 + 1) );
-            for (Statement s : commons.get(i)) {
-                //s.printStatement();
-                s.printBoard();
+    }
+
+    private void populateStatements() {
+        for (Map.Entry<State, MinimaxPlay> entry : lookupTable.entrySet()) {
+            State key = entry.getKey();
+            MinimaxPlay value = entry.getValue();
+            boolean threshold;
+            switch(selected) {
+                case OUTCOME_RED_WIN:
+                    threshold = value.score > 1000;
+                    break;
+                case OUTCOME_BLACK_WIN:
+                    threshold = value.score < -1000;
+                    break;
+                case OUTCOME_RED_WIN_DRAW:
+                    threshold = value.score > 0;
+                    break;
+                case OUTCOME_BLACK_WIN_DRAW:
+                    threshold = value.score < -1000 || (value.score > 0 && value.score < 1000);
+                    break;
+                case OUTCOME_DRAW:
+                    threshold = value.score > 0 && value.score < 1000;
+                    break;
+                default: threshold = value.score > 1000;
+
             }
-            if (commons.get(i + 2) == null)
-                done = true;
-            else
-                i+=2;
+            if (threshold) {
+                int moves = movesFromTerminal(value.score, selected);
+                if (statements.get(moves) == null) {
+                    ArrayList<Statement> list = new ArrayList<>();
+                    list.add(new Statement(key, value.move));
+                    statements.put(moves, list);
+                } else {
+                    statements.get(moves).add(new Statement(key, value.move));
+                }
+            }
         }
+    }
 
+    private void printFFT() {
+        if (PRINTCOMMON) {
+            System.out.println("COMMONS SIZE: " + commons.size());
+            boolean done = false;
+            int i = 1;
+            while (!done) {
+                System.out.println("STEP: " + (i/2 + 1) );
+                for (Statement s : commons.get(i)) {
+                    //s.printStatement();
+                    s.printBoard();
+                }
+                if (commons.get(i + 2) == null)
+                    done = true;
+                else
+                    i+=2;
+            }
+        } else {
+            System.out.println("SIMILARS SIZE: " + similars.size());
+            boolean done1 = false;
+            int i1 = 1;
+            while (!done1) {
+                System.out.println("STEP: " + (i1/2 + 1) );
+                for (ArrayList<Statement> sList : similars.get(i1)) {
+                    Statement s = sList.get(0);
+                    //s.printStatement();
+                    s.printBoard();
+                }
+                if (similars.get(i1 + 2) == null)
+                    done1= true;
+                else
+                    i1+=2;
+            }
+        }
     }
 
     private Statement findCommon(ArrayList<Statement> sims) {
@@ -153,7 +185,6 @@ public class FFTMinimax {
                 boolean common1 = false;
                 for (ArrayList<Clause> clauses1 : s1.symmetryStatements) {
                     if (clauses1.contains(c) && clauses1.containsAll(commonClauses)) {
-                        //if (clauses1.contains(c)) {
                         common1= true;
                         break;
                     }
