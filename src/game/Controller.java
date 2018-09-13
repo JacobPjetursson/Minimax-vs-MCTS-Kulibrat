@@ -1,5 +1,6 @@
 package game;
 
+import FFT.*;
 import ai.AI;
 import ai.MCTS.MCTS;
 import ai.Minimax.*;
@@ -7,6 +8,7 @@ import gui.*;
 import gui.board.BoardPiece;
 import gui.board.BoardTile;
 import gui.board.Goal;
+import gui.board.Player;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.scene.Scene;
@@ -20,6 +22,7 @@ import misc.Globals;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Random;
 
 import static misc.Globals.*;
 
@@ -37,12 +40,15 @@ public class Controller {
     private Button startAIButton;
     private Button stopAIButton;
     private Button reviewButton;
+    private Button editFFTButton;
+    private CheckBox interactiveFFTBox;
+    private Button[] swapButtons;
     private CheckBox helpHumanBox;
     private Thread aiThread;
     private NavPane navPane;
     private BoardPiece selected;
     private ArrayList<Move> curHighLights;
-    private Stage primaryStage;
+    public Stage primaryStage;
     private State state;
     private PlayArea playArea;
     private Goal goalRed;
@@ -50,6 +56,7 @@ public class Controller {
     private boolean endGamePopup;
     private ArrayList<PrevState> previousStates;
     private Window window;
+    private FFT fft;
 
     public Controller(Stage primaryStage, int playerRedInstance, int playerBlackInstance,
                       State state, int redTime, int blackTime, boolean overwriteDB) {
@@ -74,37 +81,44 @@ public class Controller {
         playArea = playPane.getPlayArea();
         window = playArea.getScene().getWindow();
 
-        if (playerRedInstance == MINIMAX) {
-            aiRed = new Minimax(RED, redTime);
-        } else if (playerRedInstance == LOOKUP_TABLE) {
-            aiRed = new LookupTableMinimax(RED, state, overwriteDB);
-        } else if (playerRedInstance == MONTE_CARLO) {
-            aiRed = new MCTS(state, RED, redTime);
-        }
-        if (playerBlackInstance == MINIMAX) {
-            aiBlack = new Minimax(BLACK, blackTime);
-        } else if (playerBlackInstance == LOOKUP_TABLE) {
-            if (playerRedInstance == LOOKUP_TABLE) {
-                overwriteDB = false;
-            }
-            aiBlack = new LookupTableMinimax(BLACK, state, overwriteDB);
-        } else if (playerBlackInstance == MONTE_CARLO) {
-            aiBlack = new MCTS(state, BLACK, blackTime);
-        }
+        instantiateAI(RED);
+        instantiateAI(BLACK);
 
         // Fetch all gui elements that invoke something game-related
         startAIButton = navPane.getStartAIButton();
         stopAIButton = navPane.getStopAIButton();
         helpHumanBox = navPane.getHelpHumanBox();
         reviewButton = navPane.getReviewButton();
+        editFFTButton = navPane.getEditFFTButton();
+        interactiveFFTBox = navPane.getInteractiveFFTBox();
         goalRed = playArea.getGoal(RED);
         goalBlack = playArea.getGoal(BLACK);
 
-        if (mode == AI_VS_AI) navPane.addAIWidgets();
-        if (mode == HUMAN_VS_AI) navPane.addReviewButton();
-        if (mode != AI_VS_AI) navPane.addHelpHumanBox();
+        showNavButtons();
 
         // Set event handlers for gui elements
+        // Swap player buttons
+        swapButtons = new Button[2];
+        Player[] players = new Player[2];
+        players[0] = playArea.getPlayer(RED);
+        players[1] = playArea.getPlayer(BLACK);
+        swapButtons[0] = players[0].getSwapBtn();
+        swapButtons[1] = players[1].getSwapBtn();
+        for (int i = 0; i < swapButtons.length; i++) {
+            Player p = players[i];
+            Button b = swapButtons[i];
+            b.setOnMouseClicked(event -> {
+                deselect();
+                Stage newStage = new Stage();
+                newStage.setScene(new Scene(new SwapPlayerPane(this, p), 325, 400));
+                newStage.initModality(Modality.APPLICATION_MODAL);
+                newStage.initOwner(window);
+                newStage.setOnCloseRequest(Event::consume);
+                newStage.show();
+            });
+        }
+
+
         // Selected piece
         playPane.setFocusTraversable(true);
         playPane.setOnKeyPressed(event -> {
@@ -178,11 +192,73 @@ public class Controller {
             }
             helpHumanBox.setDisable(false);
         });
+        // FFT LISTENERS
+        // edit fft button
+        editFFTButton.setOnMouseClicked(event -> {
+            deselect();
+            Stage newStage = new Stage();
+            newStage.setScene(new Scene(new EditFFTPane(this, fft), 450, Globals.HEIGHT - 50));
+            newStage.initModality(Modality.APPLICATION_MODAL);
+            newStage.initOwner(window);
+            newStage.setOnCloseRequest(Event::consume);
+            newStage.show();
+        });
+
+        // interactive mode
+        interactiveFFTBox.selectedProperty().addListener((observableValue, oldValue, newValue) -> {
+            deselect();
+            if (newValue) {
+
+            } else {
+
+            }
+        });
 
         if (mode == HUMAN_VS_AI && playerRedInstance != HUMAN && state.getTurn() == RED) {
             aiThread = new Thread(this::doAITurn);
             aiThread.setDaemon(true);
             aiThread.start();
+        }
+    }
+
+    private void showNavButtons() {
+        navPane.removeWidgets();
+        if (mode == AI_VS_AI && !navPane.containsAIWidgets())
+            navPane.addAIWidgets();
+        if (mode == HUMAN_VS_AI && !navPane.containsReviewButton())
+            navPane.addReviewButton();
+        if (mode != AI_VS_AI && !navPane.containsHelpBox())
+            navPane.addHelpHumanBox();
+        if ((playerBlackInstance == FFT || playerRedInstance == FFT) && !navPane.containsFFTWidgets())
+            navPane.addFFTWidgets();
+    }
+
+    private void instantiateAI(int team) {
+        if (team == RED) {
+            if (playerRedInstance == MINIMAX) {
+                aiRed = new Minimax(RED, redTime);
+            } else if (playerRedInstance == LOOKUP_TABLE) {
+                aiRed = new LookupTableMinimax(RED, state, overwriteDB);
+            } else if (playerRedInstance == MONTE_CARLO) {
+                aiRed = new MCTS(state, RED, redTime);
+            } else if (playerRedInstance == FFT) {
+                fft = new FFT();
+                aiRed = new FFT_Follower(RED, fft);
+            }
+        } else {
+            if (playerBlackInstance == MINIMAX) {
+                aiBlack = new Minimax(BLACK, blackTime);
+            } else if (playerBlackInstance == LOOKUP_TABLE) {
+                if (playerRedInstance == LOOKUP_TABLE) {
+                    overwriteDB = false;
+                }
+                aiBlack = new LookupTableMinimax(BLACK, state, overwriteDB);
+            } else if (playerBlackInstance == MONTE_CARLO) {
+                aiBlack = new MCTS(state, BLACK, blackTime);
+            } else if (playerBlackInstance == FFT) {
+                fft = new FFT();
+                aiBlack = new FFT_Follower(BLACK, fft);
+            }
         }
     }
     // Is called when a tile is pressed by the user. If vs. the AI, it calls the doAITurn after. This function also highlights
@@ -198,7 +274,9 @@ public class Controller {
         checkGameOver();
         if (Logic.gameOver(state)) return;
         if (state.getTurn() == move.team) {
-            System.out.println("TEAM " + ((move.team == RED) ? "Black" : "Red") + "'s turn has been skipped!");
+            String skipped = (state.getTurn() == RED) ? "Black" : "Red";
+            System.out.println("TEAM " + skipped + "'s turn has been skipped!");
+            playArea.getInfoPane().displaySkippedTurn(skipped);
             if (helpHumanBox.isSelected()) {
                 highlightBestPieces(true);
             }
@@ -220,6 +298,8 @@ public class Controller {
         navPane.getRestartButton().setDisable(true);
         navPane.getMenuButton().setDisable(true);
         startAIButton.setDisable(true);
+        for (Button b : swapButtons)
+            b.setDisable(true);
 
         aiThread = new Thread(() -> {
             try {
@@ -236,6 +316,8 @@ public class Controller {
                 startAIButton.setDisable(false);
                 navPane.getMenuButton().setDisable(false);
                 navPane.getRestartButton().setDisable(false);
+                for (Button b : swapButtons)
+                    b.setDisable(false);
             }
         });
         aiThread.setDaemon(true);
@@ -248,8 +330,12 @@ public class Controller {
         Move move;
         if (aiRed != null && turn == RED) {
             move = aiRed.makeMove(state);
+            if (playerRedInstance == FFT && move == null)
+                move = getDefaultFFTMove();
         } else {
             move = aiBlack.makeMove(state);
+            if (playerBlackInstance == FFT && move == null)
+                move = getDefaultFFTMove();
         }
         state = state.getNextState(move);
         turnNo++;
@@ -264,12 +350,21 @@ public class Controller {
         if (Logic.gameOver(state)) return;
         if (mode == HUMAN_VS_AI) {
             if (turn == state.getTurn()) {
-                System.out.println("TEAM " + ((turn == RED) ? "Black" : "Red") + "'s turn has been skipped!");
+                String skipped = (turn == RED) ? "Black" : "Red";
+                System.out.println("TEAM " + skipped + "'s turn has been skipped!");
+                playArea.getInfoPane().displaySkippedTurn(skipped);
                 doAITurn();
             } else if (helpHumanBox.isSelected()) {
                 highlightBestPieces(true);
             }
         }
+    }
+
+    private Move getDefaultFFTMove() {
+        Random r = new Random();
+        int moveSize = state.getLegalMoves().size();
+        int index = r.nextInt(moveSize);
+        return state.getLegalMoves().get(index);
     }
 
     // Checks if the game is over and shows a popup. Popup allows a restart, go to menu, or review game
@@ -372,7 +467,7 @@ public class Controller {
     }
 
     // Deselects the selected piece
-    private void deselect() {
+    public void deselect() {
         if (selected != null) {
             highlightMoves(selected.getRow(), selected.getCol(), selected.getTeam(), false);
             selected.deselect();
@@ -493,6 +588,24 @@ public class Controller {
         }
     }
 
+    public void setPlayerInstance(int team, int playerInstance) {
+        if (team == RED) {
+            playerRedInstance = playerInstance;
+        } else {
+            playerBlackInstance = playerInstance;
+        }
+        int oldMode = mode;
+        this.mode = setMode(playerRedInstance, playerBlackInstance);
+        instantiateAI(team);
+        if (state.getTurn() == team && playerInstance != Globals.HUMAN && mode != AI_VS_AI) {
+            doAITurn();
+        } else if (state.getTurn() != team && oldMode == AI_VS_AI && mode != AI_VS_AI) {
+            doAITurn();
+        }
+        showNavButtons();
+        playArea.update(this);
+    }
+
     // Opens the review pane
     private void reviewGame() {
         Stage newStage = new Stage();
@@ -562,6 +675,17 @@ public class Controller {
 
     public boolean getOverwriteDB() {
         return overwriteDB;
+    }
+
+    public void setOverwriteDB(boolean overwrite) {
+        this.overwriteDB = overwrite;
+    }
+
+    public void setPlayerCalcTime(int team, int time) {
+        if (team == RED)
+            redTime = time;
+        else
+            blackTime = time;
     }
 
     public PlayArea getPlayArea() {

@@ -25,6 +25,7 @@ public class NewGamePane extends AnchorPane {
     private String mcts = "Monte Carlo Tree Search";
     private String minimax = "Minimax";
     private String lookup = "Lookup Table";
+    private String fft = "Fast and Frugal Tree";
     private TextField blackDelayField;
     private TextField redDelayField;
     private HBox blackDelayBox;
@@ -32,9 +33,9 @@ public class NewGamePane extends AnchorPane {
     private ChoiceBox<String> playerBlackChoices;
     private ChoiceBox<String> playerRedChoices;
     private CheckBox overwriteDB;
-    private TextField lookupDelayField;
-    private HBox lookupDelayBox;
     private VBox finalBox;
+    private Label AIDelayLabelBlack;
+    private Label AIDelayLabelRed;
 
     NewGamePane() {
         setPrefSize(Globals.WIDTH, Globals.HEIGHT);
@@ -51,36 +52,34 @@ public class NewGamePane extends AnchorPane {
 
         playerBlackChoices = new ChoiceBox<String>();
         playerBlackChoices.setValue(human);
-        playerBlackChoices.setItems(FXCollections.observableArrayList(human, mcts, minimax, lookup));
+        playerBlackChoices.setItems(FXCollections.observableArrayList(human, mcts, minimax, fft, lookup));
         playerBlackChoices.setMinWidth(choiceWidth);
         playerBlackChoices.setMaxWidth(choiceWidth);
         playerBlackChoices.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> {
-            if (playerBlackChoices.getItems().get((Integer) newValue).equals(minimax) ||
-                    playerBlackChoices.getItems().get((Integer) newValue).equals(mcts)) {
-                finalBox.getChildren().remove(lookupDelayBox);
+            if (!playerBlackChoices.getItems().get((Integer) newValue).equals(human)) {
                 if (!finalBox.getChildren().contains(blackDelayBox)) {
                     finalBox.getChildren().add(1, blackDelayBox);
                 }
-                if (!playerRedChoices.getValue().equals(lookup)) {
-                    finalBox.getChildren().remove(overwriteDB);
-
-                }
-            } else if (playerBlackChoices.getItems().get((Integer) newValue).equals(human)) {
-                finalBox.getChildren().remove(blackDelayBox);
-                finalBox.getChildren().remove(lookupDelayBox);
-                if (!playerRedChoices.getValue().equals(lookup)) {
-                    finalBox.getChildren().remove(overwriteDB);
-                }
-            } else if (playerBlackChoices.getItems().get((Integer) newValue).equals(lookup)) {
-                finalBox.getChildren().remove(blackDelayBox);
-                if (!finalBox.getChildren().contains(overwriteDB)) {
+                if (playerBlackChoices.getItems().get((Integer) newValue).equals(lookup) &&
+                        !finalBox.getChildren().contains(overwriteDB)) {
                     int index = finalBox.getChildren().contains(redDelayBox) ? 4 : 3;
                     finalBox.getChildren().add(index, overwriteDB);
+                } else if (!playerRedChoices.getValue().equals(lookup)) {
+                    finalBox.getChildren().remove(overwriteDB);
                 }
-                if (playerRedChoices.getValue().equals(lookup)) {
-                    finalBox.getChildren().add(4, lookupDelayBox);
+            } else {
+                finalBox.getChildren().remove(blackDelayBox);
+                if (!playerRedChoices.getValue().equals(lookup)) {
+                    finalBox.getChildren().remove(overwriteDB);
                 }
             }
+
+            if (playerBlackChoices.getItems().get((Integer) newValue).equals(fft) ||
+                    playerBlackChoices.getItems().get((Integer) newValue).equals(lookup))
+                AIDelayLabelBlack.setText("AI Move delay in ms");
+            else
+                AIDelayLabelBlack.setText("AI Calculation time in ms");
+
         });
 
         Label playerBlackLabel = new Label("Player Black: ");
@@ -92,36 +91,35 @@ public class NewGamePane extends AnchorPane {
 
         playerRedChoices = new ChoiceBox<String>();
         playerRedChoices.setValue(human);
-        playerRedChoices.setItems(FXCollections.observableArrayList(human, mcts, minimax, lookup));
+        playerRedChoices.setItems(FXCollections.observableArrayList(human, mcts, minimax, fft, lookup));
         playerRedChoices.setMinWidth(choiceWidth);
         playerRedChoices.setMaxWidth(choiceWidth);
         playerRedChoices.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> {
-            if (playerRedChoices.getItems().get((Integer) newValue).equals(minimax) ||
-                    playerRedChoices.getItems().get((Integer) newValue).equals(mcts)) {
-                finalBox.getChildren().remove(lookupDelayBox);
+            if (!playerRedChoices.getItems().get((Integer) newValue).equals(human)) {
                 if (!finalBox.getChildren().contains(redDelayBox)) {
                     int index = finalBox.getChildren().contains(blackDelayBox) ? 3 : 2;
                     finalBox.getChildren().add(index, redDelayBox);
                 }
-                if (!playerBlackChoices.getValue().equals(lookup)) {
-                    finalBox.getChildren().remove(overwriteDB);
-                }
-            } else if (playerRedChoices.getItems().get((Integer) newValue).equals(human)) {
-                finalBox.getChildren().remove(redDelayBox);
-                finalBox.getChildren().remove(lookupDelayBox);
-                if (!playerBlackChoices.getValue().equals(lookup)) {
-                    finalBox.getChildren().remove(overwriteDB);
-                }
-            } else if (playerRedChoices.getItems().get((Integer) newValue).equals(lookup)) {
-                finalBox.getChildren().remove(redDelayBox);
-                if (!finalBox.getChildren().contains(overwriteDB)) {
+                if (playerRedChoices.getItems().get((Integer) newValue).equals(lookup) &&
+                        !finalBox.getChildren().contains(overwriteDB)) {
                     int index = finalBox.getChildren().contains(blackDelayBox) ? 4 : 3;
                     finalBox.getChildren().add(index, overwriteDB);
+                } else if (!playerBlackChoices.getValue().equals(lookup)) {
+                    finalBox.getChildren().remove(overwriteDB);
                 }
-                if (playerBlackChoices.getValue().equals(lookup)) {
-                    finalBox.getChildren().add(4, lookupDelayBox);
+
+            } else {
+                finalBox.getChildren().remove(redDelayBox);
+                if (!playerBlackChoices.getValue().equals(lookup)) {
+                    finalBox.getChildren().remove(overwriteDB);
                 }
             }
+            if (playerRedChoices.getItems().get((Integer) newValue).equals(fft) ||
+                    playerRedChoices.getItems().get((Integer) newValue).equals(lookup))
+                AIDelayLabelRed.setText("AI Move delay in ms");
+            else
+                AIDelayLabelRed.setText("AI Calculation time in ms");
+
         });
 
         Label playerRedLabel = new Label("Player Red: ");
@@ -160,7 +158,7 @@ public class NewGamePane extends AnchorPane {
                 this.requestFocus();
             }
         });
-        Label AIDelayLabelBlack = new Label("AI Calculation time in ms");
+        AIDelayLabelBlack = new Label();
         AIDelayLabelBlack.setFont(Font.font("Verdana", 15));
         AIDelayLabelBlack.setPadding(new Insets(0, 10, 0, 0));
         AIDelayLabelBlack.setTextFill(Color.WHITE);
@@ -183,7 +181,8 @@ public class NewGamePane extends AnchorPane {
                 this.requestFocus();
             }
         });
-        Label AIDelayLabelRed = new Label("AI Calculation time in ms");
+
+        AIDelayLabelRed = new Label();
         AIDelayLabelRed.setFont(Font.font("Verdana", 15));
         AIDelayLabelRed.setPadding(new Insets(0, 10, 0, 0));
         AIDelayLabelRed.setTextFill(Color.WHITE);
@@ -195,30 +194,6 @@ public class NewGamePane extends AnchorPane {
         overwriteDB.setFont(Font.font("Verdana", 15));
         overwriteDB.setTextFill(Color.WHITE);
 
-        Label lookupDelayLabel = new Label("Forced delay for lookup in ms");
-        lookupDelayLabel.setFont(Font.font("Verdana", 15));
-        lookupDelayLabel.setPadding(new Insets(0, 10, 0, 0));
-        lookupDelayLabel.setTextFill(Color.WHITE);
-        lookupDelayLabel.setAlignment(Pos.CENTER);
-        lookupDelayField = new TextField("0");
-        lookupDelayField.setMinWidth(textFieldWidth);
-        lookupDelayField.setMaxWidth(textFieldWidth);
-        lookupDelayField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("\\d*")) {
-                lookupDelayField.setText(newValue.replaceAll("[^\\d]", ""));
-            }
-            if (newValue.isEmpty()) {
-                lookupDelayField.setText(newValue.replaceAll("", "0"));
-            }
-        });
-        lookupDelayField.setOnKeyPressed((KeyEvent event) -> {
-            if (event.getCode() == KeyCode.ESCAPE || event.getCode() == KeyCode.ENTER) {
-                this.requestFocus();
-            }
-        });
-        lookupDelayBox = new HBox(lookupDelayLabel, lookupDelayField);
-        lookupDelayBox.setAlignment(Pos.CENTER);
-
         Button startGame = new Button("Start Game");
         startGame.setMinWidth(Globals.WIDTH / 4);
         startGame.setOnMouseClicked(event -> {
@@ -227,13 +202,13 @@ public class NewGamePane extends AnchorPane {
             Stage stage = (Stage) getScene().getWindow();
 
             int playerBlackMode = (blackValue.equals(human)) ? Globals.HUMAN :
-                    (blackValue.equals(minimax)) ? Globals.MINIMAX : (blackValue.equals(mcts)) ? Globals.MONTE_CARLO : Globals.LOOKUP_TABLE;
+                    (blackValue.equals(minimax)) ? Globals.MINIMAX :
+                    (blackValue.equals(mcts)) ? Globals.MONTE_CARLO :
+                    (blackValue.equals(fft)) ? Globals.FFT : Globals.LOOKUP_TABLE;
             int playerRedMode = (redValue.equals(human)) ? Globals.HUMAN :
-                    (redValue.equals(minimax)) ? Globals.MINIMAX : (redValue.equals(mcts)) ? Globals.MONTE_CARLO : Globals.LOOKUP_TABLE;
-            if (playerBlackMode == Globals.LOOKUP_TABLE && playerRedMode == Globals.LOOKUP_TABLE) {
-                blackDelayField.setText(lookupDelayField.getText());
-                redDelayField.setText(lookupDelayField.getText());
-            }
+                    (redValue.equals(minimax)) ? Globals.MINIMAX :
+                    (redValue.equals(mcts)) ? Globals.MONTE_CARLO :
+                    (redValue.equals(fft)) ? Globals.FFT : Globals.LOOKUP_TABLE;
             new Controller(stage, playerRedMode,
                     playerBlackMode, new State(scoreLimitChoices.getValue()),
                     Integer.parseInt(redDelayField.getText()),

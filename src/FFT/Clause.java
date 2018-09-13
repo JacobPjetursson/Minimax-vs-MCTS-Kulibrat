@@ -4,34 +4,44 @@ import java.util.Objects;
 
 public class Clause {
     String name;
-    int value;
-    boolean action;
-    int row;
-    int col;
-    int oldRow;
-    int oldCol;
-    int newRow;
-    int newCol;
-    int team;
+    boolean boardPlacement;
+    int row, col, team;
+    boolean negation;
 
-    Clause(int row, int col, int team) {
+
+    Clause(int row, int col, int team, boolean negation) {
         this.row = row;
         this.col = col;
-        this.name = "P_" + row + "_" + col;
-        this.value = team;
-        this.action = false;
+        this.team = team;
+        this.boardPlacement = true;
+        this.negation = negation;
+        if (negation)
+            this.name = "!";
+        else
+            this.name = "";
+
+        this.name += String.format("B_%d_%d=%d", row, col, team);
     }
 
-    Clause(int oldRow, int oldCol, int newRow, int newCol, int team) {
-        this.oldRow = oldRow;
-        this.oldCol = oldCol;
-        this.newRow = newRow;
-        this.newCol = newCol;
-        this.value = -1;
-        this.team = team;
-        this.name = "A_" + team + ": (" + oldRow + "," + oldCol + ") "
-                + "-> " + "(" + newRow + "," + newCol + ")";
-        this.action = true;
+    Clause(String name, boolean boardPlacement) {
+        this.name = name;
+        if (name.contains("!"))
+            this.negation = true;
+        this.boardPlacement = boardPlacement;
+
+        if (boardPlacement) {
+            // Parsing
+
+        }
+    }
+
+    Clause(Clause duplicate) {
+        this.name = duplicate.name;
+        this.boardPlacement = duplicate.boardPlacement;
+        this.row = duplicate.row;
+        this.col = duplicate.col;
+        this.team = duplicate.team;
+        this.negation = duplicate.negation;
     }
 
     @Override
@@ -40,11 +50,11 @@ public class Clause {
 
         Clause clause = (Clause) obj;
         return this == clause ||
-                (this.name.equals(clause.name) && this.value == clause.value && this.action == clause.action);
+                (this.name.equals(clause.name));
     }
 
     @Override
     public int hashCode() {
-        return 31 * Objects.hash(name, value, action);
+        return 31 * Objects.hashCode(name);
     }
 }

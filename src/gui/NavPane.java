@@ -26,6 +26,10 @@ public class NavPane extends VBox {
     private Button restartButton;
     private Button menuButton;
     private Button reviewButton;
+    private Button editFFTButton;
+    private HBox interactiveFFTBox;
+    private CheckBox interactiveFFT;
+    private VBox FFTWidgets;
     private CheckBox helpHuman;
     private HBox helpHumanBox;
     private VBox AIWidgets;
@@ -63,6 +67,21 @@ public class NavPane extends VBox {
         reviewButton = new Button("Review Game");
         buttons.add(reviewButton);
 
+        editFFTButton = new Button("Edit FFT");
+        buttons.add(editFFTButton);
+
+        interactiveFFT = new CheckBox();
+        interactiveFFT.setSelected(true);
+        Label interactiveLabel = new Label("Interactive FFT");
+        interactiveLabel.setFont(Font.font("Verdana", 14));
+        interactiveLabel.setPadding(new Insets(0, 0, 0, 5));
+        interactiveFFTBox = new HBox(interactiveFFT, interactiveLabel);
+        interactiveFFTBox.setAlignment(Pos.CENTER);
+
+        FFTWidgets = new VBox(editFFTButton, interactiveFFTBox);
+        FFTWidgets.setSpacing(10);
+        FFTWidgets.setAlignment(Pos.CENTER);
+
         for (Button button : buttons) {
             button.setMinWidth(buttonWidth);
             button.setBorder(new Border(new BorderStroke(Color.BLACK,
@@ -94,8 +113,27 @@ public class NavPane extends VBox {
         getChildren().add(helpHumanBox);
     }
 
+    public void removeWidgets() {
+        getChildren().remove(helpHumanBox);
+        getChildren().remove(AIWidgets);
+        getChildren().remove(reviewButton);
+        getChildren().remove(FFTWidgets);
+    }
+
     public void addReviewButton() {
         getChildren().add(reviewButton);
+    }
+
+    public void addFFTWidgets() {
+        getChildren().add(FFTWidgets);
+    }
+
+    public Button getEditFFTButton() {
+        return editFFTButton;
+    }
+
+    public CheckBox getInteractiveFFTBox() {
+        return interactiveFFT;
     }
 
     public Button getStartAIButton() {
@@ -120,5 +158,21 @@ public class NavPane extends VBox {
 
     public Button getReviewButton() {
         return reviewButton;
+    }
+
+    public boolean containsFFTWidgets() {
+        return getChildren().contains(FFTWidgets);
+    }
+
+    public boolean containsAIWidgets() {
+        return getChildren().contains(AIWidgets);
+    }
+
+    public boolean containsHelpBox() {
+        return getChildren().contains(helpHumanBox);
+    }
+
+    public boolean containsReviewButton() {
+        return getChildren().contains(reviewButton);
     }
 }

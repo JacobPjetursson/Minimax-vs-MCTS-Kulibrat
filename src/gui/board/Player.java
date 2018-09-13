@@ -2,14 +2,21 @@ package gui.board;
 
 import game.Controller;
 import game.State;
+import gui.ReviewPane;
+import gui.SwapPlayerPane;
+import javafx.event.Event;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import misc.Globals;
 
 import java.net.URL;
@@ -23,13 +30,16 @@ public class Player extends VBox {
     private ArrayList<BoardPiece> pieces;
     private boolean clickable;
     private int pieceRadius;
+    private int type;
+    private Label typeLabel;
+    private Button swapBtn;
 
     public Player(int team, Controller cont, int tileWidth, int pieceRadius, boolean clickable) {
         this.team = team;
         this.clickable = clickable;
         this.pieceRadius = pieceRadius;
         pieces = new ArrayList<>();
-        int type = cont.getPlayerInstance(team);
+        type = cont.getPlayerInstance(team);
         setAlignment(Pos.CENTER);
         setSpacing(tileWidth / 6);
         setStyle("-fx-background-color: rgb(255, 255, 255);");
@@ -80,13 +90,17 @@ public class Player extends VBox {
         gridPaneDisplay.setPrefSize((tileWidth * 4) / 3, tileWidth);
         gridPaneDisplay.setMaxWidth((tileWidth * 4) / 3);
 
-        Label typeLabel = new Label((type == HUMAN) ? "Human" : (type == MINIMAX) ?
-                "Minimax" : (type == LOOKUP_TABLE) ? "Lookup\n Table" : "MCTS");
+        typeLabel = new Label();
+        setTypeLabelText(type);
         typeLabel.setFont(Font.font("Verdana", tileWidth / 4));
+
+        // swap player button
+        swapBtn = new Button("Swap");
         ColumnConstraints column1 = new ColumnConstraints((tileWidth * 4) / 3);
         for (int i = 0; i < 3; i++) {
             gridPaneDisplay.getColumnConstraints().add(column1);
         }
+        gridPaneDisplay.add(swapBtn, 0, 0);
         gridPaneDisplay.add(imgPane, 1, 0);
         gridPaneDisplay.add(typeLabel, 2, 0);
         getChildren().add(gridPaneBoard);
@@ -135,9 +149,27 @@ public class Player extends VBox {
         else return Color.BLACK;
     }
 
+    public int getTeam() {
+        return team;
+    }
+
+    public void setTypeLabelText(int type) {
+        typeLabel.setText((type == HUMAN) ? "Human" : (type == MINIMAX) ? "Minimax" :
+                (type == LOOKUP_TABLE) ? "Lookup\n Table" :
+                        (type == MONTE_CARLO) ? "MCTS" : "FFT");
+    }
+
+    public Button getSwapBtn() {
+        return swapBtn;
+    }
+
     private HBox pieceBox(BoardPiece piece) {
         HBox box = new HBox(piece);
         box.setAlignment(Pos.CENTER);
         return box;
+    }
+
+    public Label getTypeLabel() {
+        return typeLabel;
     }
 }

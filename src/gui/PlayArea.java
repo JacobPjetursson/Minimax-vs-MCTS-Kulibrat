@@ -10,6 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import misc.Globals;
 
 import static misc.Globals.*;
@@ -48,6 +49,10 @@ public class PlayArea extends GridPane {
         playerRed.update(cont, cont.getState());
         playerBlack.update(cont, cont.getState());
         info.update(cont);
+    }
+
+    public InfoPane getInfoPane() {
+        return info;
     }
 
     public Board getBoard() {

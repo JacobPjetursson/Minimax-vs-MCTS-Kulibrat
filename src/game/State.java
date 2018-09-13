@@ -227,11 +227,11 @@ public class State {
 
     }
 
-    public State reflect() {
+    private State reflect() {
         State copy = new State(this);
         for (int i = 0; i < copy.board.length; i++) {
             for (int j = 0; j < copy.board[i].length; j++) {
-                copy.board[i][j] = board[i][copy.board.length - 1 - j];
+                copy.board[i][j] = board[i][board.length - 1 - j];
             }
         }
         return copy;

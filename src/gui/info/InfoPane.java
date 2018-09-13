@@ -19,7 +19,6 @@ public class InfoPane extends VBox {
     private Circle turnCircle;
     private Label skippedTurn;
     private Label turnNumberLabel;
-    private int prevTurn = 0;
 
     public InfoPane(int scoreLimit, int mode) {
         setPrefSize(Globals.WIDTH / 3, Globals.HEIGHT);
@@ -62,14 +61,7 @@ public class InfoPane extends VBox {
         scoreBoard.updateScore(state);
         updateTurn(state);
         turnNumberLabel.setText("Turns Played: " + cont.getTurnNo());
-
-        if (prevTurn == state.getTurn()) {
-            String team = (state.getTurn() == RED) ? "Black" : "Red";
-            skippedTurn.setText("Team " + team + "'s turn \nhas been skipped!");
-        } else {
-            skippedTurn.setText("");
-        }
-        prevTurn = state.getTurn();
+        skippedTurn.setText("");
     }
 
     private void updateTurn(State state) {
@@ -78,5 +70,9 @@ public class InfoPane extends VBox {
         } else {
             turnCircle.setFill(Color.BLACK);
         }
+    }
+
+    public void displaySkippedTurn(String skippedTeam) {
+        skippedTurn.setText("Team " + skippedTeam + "'s turn \nhas been skipped!");
     }
 }
