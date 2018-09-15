@@ -15,65 +15,73 @@ public class Rule {
     Move move;
 
     static final ArrayList<String> separators = new ArrayList<>(
-            Arrays.asList("|", "and", "And", "AND", "&", "&&", "∧", ","));
+            Arrays.asList("and", "And", "AND", "&", "&&", "∧", ","));
 
 
     Rule(ArrayList<Clause> clauses, Action action) {
+        symmetryRules = new ArrayList<>();
         this.clauses = clauses;
         this.action = action;
         this.move = getMove(action); // TODO - SHIT
         symmetryRules = new ArrayList<>();
         symmetryRules.add(clauses);
-        symmetryRules.add(reflectV(clauses));
+        symmetryRules.add(reflectH(clauses));
     }
 
     // parsing constructor
     Rule(String clauseStr, String actionStr) {
-        this.clauses = getClauses(clauseStr); // TODO - IS NULL SADFACE :(
+        symmetryRules = new ArrayList<>();
+        this.clauses = getClauses(clauseStr);
         this.action = getAction(actionStr);
         this.move = getMove(action); // TODO - SHIT
         symmetryRules.add(clauses);
-        System.out.println("CLAUSE SIZE: " + clauses.size());
-        System.out.println("REFCLAUSE SIZE: " + reflectV(clauses));
-        symmetryRules.add(reflectV(clauses));
+        symmetryRules.add(reflectH(clauses));
     }
 
     String printRule() {
-        String msg = "IF (";
-        String clauseMsg = "";
-        for (Clause clause : clauses) {
-            if (!clauseMsg.isEmpty())
-                clauseMsg += " ∧ ";
-            clauseMsg += clause.name;
-        }
-        msg += clauseMsg + ") THEN (";
-        clauseMsg = "";
-        for (Clause clause : action.clauses) {
-            if (!clauseMsg.isEmpty())
-                clauseMsg += " ∧ ";
-            clauseMsg += clause.name;
-        }
-        msg += clauseMsg + ")";
-        return msg;
+        return "IF (" + getClauseStr() + ") THEN (" + getActionStr() + ")";
     }
 
     private ArrayList<Clause> getClauses(String clauseStr) {
         ArrayList<Clause> clauses = new ArrayList<>();
         String[] parts = clauseStr.split(" ");
         for (String part : parts) {
-            if (separators.contains(part))
+            if (separators.contains(part)) {
                 continue;
+            }
             for (String sep : separators) {
-                if (part.contains(sep))
+                if (part.contains(sep)) {
                     part = part.replace(sep, "");
+                }
             }
             boolean boardPlacement = false;
-            if (part.contains("B_"))
+            if (part.contains("B_")) {
                 boardPlacement = true;
+            }
             clauses.add(new Clause(part, boardPlacement));
         }
 
         return clauses;
+    }
+
+    String getClauseStr() {
+        String clauseMsg = "";
+        for (Clause clause : clauses) {
+            if (!clauseMsg.isEmpty())
+                clauseMsg += " AND ";
+            clauseMsg += clause.name;
+        }
+        return clauseMsg;
+    }
+
+    String getActionStr() {
+        String clauseMsg = "";
+        for (Clause clause : action.clauses) {
+            if (!clauseMsg.isEmpty())
+                clauseMsg += " ∧ ";
+            clauseMsg += clause.name;
+        }
+        return clauseMsg;
     }
 
     private ArrayList<Clause> getClauses(State state) {
@@ -94,7 +102,7 @@ public class Rule {
     // Kulibrat specific
     private Move getMove(Action action) {
         // TODO - fix this piece of shit code
-        int newRow = -2; int newCol = -2; int oldRow = -2; int oldCol = -2; int team = -2;
+        int newRow = -1; int newCol = -1; int oldRow = -1; int oldCol = -1; int team = -1;
 
         if (action.clauses.isEmpty()) {
             System.err.println("Action clause list was empty");
@@ -194,21 +202,19 @@ public class Rule {
         }
     }
 
-    private ArrayList<Clause> reflectV(ArrayList<Clause> clauses) {
+    private ArrayList<Clause> reflectH(ArrayList<Clause> clauses) {
         ArrayList<Clause> rClauses = new ArrayList<>(clauses);
         int[][] cBoard = makeClauseBoard(rClauses);
-        int[][] refV = new int[cBoard.length][];
-
-        // Copy
-        for (int i = 0; i < cBoard.length; i++)
-            refV[i] = Arrays.copyOf(cBoard[i], cBoard[i].length);
+        int[][] refH = new int[Globals.bHeight][Globals.bWidth];
 
         // Reflect
-        for (int i = 0; i < cBoard.length; i++)
-            for (int j = 0; j < cBoard[i].length; j++)
-                refV[i][j] = cBoard[i][cBoard.length - 1 - j];
+        for (int i = 0; i < cBoard.length; i++) {
+            for (int j = 0; j < cBoard[i].length; j++) {
+                refH[i][j] = cBoard[i][cBoard[i].length - 1 - j];
+            }
+        }
 
-        addClauseBoardToList(refV, rClauses);
+        addClauseBoardToList(refH, rClauses);
 
         return rClauses;
     }

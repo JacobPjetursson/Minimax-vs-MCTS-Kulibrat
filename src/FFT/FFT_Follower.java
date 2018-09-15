@@ -22,6 +22,7 @@ public class FFT_Follower extends AI {
                     return rule.move;
             }
         }
+        System.out.println("Random move");
         return null;
     }
 }

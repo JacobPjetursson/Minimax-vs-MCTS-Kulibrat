@@ -5,7 +5,7 @@ import java.util.Objects;
 public class Clause {
     String name;
     boolean boardPlacement;
-    int row, col, team;
+    int row = -2; int col = -2; int team = -2;
     boolean negation;
 
 
@@ -31,6 +31,12 @@ public class Clause {
 
         if (boardPlacement) {
             // Parsing
+            String info = (name.replaceAll("[\\D]", ""));
+
+            this.row = Integer.parseInt(info.substring(0, 1));
+            this.col = Integer.parseInt(info.substring(1, 2));
+            if (info.length() >= 3)
+                this.team = Integer.parseInt(info.substring(2, 3));
 
         }
     }

@@ -82,6 +82,7 @@ public class EditFFTPane extends VBox {
             ruleField.clear();
             actionField.clear();
             addRuleBtn.setDisable(true);
+            fft.save();
             showRuleGroups();
         });
 
@@ -106,6 +107,7 @@ public class EditFFTPane extends VBox {
 
     private void showRuleGroups() {
         ObservableList<VBox> ruleGroups = FXCollections.observableArrayList();
+        System.out.println(fft.ruleGroups.size());
         for (int i = 0; i < fft.ruleGroups.size(); i++) {
             RuleGroup rg = fft.ruleGroups.get(i);
             VBox v = new VBox(10);
@@ -123,6 +125,7 @@ public class EditFFTPane extends VBox {
             ruleGroups.add(v);
         }
         lw.setItems(ruleGroups);
+        lw.getSelectionModel().selectLast();
         lw.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 addRuleBtn.setDisable(false));
     }
