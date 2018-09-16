@@ -160,7 +160,7 @@ public class Rule {
                         break;
                     }
                 }
-                if (!stClauses.contains(c)) {
+                else if (!stClauses.contains(c)) {
                     match = false;
                     break;
                 }

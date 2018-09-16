@@ -84,8 +84,8 @@ public class BoardPiece extends Circle {
     }
 
     private boolean isControllable() {
-        return Globals.CUSTOMIZABLE || (cont.getPlayerInstance(team) == HUMAN &&
-                cont.getState().getTurn() == this.team && clickable);
+        return Globals.CUSTOMIZABLE || clickable && cont.getState().getTurn() == this.team &&
+                (cont.getPlayerInstance(team) == HUMAN || (cont.getPlayerInstance(team) == FFT && cont.getFFTAllowInteraction()));
     }
 
     public int getCol() {

@@ -107,7 +107,6 @@ public class EditFFTPane extends VBox {
 
     private void showRuleGroups() {
         ObservableList<VBox> ruleGroups = FXCollections.observableArrayList();
-        System.out.println(fft.ruleGroups.size());
         for (int i = 0; i < fft.ruleGroups.size(); i++) {
             RuleGroup rg = fft.ruleGroups.get(i);
             VBox v = new VBox(10);

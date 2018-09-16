@@ -5,7 +5,7 @@ import java.util.Objects;
 public class Clause {
     String name;
     boolean boardPlacement;
-    int row = -2; int col = -2; int team = -2;
+    int row = -1; int col = -1; int team = -1;
     boolean negation;
 
 

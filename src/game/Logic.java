@@ -157,4 +157,8 @@ public abstract class Logic {
     private static boolean locked(State state) {
         return legalMoves(RED, state).isEmpty() && legalMoves(BLACK, state).isEmpty();
     }
+
+    public static boolean isLegalMove(State state, Move move) {
+        return legalMoves(move.team, state).contains(move);
+    }
 }

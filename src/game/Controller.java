@@ -57,6 +57,8 @@ public class Controller {
     private ArrayList<PrevState> previousStates;
     private Window window;
     private FFT fft;
+    private boolean fftInteractiveMode;
+    private boolean fftAllowInteraction;
 
     public Controller(Stage primaryStage, int playerRedInstance, int playerBlackInstance,
                       State state, int redTime, int blackTime, boolean overwriteDB) {
@@ -205,12 +207,13 @@ public class Controller {
         });
 
         // interactive mode
+        fftInteractiveMode = true;
         interactiveFFTBox.selectedProperty().addListener((observableValue, oldValue, newValue) -> {
             deselect();
             if (newValue) {
-
+                fftInteractiveMode = true;
             } else {
-
+                fftInteractiveMode = false;
             }
         });
 
@@ -282,7 +285,8 @@ public class Controller {
             }
             return;
         }
-        if (mode == HUMAN_VS_AI) {
+        if ((playerBlackInstance != HUMAN && state.getTurn() == BLACK) ||
+                (playerRedInstance != HUMAN && state.getTurn() == RED)) {
             aiThread = new Thread(this::doAITurn);
             aiThread.setDaemon(true);
             aiThread.start();
@@ -326,16 +330,29 @@ public class Controller {
 
     // The AI makes its turn, and the GUI is updated while doing so
     private void doAITurn() {
+        fftAllowInteraction = false;
+        boolean makeDefaultMove = false;
         int turn = state.getTurn();
         Move move;
         if (aiRed != null && turn == RED) {
             move = aiRed.makeMove(state);
             if (playerRedInstance == FFT && move == null)
-                move = getDefaultFFTMove();
+                makeDefaultMove = true;
         } else {
             move = aiBlack.makeMove(state);
             if (playerBlackInstance == FFT && move == null)
+                makeDefaultMove = true;
+        }
+        if (makeDefaultMove) {
+            if (fftInteractiveMode) {
+                System.out.println("Defaulting to user interaction");
+                fftAllowInteraction = true;
+                return;
+            }
+            else {
+                System.out.println("Defaulting to random move");
                 move = getDefaultFFTMove();
+            }
         }
         state = state.getNextState(move);
         turnNo++;
@@ -702,6 +719,10 @@ public class Controller {
 
     public Window getWindow() {
         return window;
+    }
+
+    public boolean getFFTAllowInteraction() {
+        return fftAllowInteraction;
     }
 
 }
