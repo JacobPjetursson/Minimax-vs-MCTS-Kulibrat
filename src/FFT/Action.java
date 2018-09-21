@@ -1,16 +1,17 @@
 package FFT;
 
-import game.Move;
-
 import java.util.ArrayList;
 
 public class Action {
-    ArrayList<Clause> clauses;
+    ArrayList<Clause> addClauses;
+    ArrayList<Clause> remClauses;
 
-    Action(ArrayList<Clause> clauses) {
-        this.clauses = clauses;
+    Action(ArrayList<Clause> addClauses, ArrayList<Clause> remClauses) {
+        this.addClauses = addClauses;
+        this.remClauses = remClauses;
     }
 
+    /*
     Action(Move move) {
         clauses = new ArrayList<Clause>();
         Clause addC = new Clause(move.newRow, move.newCol, move.team, false);
@@ -24,4 +25,5 @@ public class Action {
         remC.name = sb.toString();
         clauses.add(remC);
     }
+    */
 }

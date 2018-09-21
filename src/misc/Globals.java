@@ -42,6 +42,6 @@ public class Globals {
     // MISC
     public static final int SYMMETRY = VREF;
     public static final boolean CUSTOMIZABLE = false; // For debug
-    public static final String JDBC_URL = "jdbc:derby:lookupDB;create=true";
+    public static final String JDBC_URL = "jdbc:derby:altDB;create=true";
     public static final String FFT_PATH = "fft.txt";
 }

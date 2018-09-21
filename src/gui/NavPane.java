@@ -1,6 +1,7 @@
 package gui;
 
 import game.Controller;
+import gui.Dialogs.RestartGameDialog;
 import gui.menu.MenuPane;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -93,7 +94,8 @@ public class NavPane extends VBox {
     private void restartGame(Controller cont) {
         Stage prevStage = (Stage) getScene().getWindow();
         Stage newStage = new Stage();
-        newStage.setScene(new Scene(new RestartGamePane(prevStage, cont), 400, 150));
+        String labelText = "Are you sure you want to restart this game?";
+        newStage.setScene(new Scene(new RestartGameDialog(labelText, prevStage, cont), 400, 150));
         newStage.initModality(Modality.APPLICATION_MODAL);
         newStage.initOwner(getScene().getWindow());
         newStage.setOnCloseRequest(Event::consume);

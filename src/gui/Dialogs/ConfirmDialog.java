@@ -1,6 +1,5 @@
-package gui;
+package gui.Dialogs;
 
-import game.Controller;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -10,11 +9,11 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
-public class OverwriteDBPane extends AnchorPane {
+public abstract class ConfirmDialog extends AnchorPane {
 
-    public OverwriteDBPane(Controller cont) {
-        Label label = new Label("The DB Table for this score limit has not been built.\n" +
-                "       Do you want to build it? It will take a while");
+    public ConfirmDialog(String labelText) {
+
+        Label label = new Label(labelText);
         label.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
         label.setAlignment(Pos.CENTER);
         AnchorPane.setTopAnchor(label, 20.0);
@@ -28,9 +27,7 @@ public class OverwriteDBPane extends AnchorPane {
         AnchorPane.setTopAnchor(yes, 0.0);
         AnchorPane.setBottomAnchor(yes, 0.0);
         yesBtn.setOnMouseClicked(event -> {
-            Stage stage = (Stage) getScene().getWindow();
-            stage.close();
-            cont.buildDB();
+            setYesBtnMouseClicked();
         });
 
         Button noBtn = new Button("No");
@@ -46,4 +43,6 @@ public class OverwriteDBPane extends AnchorPane {
 
         getChildren().addAll(label, yes, no);
     }
+
+    public abstract void setYesBtnMouseClicked();
 }

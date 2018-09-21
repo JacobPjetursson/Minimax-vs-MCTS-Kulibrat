@@ -1,5 +1,7 @@
 package FFT;
 
+import misc.Globals;
+
 import java.util.Objects;
 
 public class Clause {
@@ -13,6 +15,7 @@ public class Clause {
     int row = -1; int col = -1;
     int pieceOcc;
     boolean negation;
+    boolean clauseErr;
 
 
     Clause(int row, int col, int pieceOcc, boolean negation) {
@@ -21,14 +24,7 @@ public class Clause {
         this.pieceOcc = pieceOcc;
         this.boardPlacement = true;
         this.negation = negation;
-        if (negation)
-            this.name = "!";
-        else
-            this.name = "";
-
-        String teamStr = (pieceOcc == PIECEOCC_PLAYER) ? "P_" :
-                (pieceOcc == PIECEOCC_ENEMY) ? "E_" : "";
-        this.name += String.format("%s%d_%d", teamStr, row, col);
+        formatClause();
     }
 
     Clause(String name, boolean boardPlacement) {
@@ -39,22 +35,33 @@ public class Clause {
         }
         this.boardPlacement = boardPlacement;
 
-        if (name.startsWith("+") || name.startsWith("-"))
-            name = name.substring(1);
-
         if (boardPlacement) {
             if (name.startsWith("P"))
                 this.pieceOcc = PIECEOCC_PLAYER;
             else if (name.startsWith("E"))
                 this.pieceOcc = PIECEOCC_ENEMY;
             else if (!Character.isDigit(name.charAt(0))) {
-                System.err.println("Board position clause must be specified with either P, E, or ''");
+                System.err.println("Board position clause must be specified with either:\n" +
+                        "P (Player), E (Enemy), or '' (Irrelevant), followed by a row and column specification");
+                clauseErr = true;
+                return;
             }
             // Parsing
             String info = (name.replaceAll("[\\D]", ""));
+            if (info.length() < 2) {
+                System.err.println("Failed to specify row and/or column for this clause");
+                clauseErr = true;
+                return;
+            }
             this.row = Integer.parseInt(info.substring(0, 1));
             this.col = Integer.parseInt(info.substring(1, 2));
-
+            if (row >= Globals.bHeight || col >= Globals.bWidth) {
+                System.err.println("row and/or column numbers are out of bounds w.r.t. the board size");
+                clauseErr = true;
+                return;
+            }
+            // Ensure same format
+            formatClause();
         }
     }
 
@@ -65,6 +72,17 @@ public class Clause {
         this.col = duplicate.col;
         this.pieceOcc = duplicate.pieceOcc;
         this.negation = duplicate.negation;
+    }
+
+    private void formatClause() {
+        // Check for + and - in case of action
+        this.name = "";
+        if (negation)
+            this.name += "!";
+
+        String teamStr = (pieceOcc == PIECEOCC_PLAYER) ? "P_" :
+                (pieceOcc == PIECEOCC_ENEMY) ? "E_" : "";
+        this.name += String.format("%s%d_%d", teamStr, row, col);
     }
 
     @Override

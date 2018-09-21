@@ -34,8 +34,6 @@ public class Rule {
     Rule(String clauseStr, String actionStr) {
         symmetryRules = new ArrayList<>();
         this.action = getAction(actionStr);
-        if (action == null)
-            return;
         this.clauses = getClauses(clauseStr);
 
         this.move = getMove(action); // TODO - SHIT
@@ -47,7 +45,7 @@ public class Rule {
         return "IF (" + getClauseStr() + ") THEN (" + getActionStr() + ")";
     }
 
-    private ArrayList<Clause> getClauses(String clauseStr) {
+    private static ArrayList<Clause> getClauses(String clauseStr) {
         ArrayList<Clause> clauses = new ArrayList<>();
         String[] parts = clauseStr.split(" ");
         for (String part : parts) {
@@ -60,7 +58,7 @@ public class Rule {
                 }
             }
             boolean boardPlacement = false;
-            // Cancer way
+            // TODO - Cancer way rn
             if (Character.isDigit(part.charAt(0)) || Character.isDigit(part.charAt(1))) {
                 boardPlacement = true;
             }
@@ -82,10 +80,15 @@ public class Rule {
 
     String getActionStr() {
         String clauseMsg = "";
-        for (Clause clause : action.clauses) {
+        for (Clause clause : action.addClauses) {
             if (!clauseMsg.isEmpty())
                 clauseMsg += " ∧ ";
-            clauseMsg += clause.name;
+            clauseMsg += "+" + clause.name;
+        }
+        for (Clause clause : action.remClauses) {
+            if (!clauseMsg.isEmpty())
+                clauseMsg += " ∧ ";
+            clauseMsg += "-" + clause.name;
         }
         return clauseMsg;
     }
@@ -117,28 +120,28 @@ public class Rule {
         // TODO - fix this piece of shit code
         int newRow = -1; int newCol = -1; int oldRow = -1; int oldCol = -1; int team = -1;
 
-        if (action.clauses.isEmpty()) {
+        if (action.addClauses.isEmpty() && action.remClauses.isEmpty()) {
             System.err.println("Action clause list was empty");
             return null;
         }
-        for (Clause c : action.clauses) {
-            if (isAddClause(c)) {
-                newRow = c.row;
-                newCol = c.col;
-            } else if (isRemoveClause(c)) {
-                oldRow = c.row;
-                oldCol = c.col;
-            } else {
-                System.err.println("Action contained non-allowed clauses");
-                return null;
-            }
+        if (action.addClauses.size() > 1 || action.remClauses.size() > 1) {
+            System.err.println("Only moves with a single add clause and/or a single remove clause is allowed in this game");
+            return null;
+        }
+        for (Clause c : action.addClauses) {
+            newRow = c.row;
+            newCol = c.col;
+        }
+        for (Clause c : action.remClauses) {
+            oldRow = c.row;
+            oldCol = c.col;
         }
         return new Move(oldRow, oldCol, newRow, newCol, team);
     }
 
-    private Action getAction(String actionStr) {
-
-        ArrayList<Clause> clauses = new ArrayList<>();
+    private static Action getAction(String actionStr) {
+        ArrayList<Clause> addClauses = new ArrayList<>();
+        ArrayList<Clause> remClauses = new ArrayList<>();
         String[] parts = actionStr.split(" ");
         for (String part : parts) {
             if (separators.contains(part))
@@ -147,15 +150,21 @@ public class Rule {
                 if (part.contains(sep))
                     part = part.replace(sep, "");
             }
-            if (part.startsWith("+") || part.startsWith("-"))
-                clauses.add(new Clause(part, true));
+            if (part.startsWith("+")) {
+                part = part.substring(1);
+                addClauses.add(new Clause(part, true));
+            }
+            else if (part.startsWith("-")) {
+                part = part.substring(1);
+                remClauses.add(new Clause(part, true));
+            }
         }
-        if (clauses.isEmpty()) {
+        if (addClauses.isEmpty() && remClauses.isEmpty()) {
             System.err.println("Failed to provide a valid move");
             return null;
         }
 
-        return new Action(clauses);
+        return new Action(addClauses, remClauses);
     }
 
     boolean applies(State state) {
@@ -230,12 +239,22 @@ public class Rule {
         return rClauses;
     }
 
-    private boolean isAddClause(Clause c) {
-        return c.name.startsWith("+");
-    }
+    static boolean isValidRuleFormat(String clauseStr, String actionStr) {
+        ArrayList<Clause> clauses = getClauses(clauseStr);
+        Action action = getAction(actionStr);
+        if (clauses.isEmpty() || action == null)
+            return false;
+        for (Clause c : clauses)
+            if (c.clauseErr)
+                return false;
+        for (Clause c : action.addClauses)
+            if (c.clauseErr)
+                return false;
+        for (Clause c : action.remClauses)
+            if (c.clauseErr)
+                return false;
 
-    private boolean isRemoveClause(Clause c) {
-        return c.name.startsWith("-");
+        return true;
     }
 
     @Override

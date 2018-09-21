@@ -15,4 +15,9 @@ public class RuleGroup {
         this.name = name;
         this.rules = rules;
     }
+
+    public RuleGroup(RuleGroup copy) {
+        this.rules = new ArrayList<Rule>(copy.rules);
+        this.name = copy.name;
+    }
 }

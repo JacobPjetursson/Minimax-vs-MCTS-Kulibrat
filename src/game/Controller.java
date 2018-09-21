@@ -5,6 +5,7 @@ import ai.AI;
 import ai.MCTS.MCTS;
 import ai.Minimax.*;
 import gui.*;
+import gui.Dialogs.OverwriteDBDialog;
 import gui.board.BoardPiece;
 import gui.board.BoardTile;
 import gui.board.Goal;
@@ -197,13 +198,7 @@ public class Controller {
         // FFT LISTENERS
         // edit fft button
         editFFTButton.setOnMouseClicked(event -> {
-            deselect();
-            Stage newStage = new Stage();
-            newStage.setScene(new Scene(new EditFFTPane(this, fft), 450, Globals.HEIGHT - 50));
-            newStage.initModality(Modality.APPLICATION_MODAL);
-            newStage.initOwner(window);
-            newStage.setOnCloseRequest(Event::consume);
-            newStage.show();
+            primaryStage.setScene(new Scene(new EditFFTScene(primaryStage.getScene(), this, fft), Globals.WIDTH, Globals.HEIGHT));
         });
 
         // interactive mode
@@ -636,7 +631,9 @@ public class Controller {
     // Opens the overwrite pane for DB
     private void showOverwritePane() {
         Stage newStage = new Stage();
-        newStage.setScene(new Scene(new OverwriteDBPane(this), 500, 150));
+        String labelText = "The DB Table for this score limit has not been built.\n" +
+                    "       Do you want to build it? It will take a while";
+        newStage.setScene(new Scene(new OverwriteDBDialog(labelText, this), 500, 150));
         newStage.initModality(Modality.APPLICATION_MODAL);
         newStage.initOwner(window);
         newStage.setOnCloseRequest(Event::consume);
