@@ -5,7 +5,7 @@ import misc.Globals;
 import java.util.Objects;
 
 public class Clause {
-    public static final int PIECEOCC_NONE = 0;
+    public static final int PIECEOCC_NONE = -1;
     public static final int PIECEOCC_PLAYER = 1;
     public static final int PIECEOCC_ENEMY = 2;
 
@@ -13,7 +13,7 @@ public class Clause {
     String name;
     boolean boardPlacement;
     int row = -1; int col = -1;
-    int pieceOcc;
+    int pieceOcc = PIECEOCC_NONE;
     boolean negation;
     boolean clauseErr;
 
@@ -36,9 +36,9 @@ public class Clause {
         this.boardPlacement = boardPlacement;
 
         if (boardPlacement) {
-            if (name.startsWith("P"))
+            if (name.startsWith("P") || name.startsWith("p"))
                 this.pieceOcc = PIECEOCC_PLAYER;
-            else if (name.startsWith("E"))
+            else if (name.startsWith("E") || name.startsWith("e"))
                 this.pieceOcc = PIECEOCC_ENEMY;
             else if (!Character.isDigit(name.charAt(0))) {
                 System.err.println("Board position clause must be specified with either:\n" +

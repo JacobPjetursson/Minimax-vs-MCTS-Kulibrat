@@ -118,16 +118,8 @@ public class Rule {
     // Kulibrat specific
     private Move getMove(Action action) {
         // TODO - fix this piece of shit code
-        int newRow = -1; int newCol = -1; int oldRow = -1; int oldCol = -1; int team = -1;
+        int newRow = -1; int newCol = -1; int oldRow = -1; int oldCol = -1;
 
-        if (action.addClauses.isEmpty() && action.remClauses.isEmpty()) {
-            System.err.println("Action clause list was empty");
-            return null;
-        }
-        if (action.addClauses.size() > 1 || action.remClauses.size() > 1) {
-            System.err.println("Only moves with a single add clause and/or a single remove clause is allowed in this game");
-            return null;
-        }
         for (Clause c : action.addClauses) {
             newRow = c.row;
             newCol = c.col;
@@ -136,12 +128,10 @@ public class Rule {
             oldRow = c.row;
             oldCol = c.col;
         }
-        return new Move(oldRow, oldCol, newRow, newCol, team);
+        return new Move(oldRow, oldCol, newRow, newCol, -1);
     }
 
     private static Action getAction(String actionStr) {
-        ArrayList<Clause> addClauses = new ArrayList<>();
-        ArrayList<Clause> remClauses = new ArrayList<>();
         String[] parts = actionStr.split(" ");
         for (String part : parts) {
             if (separators.contains(part))
@@ -150,21 +140,10 @@ public class Rule {
                 if (part.contains(sep))
                     part = part.replace(sep, "");
             }
-            if (part.startsWith("+")) {
-                part = part.substring(1);
-                addClauses.add(new Clause(part, true));
-            }
-            else if (part.startsWith("-")) {
-                part = part.substring(1);
-                remClauses.add(new Clause(part, true));
-            }
-        }
-        if (addClauses.isEmpty() && remClauses.isEmpty()) {
-            System.err.println("Failed to provide a valid move");
-            return null;
+
         }
 
-        return new Action(addClauses, remClauses);
+        return new Action(parts);
     }
 
     boolean applies(State state) {
@@ -242,11 +221,13 @@ public class Rule {
     static boolean isValidRuleFormat(String clauseStr, String actionStr) {
         ArrayList<Clause> clauses = getClauses(clauseStr);
         Action action = getAction(actionStr);
-        if (clauses.isEmpty() || action == null)
+        if (clauses.isEmpty())
             return false;
         for (Clause c : clauses)
             if (c.clauseErr)
                 return false;
+        if (action.actionErr)
+            return false;
         for (Clause c : action.addClauses)
             if (c.clauseErr)
                 return false;
