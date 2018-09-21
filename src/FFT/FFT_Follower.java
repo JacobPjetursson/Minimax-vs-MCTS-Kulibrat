@@ -19,11 +19,15 @@ public class FFT_Follower extends AI {
 
         for (RuleGroup ruleGroup : fft.ruleGroups) {
             for (Rule rule : ruleGroup.rules) {
+                //System.out.println(rule.move.oldRow + " " + rule.move.oldRow + " " + rule.move.newRow + " " + rule.move.newCol + " " + rule.move.team);
                 if (rule.applies(state)) {
+                    rule.move.team = state.getTurn();
+
                     if (Logic.isLegalMove(state, rule.move))
                         return rule.move;
-                    else
+                    else {
                         System.out.println("Rule applied but move was illegal. Trying next case in FFT");
+                    }
                 }
             }
         }

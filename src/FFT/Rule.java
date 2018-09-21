@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
+import static misc.Globals.RED;
+
 public class Rule {
     ArrayList<ArrayList<Clause>> symmetryRules;
     ArrayList<Clause> clauses;
@@ -31,8 +33,11 @@ public class Rule {
     // parsing constructor
     Rule(String clauseStr, String actionStr) {
         symmetryRules = new ArrayList<>();
-        this.clauses = getClauses(clauseStr);
         this.action = getAction(actionStr);
+        if (action == null)
+            return;
+        this.clauses = getClauses(clauseStr);
+
         this.move = getMove(action); // TODO - SHIT
         symmetryRules.add(clauses);
         symmetryRules.add(reflectH(clauses));
@@ -55,7 +60,8 @@ public class Rule {
                 }
             }
             boolean boardPlacement = false;
-            if (part.contains("B_")) {
+            // Cancer way
+            if (Character.isDigit(part.charAt(0)) || Character.isDigit(part.charAt(1))) {
                 boardPlacement = true;
             }
             clauses.add(new Clause(part, boardPlacement));
@@ -90,8 +96,15 @@ public class Rule {
         int[][] board = state.getBoard();
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
-                if (board[i][j] > 0)
-                    clauses.add(new Clause(i, j, board[i][j], false));
+                int pieceOcc = board[i][j];
+                if (pieceOcc > 0) {
+                    if (state.getTurn() == RED)
+                        clauses.add(new Clause(i, j, pieceOcc, false));
+                    else {
+                        pieceOcc = (pieceOcc == 1) ? 2 : 1;
+                        clauses.add(new Clause(i, j, pieceOcc, false));
+                    }
+                }
             }
         }
         clauses.add(new Clause("SL=" + state.getScoreLimit(), false));
@@ -112,11 +125,9 @@ public class Rule {
             if (isAddClause(c)) {
                 newRow = c.row;
                 newCol = c.col;
-                team = c.team;
             } else if (isRemoveClause(c)) {
                 oldRow = c.row;
                 oldCol = c.col;
-                team = c.team;
             } else {
                 System.err.println("Action contained non-allowed clauses");
                 return null;
@@ -180,9 +191,9 @@ public class Rule {
             if (c.boardPlacement && c.row != -1) {
                 changeClauses.add(c);
                 if (c.negation)
-                    clauseBoard[c.row][c.col] = -c.team;
+                    clauseBoard[c.row][c.col] = -c.pieceOcc;
                 else
-                    clauseBoard[c.row][c.col] = c.team;
+                    clauseBoard[c.row][c.col] = c.pieceOcc;
             }
         }
         clauses.removeAll(changeClauses);

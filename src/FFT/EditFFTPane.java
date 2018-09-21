@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -18,7 +19,7 @@ import javafx.stage.Stage;
 
 public class EditFFTPane extends VBox {
     private int textFieldWidth = 150;
-    private ListView<VBox> lw;
+    private ListView<HBox> lw;
     private FFT fft;
     private Button addRuleBtn;
 
@@ -74,6 +75,7 @@ public class EditFFTPane extends VBox {
 
         addRuleBtn = new Button("Add");
         addRuleBtn.setDisable(true);
+        addRuleBtn.setStyle("-fx-background-color: green; ");
         addRuleBtn.setOnMouseClicked(event -> {
             int selIndex = lw.getSelectionModel().getSelectedIndex();
             RuleGroup rg = fft.ruleGroups.get(selIndex);
@@ -106,22 +108,43 @@ public class EditFFTPane extends VBox {
     }
 
     private void showRuleGroups() {
-        ObservableList<VBox> ruleGroups = FXCollections.observableArrayList();
+        ObservableList<HBox> ruleGroups = FXCollections.observableArrayList();
         for (int i = 0; i < fft.ruleGroups.size(); i++) {
+            // Rule group
             RuleGroup rg = fft.ruleGroups.get(i);
-            VBox v = new VBox(10);
-            v.setAlignment(Pos.CENTER);
+            VBox rgVBox = new VBox(10);
+            rgVBox.setAlignment(Pos.CENTER);
             Label rgLabel = new Label((i + 1) + ": " + rg.name);
             rgLabel.setFont(Font.font("Verdana", 14));
             rgLabel.setAlignment(Pos.TOP_CENTER);
-            v.getChildren().add(rgLabel);
+            rgVBox.getChildren().add(rgLabel);
             for (int j = 0; j < rg.rules.size(); j++) {
                 Rule r = rg.rules.get(j);
                 Label rLabel = new Label((j + 1) + ": " + r.printRule());
                 rLabel.setFont(Font.font("Verdana", 10));
-                v.getChildren().add(rLabel);
+                rgVBox.getChildren().add(rLabel);
             }
-            ruleGroups.add(v);
+            // Edit / Remove buttons
+            VBox rgButtons = new VBox(10);
+            rgButtons.setAlignment(Pos.CENTER);
+
+            Button editButton = new Button("Edit");
+            editButton.setStyle("-fx-background-color: blue; ");
+            editButton.setOnMouseClicked(event -> {
+                // Open dialog with edit stuff
+            });
+
+            Button removeButton = new Button("Remove");
+            removeButton.setStyle("-fx-background-color: #ff0000; ");
+            removeButton.setOnMouseClicked(event -> {
+                // Confirmation (Pretty big delete after all)
+
+            });
+            rgButtons.getChildren().addAll(editButton, removeButton);
+            //AnchorPane.setR
+            HBox finalBox = new HBox(rgVBox, rgButtons);
+            finalBox.setAlignment(Pos.CENTER);
+            ruleGroups.add(finalBox);
         }
         lw.setItems(ruleGroups);
         lw.getSelectionModel().selectLast();
