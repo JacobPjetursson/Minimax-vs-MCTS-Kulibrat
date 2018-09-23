@@ -23,13 +23,14 @@ public class Globals {
     public static final int HEIGHT = 650;
 
     // LEVEL OF SYMMETRY
-    public static final int HREF = 1;
-    public static final int VREF = 2;
-    public static final int HVREF = 3;
-    public static final int ROT = 4;
-    public static final int HREF_ROT = 5;
-    public static final int VREF_ROT = 6;
-    public static final int HVREF_ROT = 7;
+    public static final int SYM_NONE = 0;
+    public static final int SYM_HREF = 1;
+    public static final int SYM_VREF = 2;
+    public static final int SYM_HVREF = 3;
+    public static final int SYM_ROT = 4;
+    public static final int SYM_HREF_ROT = 5;
+    public static final int SYM_VREF_ROT = 6;
+    public static final int SYM_HVREF_ROT = 7;
 
     // PREFERENCES / CUSTOMIZATION
 
@@ -40,7 +41,7 @@ public class Globals {
     public static final boolean losePieces = false;
 
     // MISC
-    public static final int SYMMETRY = VREF;
+    public static final int[] SYMMETRY = {SYM_NONE, SYM_HREF};
     public static final boolean CUSTOMIZABLE = false; // For debug
     public static final String JDBC_URL = "jdbc:derby:altDB;create=true";
     public static final String FFT_PATH = "fft.txt";

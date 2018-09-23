@@ -9,7 +9,6 @@ public class Clause {
     public static final int PIECEOCC_PLAYER = 1;
     public static final int PIECEOCC_ENEMY = 2;
 
-
     String name;
     boolean boardPlacement;
     int row = -1; int col = -1;
@@ -27,15 +26,14 @@ public class Clause {
         formatClause();
     }
 
-    Clause(String name, boolean boardPlacement) {
+    Clause(String name) {
         this.name = name;
         if (name.startsWith("!")) {
             this.negation = true;
             name = name.substring(1);
         }
-        this.boardPlacement = boardPlacement;
-
-        if (boardPlacement) {
+        this.boardPlacement = isBoardPlacement();
+        if (this.boardPlacement) {
             if (name.startsWith("P") || name.startsWith("p"))
                 this.pieceOcc = PIECEOCC_PLAYER;
             else if (name.startsWith("E") || name.startsWith("e"))
@@ -72,6 +70,17 @@ public class Clause {
         this.col = duplicate.col;
         this.pieceOcc = duplicate.pieceOcc;
         this.negation = duplicate.negation;
+    }
+
+    private boolean isBoardPlacement() {
+        String nameCopy = name;
+        if (nameCopy.startsWith("!"))
+            nameCopy = nameCopy.substring(1);
+        if(nameCopy.startsWith("E") || nameCopy.startsWith("e") ||
+                nameCopy.startsWith("P") || nameCopy.startsWith("p"))
+            nameCopy = nameCopy.substring(1);
+
+        return Character.isDigit(nameCopy.charAt(0)) || Character.isDigit(nameCopy.charAt(1));
     }
 
     private void formatClause() {

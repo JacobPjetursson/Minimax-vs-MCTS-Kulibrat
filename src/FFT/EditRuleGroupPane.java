@@ -71,7 +71,6 @@ public class EditRuleGroupPane extends VBox {
             rg_changes.rules.add(r);
             ruleField.clear();
             actionField.clear();
-            fft.save();
             showRules();
         });
 
@@ -91,6 +90,7 @@ public class EditRuleGroupPane extends VBox {
             Stage stage = (Stage) getScene().getWindow();
             stage.close();
             editFFTScene.showRuleGroups();
+            fft.save();
         });
         HBox bottomBox = new HBox(10);
         VBox.setMargin(bottomBox, new Insets(10));

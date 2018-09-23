@@ -282,9 +282,7 @@ public class Controller {
         }
         if ((playerBlackInstance != HUMAN && state.getTurn() == BLACK) ||
                 (playerRedInstance != HUMAN && state.getTurn() == RED)) {
-            aiThread = new Thread(this::doAITurn);
-            aiThread.setDaemon(true);
-            aiThread.start();
+            doAITurn();
         } else if (helpHumanBox.isSelected()) {
             highlightBestPieces(true);
         }

@@ -11,34 +11,31 @@ import java.util.Objects;
 import static misc.Globals.RED;
 
 public class Rule {
-    ArrayList<ArrayList<Clause>> symmetryRules;
+    ArrayList<ClauseList> symmetryClauses;
     ArrayList<Clause> clauses;
     Action action;
-    Move move;
+
 
     static final ArrayList<String> separators = new ArrayList<>(
             Arrays.asList("and", "And", "AND", "&", "&&", "∧", ","));
 
 
     Rule(ArrayList<Clause> clauses, Action action) {
-        symmetryRules = new ArrayList<>();
         this.clauses = clauses;
         this.action = action;
-        this.move = getMove(action); // TODO - SHIT
-        symmetryRules = new ArrayList<>();
-        symmetryRules.add(clauses);
-        symmetryRules.add(reflectH(clauses));
+        symmetryClauses = new ArrayList<>();
+        symmetryClauses.add(new ClauseList(Globals.SYM_NONE, clauses));
+        symmetryClauses.add(new ClauseList(Globals.SYM_HREF, reflectH(clauses)));
     }
 
     // parsing constructor
     Rule(String clauseStr, String actionStr) {
-        symmetryRules = new ArrayList<>();
+        symmetryClauses = new ArrayList<>();
         this.action = getAction(actionStr);
         this.clauses = getClauses(clauseStr);
 
-        this.move = getMove(action); // TODO - SHIT
-        symmetryRules.add(clauses);
-        symmetryRules.add(reflectH(clauses));
+        symmetryClauses.add(new ClauseList(Globals.SYM_NONE, clauses));
+        symmetryClauses.add(new ClauseList(Globals.SYM_HREF, reflectH(clauses)));
     }
 
     String printRule() {
@@ -57,12 +54,7 @@ public class Rule {
                     part = part.replace(sep, "");
                 }
             }
-            boolean boardPlacement = false;
-            // TODO - Cancer way rn
-            if (Character.isDigit(part.charAt(0)) || Character.isDigit(part.charAt(1))) {
-                boardPlacement = true;
-            }
-            clauses.add(new Clause(part, boardPlacement));
+            clauses.add(new Clause(part));
         }
 
         return clauses;
@@ -110,29 +102,13 @@ public class Rule {
                 }
             }
         }
-        clauses.add(new Clause("SL=" + state.getScoreLimit(), false));
+        clauses.add(new Clause("SL=" + state.getScoreLimit()));
         return clauses;
-    }
-
-
-    // Kulibrat specific
-    private Move getMove(Action action) {
-        // TODO - fix this piece of shit code
-        int newRow = -1; int newCol = -1; int oldRow = -1; int oldCol = -1;
-
-        for (Clause c : action.addClauses) {
-            newRow = c.row;
-            newCol = c.col;
-        }
-        for (Clause c : action.remClauses) {
-            oldRow = c.row;
-            oldCol = c.col;
-        }
-        return new Move(oldRow, oldCol, newRow, newCol, -1);
     }
 
     private static Action getAction(String actionStr) {
         String[] parts = actionStr.split(" ");
+        ArrayList<String> corrected_parts = new ArrayList<>();
         for (String part : parts) {
             if (separators.contains(part))
                 continue;
@@ -140,21 +116,28 @@ public class Rule {
                 if (part.contains(sep))
                     part = part.replace(sep, "");
             }
+            corrected_parts.add(part);
 
         }
 
-        return new Action(parts);
+        return new Action(corrected_parts);
     }
 
-    boolean applies(State state) {
+    boolean applies(State state, int symmetry) {
         ArrayList<Clause> stClauses = getClauses(state);
-        for (ArrayList<Clause> clauses : symmetryRules) {
+        for (ClauseList clauseList : symmetryClauses) {
+            if (clauseList.symmetry != symmetry)
+                continue;
+
+            for (Clause c : clauseList.clauses)
+                System.out.println(c.name);
+            System.out.println();
             boolean match = true;
-            for (Clause c : clauses) {
+            for (Clause c : clauseList.clauses) {
                 if (c.negation) {
                     Clause temp = new Clause(c);
                     temp.name = temp.name.replace("!", "");
-                    if (stClauses.contains(c)) {
+                    if (stClauses.contains(temp)) {
                         match = false;
                         break;
                     }
@@ -193,9 +176,10 @@ public class Rule {
         for(int i = 0; i < cb.length; i++) {
             for (int j = 0; j < cb[i].length; j++) {
                 int val = cb[i][j];
+                //System.out.println("VALUE:" + val);
                 if(val < 0)
                     clauses.add(new Clause(i, j, -val, true));
-                else
+                else if (val > 0)
                     clauses.add(new Clause(i, j, val, false));
             }
         }
@@ -214,7 +198,6 @@ public class Rule {
         }
 
         addClauseBoardToList(refH, rClauses);
-
         return rClauses;
     }
 
@@ -244,12 +227,22 @@ public class Rule {
 
         Rule rule = (Rule) obj;
         return this == rule ||
-                (this.symmetryRules.equals(rule.symmetryRules));
+                (this.symmetryClauses.equals(rule.symmetryClauses));
     }
 
     @Override
     public int hashCode() {
-        return 31 * Objects.hashCode(this.symmetryRules);
+        return 31 * Objects.hashCode(this.symmetryClauses);
+    }
+
+    private class ClauseList {
+        ArrayList<Clause> clauses;
+        int symmetry;
+
+        public ClauseList(int symmetry, ArrayList<Clause> clauses) {
+            this.clauses = clauses;
+            this.symmetry = symmetry;
+        }
     }
 
 }
