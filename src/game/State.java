@@ -213,7 +213,7 @@ public class State {
         if (!(obj instanceof State)) return false;
         State state = (State) obj;
         return this == state || turn == state.getTurn() &&
-                (Arrays.deepEquals(board, state.board) || Arrays.deepEquals(this.reflect().board, state.board)) &&
+                (Arrays.deepEquals(board, state.board)) &&
                 redScore == state.getScore(RED) &&
                 blackScore == state.getScore(BLACK);
     }
@@ -222,11 +222,22 @@ public class State {
     public int hashCode() {
         int result = Objects.hash(turn, redScore, blackScore);
         result += Arrays.deepHashCode(board);
-        result += Arrays.deepHashCode(this.reflect().board);
+        //result += Arrays.deepHashCode(this.reflect().board);
         return result;
 
     }
 
+    public String print() {
+        String boardStr = "";
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board.length; j++) {
+                boardStr += board[i][j] + " ";
+            }
+            boardStr += "\n";
+        }
+        return boardStr;
+    }
+/*
     private State reflect() {
         State copy = new State(this);
         for (int i = 0; i < copy.board.length; i++) {
@@ -236,14 +247,6 @@ public class State {
         }
         return copy;
     }
-
-    public void printBoard() {
-        for (int[] aBoard : board) {
-            for (int anABoard : aBoard) {
-                System.out.print(anABoard + " ");
-            }
-            System.out.println();
-        }
-    }
+*/
 
 }

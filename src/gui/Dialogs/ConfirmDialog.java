@@ -10,7 +10,6 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public abstract class ConfirmDialog extends AnchorPane {
-
     public ConfirmDialog(String labelText) {
 
         Label label = new Label(labelText);
@@ -43,6 +42,7 @@ public abstract class ConfirmDialog extends AnchorPane {
 
         getChildren().addAll(label, yes, no);
     }
+
 
     public abstract void setYesBtnMouseClicked();
 }

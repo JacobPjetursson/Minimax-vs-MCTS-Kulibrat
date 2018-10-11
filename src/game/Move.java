@@ -85,8 +85,8 @@ public class Move {
         return refMove;
     }
 
-    public void print() {
-        System.out.println("A_" + team + ": (" + oldRow + "," + oldCol + ") "
-                + "-> " + "(" + newRow + "," + newCol + ")");
+    public String print() {
+        return "A_" + team + ": (" + oldRow + "," + oldCol + ") "
+                + "-> " + "(" + newRow + "," + newCol + ")";
     }
 }

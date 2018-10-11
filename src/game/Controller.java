@@ -1,11 +1,15 @@
 package game;
 
-import FFT.*;
+import FFT.EditFFTScene;
+import FFT.FFTManager;
+import FFT.FFT_Follower;
 import ai.AI;
 import ai.MCTS.MCTS;
-import ai.Minimax.*;
+import ai.Minimax.LookupTableMinimax;
+import ai.Minimax.Minimax;
+import ai.Minimax.Node;
+import ai.Minimax.Zobrist;
 import gui.*;
-import gui.Dialogs.OverwriteDBDialog;
 import gui.board.BoardPiece;
 import gui.board.BoardTile;
 import gui.board.Goal;
@@ -19,16 +23,15 @@ import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import misc.Database;
 import misc.Globals;
 
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.Random;
 
 import static misc.Globals.*;
 
 public class Controller {
-    public Connection dbConnection;
     private int mode;
     private int playerRedInstance;
     private int playerBlackInstance;
@@ -57,13 +60,14 @@ public class Controller {
     private boolean endGamePopup;
     private ArrayList<PrevState> previousStates;
     private Window window;
-    private FFT fft;
+    private FFTManager fftManager;
     private boolean fftInteractiveMode;
     private boolean fftAllowInteraction;
 
     public Controller(Stage primaryStage, int playerRedInstance, int playerBlackInstance,
                       State state, int redTime, int blackTime, boolean overwriteDB) {
         Zobrist.initialize(); // Generate random numbers for state configs
+        Database.setScoreLimit(state.getScoreLimit());
         this.mode = setMode(playerRedInstance, playerBlackInstance);
         this.playerRedInstance = playerRedInstance;
         this.playerBlackInstance = playerBlackInstance;
@@ -110,7 +114,7 @@ public class Controller {
         for (int i = 0; i < swapButtons.length; i++) {
             Player p = players[i];
             Button b = swapButtons[i];
-            b.setOnMouseClicked(event -> {
+            b.setOnAction(event -> {
                 deselect();
                 Stage newStage = new Stage();
                 newStage.setScene(new Scene(new SwapPlayerPane(this, p), 325, 400));
@@ -142,19 +146,19 @@ public class Controller {
                 });
             }
         }
-        startAIButton.setOnMouseClicked(event -> {
+        startAIButton.setOnAction(event -> {
             startAI();
             stopAIButton.setDisable(false);
         });
         // Stop AI button
         stopAIButton.setDisable(true);
-        stopAIButton.setOnMouseClicked(event -> {
+        stopAIButton.setOnAction(event -> {
             aiThread.interrupt();
             stopAIButton.setDisable(true);
         });
         // Review button
-        reviewButton.setOnMouseClicked(event -> {
-            if (connect(state.getScoreLimit())) {
+        reviewButton.setOnAction(event -> {
+            if (Database.connectAndVerify()) {
                 reviewGame();
             }
         });
@@ -177,28 +181,24 @@ public class Controller {
             helpHumanBox.setDisable(true);
             deselect();
             if (newValue) {
-                if (connect(state.getScoreLimit())) {
+                if (Database.connectAndVerify()) {
                     helpHumanBox.setSelected(true);
                     highlightBestPieces(true);
                 } else {
                     helpHumanBox.setSelected(false);
                 }
             } else {
-                try {
-                    dbConnection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-
+                Database.close();
                 helpHumanBox.setSelected(false);
                 highlightBestPieces(false);
             }
             helpHumanBox.setDisable(false);
         });
-        // FFT LISTENERS
-        // edit fft button
-        editFFTButton.setOnMouseClicked(event -> {
-            primaryStage.setScene(new Scene(new EditFFTScene(primaryStage.getScene(), this, fft), Globals.WIDTH, Globals.HEIGHT));
+        // FFTManager LISTENERS
+        // edit fftManager button
+        editFFTButton.setOnAction(event -> {
+            Scene scene = primaryStage.getScene();
+            primaryStage.setScene(new Scene(new EditFFTScene(primaryStage, scene, fftManager, this), Globals.WIDTH, Globals.HEIGHT));
         });
 
         // interactive mode
@@ -225,7 +225,7 @@ public class Controller {
             navPane.addAIWidgets();
         if (mode == HUMAN_VS_AI && !navPane.containsReviewButton())
             navPane.addReviewButton();
-        if (mode != AI_VS_AI && !navPane.containsHelpBox())
+        if ((mode != AI_VS_AI || playerBlackInstance == FFT || playerRedInstance == FFT) && !navPane.containsHelpBox())
             navPane.addHelpHumanBox();
         if ((playerBlackInstance == FFT || playerRedInstance == FFT) && !navPane.containsFFTWidgets())
             navPane.addFFTWidgets();
@@ -240,8 +240,8 @@ public class Controller {
             } else if (playerRedInstance == MONTE_CARLO) {
                 aiRed = new MCTS(state, RED, redTime);
             } else if (playerRedInstance == FFT) {
-                fft = new FFT();
-                aiRed = new FFT_Follower(RED, fft);
+                fftManager = new FFTManager();
+                aiRed = new FFT_Follower(RED, fftManager);
             }
         } else {
             if (playerBlackInstance == MINIMAX) {
@@ -254,8 +254,8 @@ public class Controller {
             } else if (playerBlackInstance == MONTE_CARLO) {
                 aiBlack = new MCTS(state, BLACK, blackTime);
             } else if (playerBlackInstance == FFT) {
-                fft = new FFT();
-                aiBlack = new FFT_Follower(BLACK, fft);
+                fftManager = new FFTManager();
+                aiBlack = new FFT_Follower(BLACK, fftManager);
             }
         }
     }
@@ -280,7 +280,11 @@ public class Controller {
             }
             return;
         }
-        if ((playerBlackInstance != HUMAN && state.getTurn() == BLACK) ||
+        if ((playerRedInstance == FFT && state.getTurn() == BLACK) ||
+                (playerBlackInstance == FFT && state.getTurn() == RED)) {
+            startAIButton.fire();
+        }
+        else if ((playerBlackInstance != HUMAN && state.getTurn() == BLACK) ||
                 (playerRedInstance != HUMAN && state.getTurn() == RED)) {
             doAITurn();
         } else if (helpHumanBox.isSelected()) {
@@ -302,9 +306,16 @@ public class Controller {
             try {
                 while (!Logic.gameOver(state)) {
                     doAITurn();
+                    if (fftAllowInteraction) {
+                        stopAIButton.fire();
+                    }
                     if (playerRedInstance == LOOKUP_TABLE && playerBlackInstance == LOOKUP_TABLE) {
                         Thread.sleep(redTime);
-                    } else {
+                    } else if (state.getTurn() == RED && playerRedInstance == FFT && !fftAllowInteraction)
+                        Thread.sleep(redTime);
+                    else if (state.getTurn() == BLACK && playerBlackInstance == FFT && !fftAllowInteraction)
+                        Thread.sleep(blackTime);
+                    else {
                         Thread.sleep(0); // To allow thread interruption
                     }
                 }
@@ -367,6 +378,10 @@ public class Controller {
             } else if (helpHumanBox.isSelected()) {
                 highlightBestPieces(true);
             }
+        } else if (((state.getTurn() == RED && playerRedInstance == FFT) ||
+                (state.getTurn() == BLACK && playerBlackInstance == FFT)) &&
+                helpHumanBox.isSelected()) {
+            highlightBestPieces(true);
         }
     }
 
@@ -395,87 +410,6 @@ public class Controller {
         }
     }
 
-    // Connects to the database. If the table in question is incomplete or missing, show a pane to allow creating the DB on the spot.
-    public boolean connect(int scoreLimit) {
-        String JDBC_URL = Globals.JDBC_URL;
-        System.out.println("Connecting to database. This might take some time");
-        try {
-            dbConnection = DriverManager.getConnection(
-                    JDBC_URL);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Connection successful");
-
-        String tableName = "plays_" + scoreLimit;
-        long key = new Node(state).getHashCode();
-        boolean error = false;
-        // Try query to check for table existance
-        try {
-            Statement statement = dbConnection.createStatement();
-            ResultSet resultSet = statement.executeQuery("select oldRow, oldCol, newRow, newCol, team, score from "
-                    + tableName + " where id=" + key);
-            if (!resultSet.next()) {
-                System.err.println("The database table '" + tableName + "' is incomplete.");
-                error = true;
-            }
-            statement.close();
-        } catch (SQLException e) {
-            System.out.println("Table '" + tableName + "' does not exist in the database!");
-            error = true;
-        }
-        if (error) {
-            showOverwritePane();
-            return false;
-        }
-        return true;
-    }
-
-    // Fetches the best play corresponding to the input node
-    public MinimaxPlay queryPlay(Node n) {
-        MinimaxPlay play = null;
-        String tableName = "plays_" + state.getScoreLimit();
-        Long key = n.getHashCode();
-        try {
-            Statement statement = dbConnection.createStatement();
-            ResultSet resultSet = statement.executeQuery("select oldRow, oldCol, newRow, newCol, team, score from "
-                    + tableName + " where id=" + key);
-            while (resultSet.next()) {
-                Move move = new Move(resultSet.getInt(1), resultSet.getInt(2),
-                        resultSet.getInt(3), resultSet.getInt(4), resultSet.getInt(5));
-                int score = resultSet.getInt(6);
-                play = new MinimaxPlay(move, score, 0);
-            }
-            statement.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        if (play == null) {
-            System.err.println("PLAY DOES NOT EXIST IN DATABASE!");
-        }
-        return play;
-    }
-
-    // Outputs a string which is the amount of turns to a terminal node, based on a score from the database entry
-    public String turnsToTerminal(int score) {
-        if (score == 0) {
-            return "∞";
-        }
-        if (score > 0) {
-            if (state.getTurn() == BLACK) {
-                return "" + (-2000 + score);
-            } else {
-                return "" + (2000 - score);
-            }
-        } else {
-            if (state.getTurn() == BLACK) {
-                return "" + (2000 + score);
-            } else {
-                return "" + (-2000 - score);
-            }
-        }
-    }
-
     // Deselects the selected piece
     public void deselect() {
         if (selected != null) {
@@ -491,7 +425,7 @@ public class Controller {
                 col, team, state);
         ArrayList<Move> bestPlays = null;
         if (highlight && helpHumanBox.isSelected()) {
-            bestPlays = bestPlays(new Node(state));
+            bestPlays = Database.bestPlays(new Node(state));
         }
         ArrayList<String> turnsToTerminalList = null;
         if (highlight && helpHumanBox.isSelected()) {
@@ -518,32 +452,11 @@ public class Controller {
         }
     }
 
-    // Outputs a list of the best plays from a given node. Checks through the children of a node to find the ones
-    // which have the least amount of turns to terminal for win, or most for loss.
-    public ArrayList<Move> bestPlays(Node n) {
-        ArrayList<Move> bestPlays = new ArrayList<>();
-        MinimaxPlay bestPlay = queryPlay(n);
-        int bestScore = 0;
-        if (!Logic.gameOver(n.getNextNode(bestPlay.move).getState())) {
-            bestScore = queryPlay(n.getNextNode(bestPlay.move)).score;
-        }
-        for (Node child : n.getChildren()) {
-            Move m = child.getState().getMove();
-            State state = n.getNextNode(m).getState();
-            if (Logic.gameOver(state)) {
-                if (Logic.getWinner(state) == m.team) bestPlays.add(m);
-            } else if (queryPlay(child).score == bestScore) {
-                bestPlays.add(m);
-            }
-        }
-        return bestPlays;
-    }
-
     // Highlights the best pieces found above
     private void highlightBestPieces(boolean highlight) {
         Node n = new Node(state);
         ArrayList<Move> bestPlays = null;
-        if (highlight) bestPlays = bestPlays(n);
+        if (highlight) bestPlays = Database.bestPlays(n);
         BoardTile[][] tiles = playArea.getBoard().getTiles();
 
         for (int i = 0; i < tiles.length; i++) {
@@ -574,14 +487,14 @@ public class Controller {
         }
     }
 
-    // Adds sting scores to all moves from a piece
+    // Adds string scores to all moves from a piece
     private ArrayList<String> getScores(ArrayList<Move> curHighLights) {
         ArrayList<String> turnsToTerminalList = new ArrayList<>();
         for (Move m : curHighLights) {
             Node n = new Node(state).getNextNode(m);
             if (Logic.gameOver(n.getState())) {
                 turnsToTerminalList.add("0");
-            } else turnsToTerminalList.add(turnsToTerminal(queryPlay(n).score));
+            } else turnsToTerminalList.add(Database.turnsToTerminal(state.getTurn(), n));
         }
         return turnsToTerminalList;
     }
@@ -624,23 +537,6 @@ public class Controller {
         newStage.initOwner(window);
         newStage.setOnCloseRequest(Event::consume);
         newStage.show();
-    }
-
-    // Opens the overwrite pane for DB
-    private void showOverwritePane() {
-        Stage newStage = new Stage();
-        String labelText = "The DB Table for this score limit has not been built.\n" +
-                    "       Do you want to build it? It will take a while";
-        newStage.setScene(new Scene(new OverwriteDBDialog(labelText, this), 500, 150));
-        newStage.initModality(Modality.APPLICATION_MODAL);
-        newStage.initOwner(window);
-        newStage.setOnCloseRequest(Event::consume);
-        newStage.show();
-    }
-
-    // Builds the DB
-    public void buildDB() {
-        LookupTableMinimax lt = new LookupTableMinimax(RED, state, true);
     }
 
     // Sets the mode based on the red and black player types

@@ -1,6 +1,5 @@
 package FFT;
 
-import game.Move;
 import game.State;
 import misc.Globals;
 
@@ -54,7 +53,17 @@ public class Rule {
                     part = part.replace(sep, "");
                 }
             }
-            clauses.add(new Clause(part));
+            if ((part.charAt(0) == '!' && Character.isDigit(part.charAt(1)))) {
+                String newpart = "!E" + part.substring(1);
+                clauses.add(new Clause(newpart));
+                newpart = "!P" + part.substring(1);
+                clauses.add(new Clause(newpart));
+            } else if (Character.isDigit(part.charAt(0))) {
+                clauses.add(new Clause("E" + part));
+                clauses.add(new Clause("P" + part));
+            }
+            else
+                clauses.add(new Clause(part));
         }
 
         return clauses;
@@ -64,7 +73,7 @@ public class Rule {
         String clauseMsg = "";
         for (Clause clause : clauses) {
             if (!clauseMsg.isEmpty())
-                clauseMsg += " AND ";
+                clauseMsg += " ∧ ";
             clauseMsg += clause.name;
         }
         return clauseMsg;
@@ -128,10 +137,6 @@ public class Rule {
         for (ClauseList clauseList : symmetryClauses) {
             if (clauseList.symmetry != symmetry)
                 continue;
-
-            for (Clause c : clauseList.clauses)
-                System.out.println(c.name);
-            System.out.println();
             boolean match = true;
             for (Clause c : clauseList.clauses) {
                 if (c.negation) {

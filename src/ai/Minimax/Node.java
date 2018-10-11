@@ -4,17 +4,18 @@ import game.Logic;
 import game.Move;
 import game.State;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import static misc.Globals.BLACK;
 import static misc.Globals.RED;
 
-public class Node {
+public class Node implements Serializable {
     private State state;
     private long zobrist_key;
 
     // Starting Root state
-    public Node(State startState) {
+    public Node(State startState)  {
         this.state = new State(startState);
         this.zobrist_key = initHashCode();
     }

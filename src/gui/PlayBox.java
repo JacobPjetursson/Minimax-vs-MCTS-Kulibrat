@@ -26,7 +26,7 @@ public class PlayBox extends Group {
     private Player playerBlack;
     private SimpleBooleanProperty isRendered = new SimpleBooleanProperty();
 
-    PlayBox(Player playerBlack, Goal goalRed, Board board, Goal goalBlack, Player playerRed) {
+    public PlayBox(Player playerBlack, Goal goalRed, Board board, Goal goalBlack, Player playerRed) {
         VBox vbox = new VBox();
         vbox.setAlignment(Pos.CENTER);
         vbox.setStyle("-fx-background-color: rgb(255, 255, 255);");
@@ -40,7 +40,7 @@ public class PlayBox extends Group {
         updateBounds();
     }
 
-    void update(Controller cont, State s) {
+    public void update(Controller cont, State s) {
         board.update(cont, s);
         playerRed.update(cont, s);
         playerBlack.update(cont, s);
@@ -51,7 +51,7 @@ public class PlayBox extends Group {
         isRendered.setValue(true);
     }
 
-    void addArrow(Move m, Color color) {
+    public void addArrow(Move m, Color color) {
         isRendered.addListener((observable, oldValue, newValue) -> Platform.runLater(() -> {
             double startX, startY, endX, endY;
             Bounds b;

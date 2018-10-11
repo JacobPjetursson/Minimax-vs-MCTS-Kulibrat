@@ -2,18 +2,19 @@ package FFT;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class EditRuleGroupPane extends VBox {
@@ -21,19 +22,17 @@ public class EditRuleGroupPane extends VBox {
     private ListView<BorderPane> lw;
     private RuleGroup rg;
     private RuleGroup rg_changes;
-    private FFT fft;
-    private EditFFTScene editFFTScene;
+    private Label titleLabel;
 
-    public EditRuleGroupPane(FFT fft, RuleGroup rg, EditFFTScene editFFTScene) {
+    public EditRuleGroupPane(RuleGroup rg, EditFFTScene editFFTScene) {
         this.rg = rg;
-        rg_changes = new RuleGroup(rg);
-        this.fft = fft;
-        this.editFFTScene = editFFTScene;
+        rg_changes = new RuleGroup(this.rg);
         setSpacing(15);
         setAlignment(Pos.CENTER);
-        Label title = new Label("Edit rule group:\n" + rg.name);
-        title.setFont(Font.font("Verdana", FontWeight.BOLD, 20));
-        title.setAlignment(Pos.CENTER);
+        titleLabel = new Label("Edit rule group:\n" + rg.name);
+        titleLabel.setFont(Font.font("Verdana", FontWeight.BOLD, 20));
+        titleLabel.setTextAlignment(TextAlignment.CENTER);
+        titleLabel.setMinHeight(65);
 
         // Existing rule groups
         lw = new ListView<>();
@@ -73,8 +72,8 @@ public class EditRuleGroupPane extends VBox {
             actionField.clear();
             showRules();
         });
-
-        VBox ruleBox = new VBox(newRuleLabel, newRuleBox, addRuleBtn);
+        newRuleBox.getChildren().add(addRuleBtn);
+        VBox ruleBox = new VBox(newRuleLabel, newRuleBox);
         ruleBox.setAlignment(Pos.CENTER);
         ruleBox.setSpacing(10);
 
@@ -86,11 +85,10 @@ public class EditRuleGroupPane extends VBox {
         Button save = new Button("Save");
         save.setOnMouseClicked(event -> {
             rg.rules = rg_changes.rules;
-            rg.name = rg_changes.name;
             Stage stage = (Stage) getScene().getWindow();
             stage.close();
             editFFTScene.showRuleGroups();
-            fft.save();
+            FFTManager.save();
         });
         HBox bottomBox = new HBox(10);
         VBox.setMargin(bottomBox, new Insets(10));
@@ -98,7 +96,26 @@ public class EditRuleGroupPane extends VBox {
         bottomBox.getChildren().addAll(save, back);
 
         setVgrow(lw, Priority.ALWAYS);
-        getChildren().addAll(title, lw, ruleBox, bottomBox);
+        BorderPane titleBox = new BorderPane();
+        // add rename button
+        Button renameBtn = new Button("Rename");
+        renameBtn.setAlignment(Pos.CENTER);
+        renameBtn.setOnMouseClicked(event -> {
+            Stage newStage = new Stage();
+            newStage.setScene(new Scene(
+                    new RenameRGPane(rg), 500, 200));
+            newStage.initModality(Modality.APPLICATION_MODAL);
+            newStage.initOwner(getScene().getWindow());
+            newStage.setOnCloseRequest(Event::consume);
+            newStage.show();
+        });
+        // FIX ME AND MY SHITTY ALIGNING
+        titleBox.setPadding(new Insets(10, 10, 0, 10));
+        titleBox.setCenter(titleLabel);
+        titleBox.setRight(renameBtn);
+        BorderPane.setAlignment(titleLabel, Pos.CENTER);
+        BorderPane.setAlignment(renameBtn, Pos.CENTER);
+        getChildren().addAll(titleBox, lw, ruleBox, bottomBox);
     }
 
     private void showRules() {
@@ -107,7 +124,7 @@ public class EditRuleGroupPane extends VBox {
             final int index = i; // FUCKING JAVA CANCER
             Rule r = rg_changes.rules.get(i);
             Label rLabel = new Label((i + 1) + ": " + r.printRule());
-            rLabel.setFont(Font.font("Verdana", 12));
+            rLabel.setFont(Font.font("Verdana", 11));
 
             // up/down list buttons
             int buttonSize = 100;
@@ -146,6 +163,7 @@ public class EditRuleGroupPane extends VBox {
             upDownButtons.getChildren().addAll(upButton, downButton);
             HBox allButtons = new HBox(removeButton, upDownButtons);
             allButtons.setAlignment(Pos.CENTER);
+            allButtons.setSpacing(5);
 
             finalPane.setCenter(rLabel);
             finalPane.setRight(allButtons);
@@ -159,6 +177,43 @@ public class EditRuleGroupPane extends VBox {
         lw.getItems().remove(index);
         rg_changes.rules.remove(index);
         showRules();
-        fft.save();
+        FFTManager.save();
+    }
+
+    public class RenameRGPane extends VBox {
+
+        RenameRGPane(RuleGroup rg) {
+            setAlignment(Pos.CENTER);
+            setSpacing(15);
+            setPadding(new Insets(10));
+            Label label = new Label("Write a new rule group name");
+            label.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
+            label.setAlignment(Pos.CENTER);
+
+            TextField tf = new TextField();
+            tf.setMaxWidth(200);
+
+            Button saveBtn = new Button("Save");
+            saveBtn.setAlignment(Pos.CENTER);
+            saveBtn.setOnMouseClicked(event -> {
+                if (!tf.getText().replace(" ", "").isEmpty()) {
+                    rg.name = tf.getText();
+                    FFTManager.save();
+                    Stage stage = (Stage) getScene().getWindow();
+                    stage.close();
+                    titleLabel.setText("Edit rule group:\n" + tf.getText());
+                }
+            });
+
+            Button cancelBtn = new Button("Cancel");
+            cancelBtn.setAlignment(Pos.CENTER);
+            cancelBtn.setOnMouseClicked(event -> {
+                Stage stage = (Stage) getScene().getWindow();
+                stage.close();
+            });
+
+            getChildren().addAll(label, tf, saveBtn, cancelBtn);
+
+        }
     }
 }

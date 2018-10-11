@@ -35,14 +35,14 @@ public class Globals {
     // PREFERENCES / CUSTOMIZATION
 
     // BOARD CONFIG AND RULES FOR KULIBRAT
-    public static final int bWidth = 2;
-    public static final int bHeight = 2;
+    public static final int bWidth = 3;
+    public static final int bHeight = 3;
     public static final int piece_amount = 4;
     public static final boolean losePieces = false;
 
     // MISC
     public static final int[] SYMMETRY = {SYM_NONE, SYM_HREF};
     public static final boolean CUSTOMIZABLE = false; // For debug
-    public static final String JDBC_URL = "jdbc:derby:altDB;create=true";
+    public static final String REG_DB = "jdbc:derby:altDB;create=true";
     public static final String FFT_PATH = "fft.txt";
 }

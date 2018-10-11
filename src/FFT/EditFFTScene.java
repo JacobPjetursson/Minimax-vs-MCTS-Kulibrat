@@ -8,10 +8,7 @@ import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -20,24 +17,27 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import misc.Database;
+import misc.Globals;
 
 public class EditFFTScene extends VBox {
     private int textFieldWidth = 150;
     private ListView<BorderPane> lw;
-    private FFT fft;
-    private Button addRuleBtn;
-    private Scene prevScene;
+    private FFTManager fftManager;
 
-    public EditFFTScene(Scene prevScene, Controller cont, FFT fft) {
-        this.prevScene = prevScene;
+    public EditFFTScene(Stage primaryStage, Scene prevScene, FFTManager fftManager, Controller cont) {
         setSpacing(15);
         setAlignment(Pos.CENTER);
-        this.fft = fft;
-        Label title = new Label("Edit Fast and Frugal Tree");
+        this.fftManager = fftManager;
+        Label title = new Label("Edit FFT with name:\n" + fftManager.currFFT.name);
         title.setFont(Font.font("Verdana", FontWeight.BOLD, 20));
         title.setAlignment(Pos.CENTER);
+        title.setTextAlignment(TextAlignment.CENTER);
+        title.setMinHeight(65);
+        // Make box here with rename, change, delete (not now)
 
         // Existing rule groups
         lw = new ListView<>();
@@ -56,7 +56,7 @@ public class EditFFTScene extends VBox {
         Button addNewRuleGroupBtn = new Button("Add");
         addNewRuleGroupBtn.setOnMouseClicked(event -> {
             RuleGroup rg = new RuleGroup(newRuleGroupField.getText());
-            fft.addRuleGroup(rg);
+            fftManager.currFFT.addRuleGroup(rg);
             newRuleGroupField.clear();
             showRuleGroups();
         });
@@ -64,42 +64,49 @@ public class EditFFTScene extends VBox {
         HBox ruleGroupBox = new HBox(newRuleGroupLabel, newRuleGroupField, addNewRuleGroupBtn);
         ruleGroupBox.setAlignment(Pos.CENTER);
 
-        // New rule
-        Label newRuleLabel = new Label("New Rule");
-        newRuleLabel.setFont(Font.font("Verdana", 15));
-        HBox newRuleBox = new HBox();
-        newRuleBox.setAlignment(Pos.CENTER);
-        Label label = new Label("IF ");
-        newRuleBox.getChildren().add(label);
-        TextField ruleField = new TextField();
-        ruleField.setMinWidth(textFieldWidth);
-        ruleField.setMaxWidth(textFieldWidth);
-        newRuleBox.getChildren().add(ruleField);
-        label = new Label("THEN ");
-        newRuleBox.getChildren().add(label);
-        TextField actionField = new TextField();
-        actionField.setMinWidth(textFieldWidth);
-        actionField.setMaxWidth(textFieldWidth);
-        newRuleBox.getChildren().add(actionField);
+        Label teamLabel = new Label(" as team: ");
+        teamLabel.setFont(Font.font("Verdana", 15));
+        ChoiceBox<String> teamChoice = new ChoiceBox<>();
+        teamChoice.setMinWidth(textFieldWidth);
+        teamChoice.setMaxWidth(textFieldWidth);
+        teamChoice.setValue("Red");
+        teamChoice.setItems(FXCollections.observableArrayList("Red", "Black"));
 
+        Label forLabel = new Label(" for: ");
+        forLabel.setFont(Font.font("Verdana", 15));
+        ChoiceBox<String> verificationChoice = new ChoiceBox<>();
+        verificationChoice.setMinWidth(textFieldWidth);
+        verificationChoice.setMaxWidth(textFieldWidth);
+        verificationChoice.setValue("Whole FFT");
+        verificationChoice.setItems(FXCollections.observableArrayList("Whole FFT", "Existing Rules"));
 
-        addRuleBtn = new Button("Add");
-        addRuleBtn.setDisable(true);
-        addRuleBtn.setOnMouseClicked(event -> {
-            int selIndex = lw.getSelectionModel().getSelectedIndex();
-            RuleGroup rg = fft.ruleGroups.get(selIndex);
-            Rule r = new Rule(ruleField.getText(), actionField.getText());
-            rg.rules.add(r);
-            ruleField.clear();
-            actionField.clear();
-            addRuleBtn.setDisable(true);
-            fft.save();
-            showRuleGroups();
+        Label verifiedLabel = new Label("The FFT was successfully verified");
+        verifiedLabel.setFont(Font.font("Verdana", 15));
+
+        Button verifyButton = new Button("Verify FFT");
+        verifyButton.setTooltip(new Tooltip("Checks if the current FFT is a winning strategy,\n" +
+                "or if given rules are part of winning strategy"));
+        verifyButton.setOnMouseClicked(event -> {
+            if (!Database.connectAndVerify())
+                return;
+            int team = teamChoice.getSelectionModel().getSelectedIndex() + 1;
+            boolean wholeFFT = verificationChoice.getSelectionModel().getSelectedIndex() == 0;
+            boolean verified = fftManager.currFFT.verify(team, wholeFFT);
+            System.out.println("VERIFIED: " + verified);
+            if (!verified && fftManager.currFFT.failingPoint != null) {
+                Scene scene = primaryStage.getScene();
+                primaryStage.setScene(new Scene(new FFTFailurePane(scene, fftManager, cont), Globals.WIDTH, Globals.HEIGHT));
+            } else if (verified && !getChildren().contains(verifiedLabel)) {
+                getChildren().add(4, verifiedLabel);
+
+            }
         });
+        HBox verifyBox = new HBox();
+        verifyBox.setAlignment(Pos.CENTER);
+        verifyBox.setSpacing(10);
+        verifyBox.getChildren().addAll(verifyButton, teamChoice, forLabel, verificationChoice);
 
-        VBox ruleBox = new VBox(newRuleLabel, newRuleBox, addRuleBtn);
-        ruleBox.setAlignment(Pos.CENTER);
-        ruleBox.setSpacing(10);
+
 
         Button back = new Button("Back");
         back.setOnMouseClicked(event -> {
@@ -112,15 +119,15 @@ public class EditFFTScene extends VBox {
         bottomBox.getChildren().add(back);
 
         setVgrow(lw, Priority.ALWAYS);
-        getChildren().addAll(title, lw, ruleGroupBox, ruleBox, bottomBox);
+        getChildren().addAll(title, lw, ruleGroupBox, verifyBox, bottomBox);
     }
 
     void showRuleGroups() {
         ObservableList<BorderPane> ruleGroups = FXCollections.observableArrayList();
-        for (int i = 0; i < fft.ruleGroups.size(); i++) {
+        for (int i = 0; i < fftManager.currFFT.ruleGroups.size(); i++) {
             // Rule group
             final int index = i; // FUCKING JAVA CANCER
-            RuleGroup rg = fft.ruleGroups.get(i);
+            RuleGroup rg = fftManager.currFFT.ruleGroups.get(i);
             VBox rgVBox = new VBox(10);
             rgVBox.setAlignment(Pos.CENTER);
             Label rgLabel = new Label((i + 1) + ": " + rg.name);
@@ -143,18 +150,18 @@ public class EditFFTScene extends VBox {
             upButton.setOnMouseClicked(event -> {
                 if (index == 0)
                     return;
-                fft.ruleGroups.remove(index);
-                fft.ruleGroups.add(index - 1, rg);
-                fft.save();
+                fftManager.currFFT.ruleGroups.remove(index);
+                fftManager.currFFT.ruleGroups.add(index - 1, rg);
+                FFTManager.save();
                 showRuleGroups();
                 lw.getSelectionModel().select(index - 1);
             });
             downButton.setOnMouseClicked(event -> {
-                if (index == fft.ruleGroups.size() - 1)
+                if (index == fftManager.currFFT.ruleGroups.size() - 1)
                     return;
-                fft.ruleGroups.remove(index);
-                fft.ruleGroups.add(index + 1, rg);
-                fft.save();
+                fftManager.currFFT.ruleGroups.remove(index);
+                fftManager.currFFT.ruleGroups.add(index + 1, rg);
+                FFTManager.save();
                 showRuleGroups();
                 lw.getSelectionModel().select(index + 1);
                 showRuleGroups();
@@ -170,7 +177,7 @@ public class EditFFTScene extends VBox {
             editButton.setOnMouseClicked(event -> {
                 Stage newStage = new Stage();
                 newStage.setScene(new Scene(
-                        new EditRuleGroupPane(fft, rg, this), 700, 500));
+                        new EditRuleGroupPane(rg, this), 700, 500));
                 newStage.initModality(Modality.APPLICATION_MODAL);
                 newStage.initOwner(getScene().getWindow());
                 newStage.setOnCloseRequest(Event::consume);
@@ -196,6 +203,7 @@ public class EditFFTScene extends VBox {
             upDownButtons.getChildren().addAll(upButton, downButton);
             HBox allButtons = new HBox(editRemoveButtons, upDownButtons);
             allButtons.setAlignment(Pos.CENTER);
+            allButtons.setSpacing(5);
 
             BorderPane finalPane = new BorderPane();
             finalPane.setCenter(rgVBox);
@@ -204,14 +212,12 @@ public class EditFFTScene extends VBox {
         }
         lw.setItems(ruleGroups);
         lw.getSelectionModel().selectLast();
-        lw.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-                addRuleBtn.setDisable(false));
     }
 
     public void removeRuleGroup(int index) {
         lw.getItems().remove(index);
-        fft.ruleGroups.remove(index);
+        fftManager.currFFT.ruleGroups.remove(index);
         showRuleGroups();
-        fft.save();
+        FFTManager.save();
     }
 }

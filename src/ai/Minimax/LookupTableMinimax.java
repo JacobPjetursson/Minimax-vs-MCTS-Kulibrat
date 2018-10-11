@@ -4,11 +4,11 @@ import ai.AI;
 import game.Logic;
 import game.Move;
 import game.State;
+import misc.Database;
 import misc.Globals;
 
-import java.sql.*;
+import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Map;
 
 import static misc.Globals.BLACK;
 import static misc.Globals.RED;
@@ -18,28 +18,24 @@ public class LookupTableMinimax extends AI {
     private int CURR_MAX_DEPTH;
     private int unevaluatedNodes = 0;
     private HashMap<Long, MinimaxPlay> lookupTable;
-    private String JDBC_URL;
-    private Connection conn;
+
+
 
     public LookupTableMinimax(int team, State state, boolean overwriteDB) {
         super(team);
         lookupTable = new HashMap<>();
-        JDBC_URL = Globals.JDBC_URL;
-        if (!overwriteDB)
-            checkConnection(state);
-        if (useDB) {
-            conn = getConnection(state.getScoreLimit());
-            if (overwriteDB) {
-                this.team = RED;
-                System.out.println("Rebuilding lookup table. This will take some time.");
-                buildLookupTable(state);
-                try {
-                    fillTable(state.getScoreLimit());
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                this.team = team;
+        if (useDB && overwriteDB) {
+            this.team = RED;
+            System.out.println("Rebuilding lookup table. This will take some time.");
+            buildLookupTable(state);
+            try {
+                Database.fillLookupTable(lookupTable);
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
+            this.team = team;
+        } else if (useDB) {
+            Database.connectAndVerify();
         }
     }
 
@@ -54,7 +50,7 @@ public class LookupTableMinimax extends AI {
         Node simNode = new Node(state);
         MinimaxPlay play;
         if (useDB) {
-            play = queryData(simNode.getHashCode(), state.getScoreLimit());
+            play = Database.queryPlay(simNode);
         } else {
             play = iterativeDeepeningMinimax(state);
         }
@@ -69,13 +65,6 @@ public class LookupTableMinimax extends AI {
                 ", WINNER IS: " + winner);
         System.out.println(" in " + (play.score >= 1000 ? 2000 - play.score : (play.score == 0) ? "∞" : 2000 + play.score) + " moves!");
         return move;
-    }
-
-    // This function builds the lookup table from scratch
-    private void buildLookupTable(State state) {
-        long startTime = System.currentTimeMillis();
-        iterativeDeepeningMinimax(state);
-        System.out.println("Lookup table successfully built. Time spent: " + (System.currentTimeMillis() - startTime));
     }
 
     // Runs an iterative deepening minimax as the exhaustive brute-force for the lookupDB. The data is saved in the transpo table
@@ -161,115 +150,11 @@ public class LookupTableMinimax extends AI {
         return 0;
     }
 
-    // Connects to the DB
-    private Connection getConnection(int scoreLimit) {
-        System.out.println("Connecting to database. This might take some time");
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(
-                    JDBC_URL);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Connection successful");
-        // Creating the table, if it does not exist already
-        String tableName = "plays_" + scoreLimit;
-        try {
-            conn.createStatement().execute("create table " + tableName +
-                    "(id bigint primary key, oldRow smallint, oldCol smallint, newRow smallint, newCol smallint, team smallint, score smallint)");
-        } catch (SQLException e) {
-            System.out.println("Table '" + tableName + "' exists in the DB");
-        }
-        return conn;
-    }
-
-    // Copies the transposition table into the database
-    private void fillTable(int scoreLimit) throws SQLException {
-        System.out.println("Inserting data into table. This will take some time");
-        String tableName = "plays_" + scoreLimit;
+    // This function builds the lookup table from scratch
+    private void buildLookupTable(State state) {
+        Database.createLookupTable();
         long startTime = System.currentTimeMillis();
-        conn.createStatement().execute("truncate table " + tableName);
-
-        final int batchSize = 1000;
-        int count = 0;
-        PreparedStatement stmt = conn.prepareStatement("insert into " + tableName + " values (?, ?, ?, ?, ?, ?, ?)");
-        for (Map.Entry<Long, MinimaxPlay> entry : lookupTable.entrySet()) {
-            Long key = entry.getKey();
-            MinimaxPlay value = entry.getValue();
-            stmt.setLong(1, key);
-            stmt.setInt(2, value.move.oldRow);
-            stmt.setInt(3, value.move.oldCol);
-            stmt.setInt(4, value.move.newRow);
-            stmt.setInt(5, value.move.newCol);
-            stmt.setInt(6, value.move.team);
-            stmt.setInt(7, value.score);
-
-            stmt.addBatch();
-            if (++count % batchSize == 0) {
-                stmt.executeBatch();
-            }
-        }
-        stmt.executeBatch();
-        stmt.close();
-        System.out.println("Data inserted successfully. Time spent: " + (System.currentTimeMillis() - startTime));
-    }
-
-    // Fetches the best state, given a key and a score limit
-    private MinimaxPlay queryData(Long key, int scoreLimit) {
-        MinimaxPlay play = null;
-        String tableName = "plays_" + scoreLimit;
-        try {
-            Statement statement = conn.createStatement();
-            ResultSet resultSet = statement.executeQuery("select oldRow, oldCol, newRow, newCol, team, score from " + tableName + " where id=" + key);
-            while (resultSet.next()) {
-                Move move = new Move(resultSet.getInt(1), resultSet.getInt(2),
-                        resultSet.getInt(3), resultSet.getInt(4), resultSet.getInt(5));
-                int score = resultSet.getInt(6);
-                play = new MinimaxPlay(move, score, 0);
-            }
-            statement.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Table '" + tableName + "' does not exist! Exiting.");
-            System.exit(0);
-        }
-        return play;
-    }
-
-    // Checks whether the database table to be used exists and is not empty.
-    // If not, exits the program and tells the user to rebuild the database
-    private void checkConnection(State state) {
-        int scoreLimit = state.getScoreLimit();
-        System.out.println("Connecting to database. This might take some time");
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(
-                    JDBC_URL);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Connection successful");
-
-        String tableName = "plays_" + scoreLimit;
-        long key = new Node(state).getHashCode();
-        boolean error = false;
-        // Try query to check for table existance
-        try {
-            Statement statement = conn.createStatement();
-            ResultSet resultSet = statement.executeQuery("select oldRow, oldCol, newRow, newCol, team, score from "
-                    + tableName + " where id=" + key);
-            if (!resultSet.next()) {
-                System.err.println("The database table '" + tableName + "' is incomplete.");
-                error = true;
-            }
-            statement.close();
-        } catch (SQLException e) {
-            System.err.println("Table '" + tableName + "' does not exist in the database.");
-            error = true;
-        }
-        if (error) {
-            System.err.println("Please rebuild the database. Exiting");
-            System.exit(-1);
-        }
+        iterativeDeepeningMinimax(state);
+        System.out.println("Lookup table successfully built. Time spent: " + (System.currentTimeMillis() - startTime));
     }
 }

@@ -1,76 +1,118 @@
 package FFT;
 
+import ai.Minimax.MinimaxPlay;
+import ai.Minimax.Node;
+import game.*;
+import misc.Database;
 import misc.Globals;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.LinkedList;
+
+import static misc.Globals.BLACK;
+import static misc.Globals.RED;
 
 public class FFT {
-    String path = Globals.FFT_PATH;
+    String name;
     ArrayList<RuleGroup> ruleGroups;
+    PrevState failingPoint = null;
 
-    public FFT() {
+    public FFT(String name) {
+        this.name = name;
         ruleGroups = new ArrayList<RuleGroup>();
-        // Try loading fft from file in working directory
-        load();
-
     }
+
 
     void addRuleGroup(RuleGroup ruleGroup) {
         ruleGroups.add(ruleGroup);
-        save();
+        FFTManager.save();
     }
 
-    void save() {
-        BufferedWriter writer;
-        try {
-            writer = new BufferedWriter(new FileWriter(path));
-            String fft_file = "";
-            for (RuleGroup rg : ruleGroups) {
-                fft_file += "[" + rg.name + "]\n";
-                for (Rule r : rg.rules) {
-                    fft_file += r.getClauseStr() + " -> " + r.getActionStr() + "\n";
-                }
-            }
-            writer.write(fft_file);
-            writer.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+    boolean verify(int team, boolean wholeFFT) {
+        Node initialNode = new Node(new State(Database.scoreLimit));
+        LinkedList<Node> frontier = new LinkedList<>();
+        HashSet<Node> closedSet = new HashSet<>();
+        frontier.add(initialNode);
+        int opponent = (team == RED) ? BLACK : RED;
+        // Check if win or draw is even possible
+        int score = Database.queryPlay(initialNode).score;
+        if (team == RED && score < 0) {
+            System.out.println("A perfect player black has won from start of the game");
+            return false;
+        } else if (team == BLACK && score > 0) {
+            System.out.println("A perfect player red has won from the start of the game");
+            return false;
         }
 
+        while (!frontier.isEmpty()) {
+            Node node = frontier.pop();
+            if (Logic.gameOver(node.getState())) {
+                if (Logic.getWinner(node.getState()) == opponent) {
+                    // Should not hit this given initial check
+                    System.out.println("No chance of winning vs. perfect player");
+                    return false;
+                }
+            }
+            else if (team != node.getState().getTurn()) {
+                for (Node child : node.getChildren())
+                    if (!closedSet.contains(child)) {
+                        closedSet.add(child);
+                        frontier.add(child);
+                    }
+            }
+            else {
+                Move move = makeMove(node);
+                ArrayList<Move> nonLosingPlays = Database.nonLosingPlays(node);
+                // If move is null, check that all possible (random) moves are ok
+                if (move == null) {
+                    for (Move m : node.getState().getLegalMoves()) {
+                        if (nonLosingPlays.contains(m)) {
+                            Node nextNode = node.getNextNode(m);
+                            if (!closedSet.contains(nextNode)) {
+                                closedSet.add(nextNode);
+                                frontier.add(nextNode);
+                            }
+                        } else if (wholeFFT) {
+                            System.out.println("FFT did not apply to certain state, random move lost you the game");
+                            failingPoint = new PrevState(node.getState(), m, true);
+                            return false;
+                        }
+                    }
+                }
+                else if (!nonLosingPlays.contains(move)) {
+                    System.out.println("FFT applied, but its move lost you the game");
+                    failingPoint = new PrevState(node.getState(), move, false);
+                    return false;
+                }
+                else {
+                    Node nextNode = node.getNextNode(move);
+                    if (!closedSet.contains(nextNode)) {
+                        closedSet.add(nextNode);
+                        frontier.add(nextNode);
+                    }
+                }
+            }
+        }
+        return true;
     }
 
-    private void load() {
-        List<String> lines;
-        try {
-            lines = Files.readAllLines(Paths.get(path));
-            RuleGroup rg = null;
-            for (String line : lines) {
-                // Rulegroup name
-                if (line.startsWith("[")) {
-                    if (rg != null) {
-                        ruleGroups.add(rg);
-                    }
-                    rg = new RuleGroup(line.substring(1, line.length() - 1));
-                } else {
-                    String[] rule = line.split("->");
-                    String clausesStr = rule[0].trim();
-                    String actionStr = rule[1].trim();
-                    if (rg != null) {
-                        rg.rules.add(new Rule(clausesStr, actionStr));
+    private Move makeMove(Node node) {
+        State state = node.getState();
+        for (RuleGroup ruleGroup : ruleGroups) {
+            for (Rule rule : ruleGroup.rules) {
+                for(int symmetry : Globals.SYMMETRY) {
+                    if (rule.applies(state, symmetry)) {
+                        Action action = rule.action.applySymmetry(symmetry);
+                        Move move = action.getMove();
+                        move.team = state.getTurn();
+                        if (Logic.isLegalMove(state, move)) {
+                            return move;
+                        }
                     }
                 }
             }
-            if(rg != null)
-                ruleGroups.add(rg);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        return null;
     }
 }

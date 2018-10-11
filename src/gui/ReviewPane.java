@@ -24,6 +24,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import misc.Database;
+import misc.Globals;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -37,8 +39,8 @@ public class ReviewPane extends VBox {
 
     public ReviewPane(Stage primaryStage, Controller currCont) {
         try {
-            if (currCont.dbConnection == null || currCont.dbConnection.isClosed()) {
-                currCont.connect(currCont.getScoreLimit());
+            if (Database.dbConnection == null || Database.dbConnection.isClosed()) {
+                Database.connectAndVerify();
                 connected = true;
             }
         } catch (SQLException e) {
@@ -58,7 +60,7 @@ public class ReviewPane extends VBox {
             stage.close();
             if (connected) {
                 try {
-                    currCont.dbConnection.close();
+                    Database.dbConnection.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -83,7 +85,7 @@ public class ReviewPane extends VBox {
             vBox.setAlignment(Pos.CENTER);
             vBox.setFillWidth(true);
             Node n = new Node(ps.getState());
-            ArrayList<Move> bestPlays = currCont.bestPlays(n);
+            ArrayList<Move> bestPlays = Database.bestPlays(n);
             PlayBox playBox = getPlayBox(currCont, ps, bestPlays);
             Label turnL = new Label("Turns Played: " + (ps.getTurnNo()));
             turnL.setFont(Font.font("Verdana", 14));
@@ -112,8 +114,7 @@ public class ReviewPane extends VBox {
             if (Logic.gameOver(nextNode.getState())) {
                 scoreStr = "0";
             } else {
-                scoreStr = currCont.turnsToTerminal(
-                        currCont.queryPlay(nextNode).score);
+                scoreStr = Database.turnsToTerminal(currCont.getState().getTurn(), nextNode);
             }
             int score;
             if (scoreStr.equals("∞")) score = 0;
