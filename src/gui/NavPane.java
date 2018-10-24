@@ -30,6 +30,7 @@ public class NavPane extends VBox {
     private Button editFFTButton;
     private HBox interactiveFFTBox;
     private CheckBox interactiveFFT;
+    private Button showFFTButton;
     private VBox FFTWidgets;
     private CheckBox helpHuman;
     private HBox helpHumanBox;
@@ -67,6 +68,9 @@ public class NavPane extends VBox {
 
         reviewButton = new Button("Review Game");
         buttons.add(reviewButton);
+
+        showFFTButton = new Button("Show FFT");
+        buttons.add(showFFTButton);
 
         editFFTButton = new Button("Edit FFT");
         buttons.add(editFFTButton);
@@ -130,6 +134,8 @@ public class NavPane extends VBox {
         getChildren().add(FFTWidgets);
     }
 
+    public void addShowFFTButton() { getChildren().add(showFFTButton); }
+
     public Button getEditFFTButton() {
         return editFFTButton;
     }
@@ -162,6 +168,10 @@ public class NavPane extends VBox {
         return reviewButton;
     }
 
+    public Button getShowFFTButton() {
+        return showFFTButton;
+    }
+
     public boolean containsFFTWidgets() {
         return getChildren().contains(FFTWidgets);
     }
@@ -176,5 +186,9 @@ public class NavPane extends VBox {
 
     public boolean containsReviewButton() {
         return getChildren().contains(reviewButton);
+    }
+
+    public boolean containsShowFFTButton() {
+        return getChildren().contains(showFFTButton);
     }
 }

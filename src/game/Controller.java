@@ -3,6 +3,7 @@ package game;
 import FFT.EditFFTScene;
 import FFT.FFTManager;
 import FFT.FFT_Follower;
+import FFT.ShowFFTPane;
 import ai.AI;
 import ai.MCTS.MCTS;
 import ai.Minimax.LookupTableMinimax;
@@ -20,6 +21,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -28,6 +30,8 @@ import misc.Globals;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static misc.Globals.*;
 
@@ -45,6 +49,7 @@ public class Controller {
     private Button stopAIButton;
     private Button reviewButton;
     private Button editFFTButton;
+    private Button showFFTButton;
     private CheckBox interactiveFFTBox;
     private Button[] swapButtons;
     private CheckBox helpHumanBox;
@@ -63,6 +68,7 @@ public class Controller {
     private FFTManager fftManager;
     private boolean fftInteractiveMode;
     private boolean fftAllowInteraction;
+    private ShowFFTPane shownFFT;
 
     public Controller(Stage primaryStage, int playerRedInstance, int playerBlackInstance,
                       State state, int redTime, int blackTime, boolean overwriteDB) {
@@ -80,6 +86,7 @@ public class Controller {
         this.endGamePopup = false;
         this.curHighLights = new ArrayList<>();
         this.previousStates = new ArrayList<>();
+        this.fftManager = new FFTManager();
 
         PlayPane playPane = new PlayPane(this);
         primaryStage.setScene(new Scene(playPane,
@@ -96,6 +103,7 @@ public class Controller {
         stopAIButton = navPane.getStopAIButton();
         helpHumanBox = navPane.getHelpHumanBox();
         reviewButton = navPane.getReviewButton();
+        showFFTButton = navPane.getShowFFTButton();
         editFFTButton = navPane.getEditFFTButton();
         interactiveFFTBox = navPane.getInteractiveFFTBox();
         goalRed = playArea.getGoal(RED);
@@ -162,6 +170,7 @@ public class Controller {
                 reviewGame();
             }
         });
+
         // Goal Red
         goalRed.setOnMouseClicked(event -> {
             if (goalRed.getHighlight() || Globals.CUSTOMIZABLE) {
@@ -205,11 +214,18 @@ public class Controller {
         fftInteractiveMode = true;
         interactiveFFTBox.selectedProperty().addListener((observableValue, oldValue, newValue) -> {
             deselect();
-            if (newValue) {
-                fftInteractiveMode = true;
-            } else {
-                fftInteractiveMode = false;
-            }
+            fftInteractiveMode = newValue;
+        });
+
+        // Show FFT button
+        showFFTButton.setOnAction(event -> {
+            deselect();
+            Stage newStage = new Stage();
+            shownFFT = new ShowFFTPane(fftManager, this);
+            newStage.setScene(new Scene(shownFFT, 450, 550));
+            newStage.show();
+            newStage.setOnCloseRequest(otherevent -> shownFFT = null);
+
         });
 
         if (mode == HUMAN_VS_AI && playerRedInstance != HUMAN && state.getTurn() == RED) {
@@ -225,8 +241,12 @@ public class Controller {
             navPane.addAIWidgets();
         if (mode == HUMAN_VS_AI && !navPane.containsReviewButton())
             navPane.addReviewButton();
-        if ((mode != AI_VS_AI || playerBlackInstance == FFT || playerRedInstance == FFT) && !navPane.containsHelpBox())
-            navPane.addHelpHumanBox();
+        if ((mode != AI_VS_AI || playerBlackInstance == FFT || playerRedInstance == FFT)) {
+            if (!navPane.containsHelpBox())
+                navPane.addHelpHumanBox();
+            if (!navPane.containsShowFFTButton())
+                navPane.addShowFFTButton();
+        }
         if ((playerBlackInstance == FFT || playerRedInstance == FFT) && !navPane.containsFFTWidgets())
             navPane.addFFTWidgets();
     }
@@ -240,7 +260,6 @@ public class Controller {
             } else if (playerRedInstance == MONTE_CARLO) {
                 aiRed = new MCTS(state, RED, redTime);
             } else if (playerRedInstance == FFT) {
-                fftManager = new FFTManager();
                 aiRed = new FFT_Follower(RED, fftManager);
             }
         } else {
@@ -254,7 +273,6 @@ public class Controller {
             } else if (playerBlackInstance == MONTE_CARLO) {
                 aiBlack = new MCTS(state, BLACK, blackTime);
             } else if (playerBlackInstance == FFT) {
-                fftManager = new FFTManager();
                 aiBlack = new FFT_Follower(BLACK, fftManager);
             }
         }
@@ -264,12 +282,7 @@ public class Controller {
     private void doHumanTurn(Move move) {
         previousStates.add(new PrevState(state, move, turnNo));
         state = state.getNextState(move);
-        turnNo++;
-        if (aiRed != null) aiRed.update(state);
-        if (aiBlack != null) aiBlack.update(state);
-        deselect();
-        playArea.update(this);
-        checkGameOver();
+        updatePostHumanTurn();
         if (Logic.gameOver(state)) return;
         if (state.getTurn() == move.team) {
             String skipped = (state.getTurn() == RED) ? "Black" : "Red";
@@ -290,6 +303,28 @@ public class Controller {
         } else if (helpHumanBox.isSelected()) {
             highlightBestPieces(true);
         }
+    }
+
+    private void updatePostHumanTurn() {
+        turnNo++;
+        if (aiRed != null) aiRed.update(state);
+        if (aiBlack != null) aiBlack.update(state);
+        deselect();
+        playArea.update(this);
+        checkGameOver();
+        if (shownFFT != null) shownFFT.showRuleGroups();
+    }
+
+    private void updatePostAITurn() {
+        turnNo++;
+        if (aiRed != null) aiRed.update(state);
+        if (aiBlack != null) aiBlack.update(state);
+        // Update gui elements on another thread
+        Platform.runLater(() -> {
+            playArea.update(this);
+            checkGameOver();
+        });
+        if (shownFFT != null) shownFFT.showRuleGroups();
     }
 
     // This function is called when two AI's are matched against each other. It can be interrupted by the user.
@@ -359,15 +394,7 @@ public class Controller {
             }
         }
         state = state.getNextState(move);
-        turnNo++;
-
-        if (aiRed != null) aiRed.update(state);
-        if (aiBlack != null) aiBlack.update(state);
-        // Update gui elements on another thread
-        Platform.runLater(() -> {
-            playArea.update(this);
-            checkGameOver();
-        });
+        updatePostAITurn();
         if (Logic.gameOver(state)) return;
         if (mode == HUMAN_VS_AI) {
             if (turn == state.getTurn()) {

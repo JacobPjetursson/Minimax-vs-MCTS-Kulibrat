@@ -107,7 +107,7 @@ public class FFTFailurePane extends BorderPane {
         }
         return pb;
     }
-    void showRuleGroups() {
+    private void showRuleGroups() {
         ObservableList<VBox> ruleGroups = FXCollections.observableArrayList();
         for (int i = 0; i < fftManager.currFFT.ruleGroups.size(); i++) {
             // Rule group
@@ -132,7 +132,5 @@ public class FFTFailurePane extends BorderPane {
             ruleGroups.add(rgVBox);
         }
         lw.setItems(ruleGroups);
-        //lw.setMouseTransparent(true);
-        //lw.setFocusTraversable(false);
     }
 }

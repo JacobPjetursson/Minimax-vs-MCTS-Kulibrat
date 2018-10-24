@@ -3,6 +3,7 @@ package FFT;
 import misc.Globals;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,7 +20,8 @@ public class FFTManager {
         ffts = new ArrayList<>();
         // Try loading ffts from file in working directory
         load();
-        currFFT = ffts.get(0);
+        if (!ffts.isEmpty())
+            currFFT = ffts.get(0);
 
     }
 
@@ -27,7 +29,21 @@ public class FFTManager {
         currFFT = ffts.get(index);
     }
 
-    static void save() {
+    void addNewFFT(String name) {
+        FFT newFFT = new FFT(name);
+        ffts.add(newFFT);
+        currFFT = newFFT;
+    }
+
+    public void deleteCurrFFT() {
+        ffts.remove(currFFT);
+        if (!ffts.isEmpty())
+            currFFT = ffts.get(0);
+        else
+            currFFT = null;
+    }
+
+    public static void save() {
         BufferedWriter writer;
         try {
             writer = new BufferedWriter(new FileWriter(path));
@@ -52,35 +68,42 @@ public class FFTManager {
 
     private static void load() {
         List<String> lines;
+        // Create new file if not exists
+        File fftFile = new File(path);
         try {
-            lines = Files.readAllLines(Paths.get(path));
-            RuleGroup rg = null;
-            FFT fft = null;
-            for (String line : lines) {
-                if (line.startsWith("{")) {
-                    if (fft != null) {
-                        ffts.add(fft);
+            if (!fftFile.createNewFile()) {
+                lines = Files.readAllLines(Paths.get(path));
+                RuleGroup rg = null;
+                FFT fft = null;
+                for (String line : lines) {
+                    if (line.startsWith("{")) {
+                        if (fft != null) {
+                            ffts.add(fft);
+                        }
+                        fft = new FFT(line.substring(1, line.length() - 1));
                     }
-                    fft = new FFT(line.substring(1, line.length() - 1));
+                    // Rulegroup name
+                    else if (line.startsWith("[")) {
+                        if (rg != null) {
+                            fft.ruleGroups.add(rg);
+                        }
+                        rg = new RuleGroup(line.substring(1, line.length() - 1));
+                    } else {
+                        String[] rule = line.split("->");
+                        String clausesStr = rule[0].trim();
+                        String actionStr = rule[1].trim();
+                        if (rg != null) {
+                            rg.rules.add(new Rule(clausesStr, actionStr));
+                        }
+                    }
                 }
-                // Rulegroup name
-                else if (line.startsWith("[")) {
-                    if (rg != null) {
+                // In case of at least 1 FFT
+                if (fft != null) {
+                    if(rg != null)
                         fft.ruleGroups.add(rg);
-                    }
-                    rg = new RuleGroup(line.substring(1, line.length() - 1));
-                } else {
-                    String[] rule = line.split("->");
-                    String clausesStr = rule[0].trim();
-                    String actionStr = rule[1].trim();
-                    if (rg != null) {
-                        rg.rules.add(new Rule(clausesStr, actionStr));
-                    }
+
+                    ffts.add(fft);
                 }
-            }
-            if(rg != null) {
-                fft.ruleGroups.add(rg);
-                ffts.add(fft);
             }
         } catch (IOException e) {
             e.printStackTrace();

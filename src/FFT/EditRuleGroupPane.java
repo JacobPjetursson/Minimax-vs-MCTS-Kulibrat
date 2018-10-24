@@ -87,7 +87,7 @@ public class EditRuleGroupPane extends VBox {
             rg.rules = rg_changes.rules;
             Stage stage = (Stage) getScene().getWindow();
             stage.close();
-            editFFTScene.showRuleGroups();
+            editFFTScene.update();
             FFTManager.save();
         });
         HBox bottomBox = new HBox(10);
@@ -103,7 +103,7 @@ public class EditRuleGroupPane extends VBox {
         renameBtn.setOnMouseClicked(event -> {
             Stage newStage = new Stage();
             newStage.setScene(new Scene(
-                    new RenameRGPane(rg), 500, 200));
+                    new RenameRGPane("Write a new rule group name", rg), 500, 200));
             newStage.initModality(Modality.APPLICATION_MODAL);
             newStage.initOwner(getScene().getWindow());
             newStage.setOnCloseRequest(Event::consume);
@@ -180,40 +180,22 @@ public class EditRuleGroupPane extends VBox {
         FFTManager.save();
     }
 
-    public class RenameRGPane extends VBox {
+    public class RenameRGPane extends RenamePane {
 
-        RenameRGPane(RuleGroup rg) {
-            setAlignment(Pos.CENTER);
-            setSpacing(15);
-            setPadding(new Insets(10));
-            Label label = new Label("Write a new rule group name");
-            label.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
-            label.setAlignment(Pos.CENTER);
-
-            TextField tf = new TextField();
-            tf.setMaxWidth(200);
-
-            Button saveBtn = new Button("Save");
-            saveBtn.setAlignment(Pos.CENTER);
-            saveBtn.setOnMouseClicked(event -> {
-                if (!tf.getText().replace(" ", "").isEmpty()) {
-                    rg.name = tf.getText();
-                    FFTManager.save();
-                    Stage stage = (Stage) getScene().getWindow();
-                    stage.close();
-                    titleLabel.setText("Edit rule group:\n" + tf.getText());
-                }
-            });
-
-            Button cancelBtn = new Button("Cancel");
-            cancelBtn.setAlignment(Pos.CENTER);
-            cancelBtn.setOnMouseClicked(event -> {
+        RuleGroup rg;
+        RenameRGPane(String labelText, RuleGroup rg) {
+            super(labelText);
+            this.rg = rg;
+        }
+        @Override
+        void setSaveBtnMouseClicked() {
+            if (!tf.getText().replace(" ", "").isEmpty()) {
+                rg.name = tf.getText();
+                FFTManager.save();
                 Stage stage = (Stage) getScene().getWindow();
                 stage.close();
-            });
-
-            getChildren().addAll(label, tf, saveBtn, cancelBtn);
-
+                titleLabel.setText("Edit rule group:\n" + tf.getText());
+            }
         }
     }
 }

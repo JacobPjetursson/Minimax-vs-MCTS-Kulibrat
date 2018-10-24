@@ -7,6 +7,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 public abstract class ConfirmDialog extends AnchorPane {
@@ -15,6 +16,7 @@ public abstract class ConfirmDialog extends AnchorPane {
         Label label = new Label(labelText);
         label.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
         label.setAlignment(Pos.CENTER);
+        label.setTextAlignment(TextAlignment.CENTER);
         AnchorPane.setTopAnchor(label, 20.0);
         AnchorPane.setLeftAnchor(label, 0.0);
         AnchorPane.setRightAnchor(label, 0.0);

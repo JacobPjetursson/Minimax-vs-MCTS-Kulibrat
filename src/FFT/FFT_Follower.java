@@ -15,6 +15,8 @@ public class FFT_Follower extends AI {
     }
 
     public Move makeMove(State state) {
+        if (fftManager.currFFT == null)
+            return null;
         for (RuleGroup ruleGroup : fftManager.currFFT.ruleGroups) {
             for (Rule rule : ruleGroup.rules) {
                 for(int symmetry : Globals.SYMMETRY) {
