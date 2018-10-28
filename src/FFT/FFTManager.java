@@ -1,4 +1,4 @@
-/*
+
 package FFT;
 
 import misc.Config;
@@ -16,15 +16,10 @@ public class FFTManager extends FFTLib.FFT.FFTManager {
     static String path = Config.FFT_PATH;
     static ArrayList<FFT> ffts;
     FFT currFFT;
-
     public FFTManager() {
-        ffts = new ArrayList<>();
-        // Try loading ffts from file in working directory
-        load();
-        if (!ffts.isEmpty())
-            currFFT = ffts.get(0);
-
+        super();
     }
+/*
 
     void setCurrFFT(int index) {
         currFFT = ffts.get(index);
@@ -110,7 +105,7 @@ public class FFTManager extends FFTLib.FFT.FFTManager {
             e.printStackTrace();
         }
     }
-
-}
 */
+}
+
 

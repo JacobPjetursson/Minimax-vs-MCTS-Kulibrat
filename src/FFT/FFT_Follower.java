@@ -1,7 +1,5 @@
 package FFT;
 
-import FFTLib.FFT.FFTManager;
-import FFTLib.FFT.RuleGroup;
 import ai.AI;
 import game.Logic;
 import game.Move;

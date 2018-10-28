@@ -1,7 +1,6 @@
 package game;
 
 import misc.Config;
-import misc.Database;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -142,6 +141,7 @@ public class State extends FFTLib.Game.State {
     }
 
     // Creates and/or returns a list of new state objects which correspond to the children of the given state.
+    @Override
     public ArrayList<Move> getLegalMoves() {
         if (legalMoves != null) return legalMoves;
         legalMoves = Logic.legalMoves(turn, this);

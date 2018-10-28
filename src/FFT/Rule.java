@@ -1,32 +1,22 @@
 package FFT;
 
-import FFTLib.FFT.Clause;
 import game.State;
-import misc.Config;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Objects;
 
-import static misc.Config.RED;
+import misc.Config;
 
 public class Rule extends FFTLib.FFT.Rule {
     //ArrayList<ClauseList> symmetryClauses;
     //ArrayList<Clause> clauses;
-    //Action action;
+    Action action;
+    public int boardWidth = Config.bWidth;
+    public int boardHeight = Config.bHeight;
 
     // parsing constructor
     Rule(String clauseStr, String actionStr) {
         super(clauseStr, actionStr);
-        /*
-        symmetryClauses = new ArrayList<>();
-        this.action = getAction(actionStr);
-        this.clauses = getClauses(clauseStr);
-
-        symmetryClauses.add(new ClauseList(Config.SYM_NONE, clauses));
         symmetryClauses.add(new ClauseList(Config.SYM_HREF, reflectH(clauses)));
-        */
+
     }
     // FIXME
     private HashSet<Clause> getClauses(State state) {
@@ -37,7 +27,7 @@ public class Rule extends FFTLib.FFT.Rule {
             for (int j = 0; j < board[i].length; j++) {
                 int pieceOcc = board[i][j];
                 if (pieceOcc > 0) {
-                    if (state.getTurn() == RED)
+                    if (state.getTurn() == Config.RED)
                         clauses.add(new Clause(i, j, pieceOcc, false));
                     else {
                         pieceOcc = (pieceOcc == 1) ? 2 : 1;

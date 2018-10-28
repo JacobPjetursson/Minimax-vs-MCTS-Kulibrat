@@ -1,17 +1,12 @@
-/*
+
 package FFT;
 
-public class Clause extends FFTLib.FFT.Clause {
-    public static final int PIECEOCC_NONE = -1;
-    public static final int PIECEOCC_PLAYER = 1;
-    public static final int PIECEOCC_ENEMY = 2;
+import misc.Config;
 
-    String name;
-    boolean boardPlacement;
-    int row = -1; int col = -1;
-    int pieceOcc = PIECEOCC_NONE;
-    boolean negation;
-    boolean clauseErr;
+public class Clause extends FFTLib.FFT.Clause {
+    public int boardWidth = Config.bWidth;
+    public int boardHeight = Config.bHeight;
+
 
 
     Clause(int row, int col, int pieceOcc, boolean negation) {
@@ -26,4 +21,3 @@ public class Clause extends FFTLib.FFT.Clause {
         super(duplicate);
     }
 }
-*/

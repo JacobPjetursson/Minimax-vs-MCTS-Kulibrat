@@ -1,14 +1,14 @@
 package FFT;
 
-import FFTLib.FFT.Clause;
 import game.Move;
+import misc.Config;
 
 import java.util.ArrayList;
 
 public class Action extends FFTLib.FFT.Action {
     ArrayList<Clause> addClauses;
     ArrayList<Clause> remClauses;
-    boolean actionErr;
+    //boolean actionErr;
 
     Action(ArrayList<String> clauses) {
         super(clauses);
@@ -17,14 +17,14 @@ public class Action extends FFTLib.FFT.Action {
             actionErr = true;
         }
     }
-    //Action(ArrayList<Clause> addClauses, ArrayList<Clause> remClauses) {
-    //    super(addClauses, remClauses);
-   //}
+
+    Action(ArrayList<FFTLib.FFT.Clause> addClauses, ArrayList<FFTLib.FFT.Clause> remClauses) {
+        super(addClauses, remClauses);
+   }
 
     // Kulibrat specific
     @Override
     public Move getMove() {
-        // TODO - fix this piece of shit code
         int newRow = -1; int newCol = -1; int oldRow = -1; int oldCol = -1;
 
         for (Clause c : addClauses) {
@@ -37,34 +37,21 @@ public class Action extends FFTLib.FFT.Action {
         }
         return new Move(oldRow, oldCol, newRow, newCol, -1);
     }
-/*
+
+
     public Action applySymmetry(int symmetry) {
+        FFTLib.FFT.Action a;
         switch(symmetry) {
             case Config.SYM_HREF:
-                return reflectH();
+                a = reflectH();
+                break;
             default:
-                return this;
+                a = this;
         }
+        return new Action(a.addClauses, (a.remClauses));
     }
-    */
+
 /*
-    Action reflectH() {
-        ArrayList<Clause> rAddClauses = new ArrayList<>(addClauses);
-        ArrayList<Clause> rRemClauses = new ArrayList<>(remClauses);
-        int[][] cBoard = makeClauseBoard(rAddClauses, rRemClauses);
-        int[][] refH = new int[Config.bHeight][Config.bWidth];
-
-        // Reflect
-        for (int i = 0; i < cBoard.length; i++) {
-            for (int j = 0; j < cBoard[i].length; j++) {
-                refH[i][j] = cBoard[i][cBoard[i].length - 1 - j];
-            }
-        }
-        addClauseBoardToList(refH, rAddClauses, rRemClauses);
-
-        return new Action(rAddClauses, rRemClauses);
-    }
-
     private int[][] makeClauseBoard(ArrayList<Clause> addClauses, ArrayList<Clause> remClauses) {
         int[][] clauseBoard = new int[Config.bHeight][Config.bWidth];
         // These clauses will be reflected/rotated
