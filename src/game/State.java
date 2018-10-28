@@ -1,17 +1,17 @@
 package game;
 
-import ai.Minimax.Node;
-import misc.Globals;
+import misc.Config;
+import misc.Database;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
-import static misc.Globals.BLACK;
-import static misc.Globals.RED;
+import static misc.Config.BLACK;
+import static misc.Config.RED;
 
-public class State {
+public class State extends FFTLib.Game.State {
     private int[][] board;
     private int turn;
     private int redScore;
@@ -23,21 +23,17 @@ public class State {
     private Move move;
 
     // Starting state
-    public State(int scoreLimit) {
-        int rows = Globals.bHeight;
-        int columns = Globals.bWidth;
+    public State() {
+        int rows = Config.bHeight;
+        int columns = Config.bWidth;
         board = new int[rows][columns];
         redScore = 0;
         blackScore = 0;
-        if (Globals.losePieces) {
-            unplacedRed = scoreLimit;
-            unplacedBlack = scoreLimit;
-        } else {
-            unplacedRed = Globals.piece_amount;
-            unplacedBlack = Globals.piece_amount;
-        }
+        unplacedRed = 4;
+        unplacedBlack = 4;
+
         turn = RED;
-        this.scoreLimit = scoreLimit;
+        this.scoreLimit = Config.SCORELIMIT;
     }
 
     // Duplicate constructor
@@ -66,10 +62,10 @@ public class State {
     public void addPoint(int team) {
         if (team == RED) {
             redScore++;
-            if (!Globals.losePieces) unplacedRed++;
+            unplacedRed++;
         } else {
             blackScore++;
-            if (!Globals.losePieces) unplacedBlack++;
+            unplacedBlack++;
         }
     }
 

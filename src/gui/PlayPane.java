@@ -4,7 +4,7 @@ import game.Controller;
 import javafx.geometry.Pos;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import misc.Globals;
+import misc.Config;
 
 public class PlayPane extends GridPane {
     private PlayArea playArea;
@@ -20,10 +20,10 @@ public class PlayPane extends GridPane {
 
     private void setup() {
         setAlignment(Pos.CENTER);
-        setPrefSize(Globals.WIDTH, Globals.HEIGHT);
+        setPrefSize(Config.WIDTH, Config.HEIGHT);
         setStyle("-fx-background-color: rgb(255, 255, 255);");
-        ColumnConstraints column = new ColumnConstraints(Globals.WIDTH / 3);
-        ColumnConstraints column1 = new ColumnConstraints(Globals.WIDTH * 2 / 3);
+        ColumnConstraints column = new ColumnConstraints(Config.WIDTH / 3);
+        ColumnConstraints column1 = new ColumnConstraints(Config.WIDTH * 2 / 3);
         getColumnConstraints().add(column);
         getColumnConstraints().add(column1);
     }

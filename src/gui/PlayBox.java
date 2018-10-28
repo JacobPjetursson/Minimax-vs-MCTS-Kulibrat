@@ -16,7 +16,7 @@ import javafx.scene.Group;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-import static misc.Globals.RED;
+import static misc.Config.RED;
 
 public class PlayBox extends Group {
     private Board board;

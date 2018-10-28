@@ -10,9 +10,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import misc.Globals;
+import misc.Config;
 
-import static misc.Globals.*;
+import static misc.Config.*;
 
 public class InfoPane extends VBox {
     private ScoreBoard scoreBoard;
@@ -21,7 +21,7 @@ public class InfoPane extends VBox {
     private Label turnNumberLabel;
 
     public InfoPane(int scoreLimit, int mode) {
-        setPrefSize(Globals.WIDTH / 3, Globals.HEIGHT);
+        setPrefSize(Config.WIDTH / 3, Config.HEIGHT);
         setSpacing(40);
         setAlignment(Pos.CENTER);
         scoreBoard = new ScoreBoard();

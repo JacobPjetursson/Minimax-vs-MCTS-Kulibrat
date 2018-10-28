@@ -14,9 +14,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import misc.Globals;
+import misc.Config;
 
-import static misc.Globals.*;
+import static misc.Config.*;
 
 public class EndGamePane extends VBox {
 
@@ -38,7 +38,7 @@ public class EndGamePane extends VBox {
             Stage stage = (Stage) getScene().getWindow();
             stage.close();
             primaryStage.setScene(new Scene(new MenuPane(),
-                    Globals.WIDTH, Globals.HEIGHT));
+                    Config.WIDTH, Config.HEIGHT));
         });
         menuBtn.setPrefWidth(110);
         hBox.getChildren().add(menuBtn);
@@ -47,7 +47,7 @@ public class EndGamePane extends VBox {
             Stage stage = (Stage) getScene().getWindow();
             stage.close();
             new Controller(primaryStage, cont.getPlayerInstance(RED),
-                    cont.getPlayerInstance(BLACK), new State(cont.getScoreLimit()), cont.getTime(RED), cont.getTime(BLACK), cont.getOverwriteDB());
+                    cont.getPlayerInstance(BLACK), new State(), cont.getTime(RED), cont.getTime(BLACK), cont.getOverwriteDB());
         });
         restartGameBtn.setPrefWidth(110);
         hBox.getChildren().add(restartGameBtn);
@@ -58,7 +58,7 @@ public class EndGamePane extends VBox {
             Stage stage = (Stage) getScene().getWindow();
             stage.close();
             Stage newStage = new Stage();
-            newStage.setScene(new Scene(new ReviewPane(primaryStage, cont), 325, Globals.HEIGHT - 50));
+            newStage.setScene(new Scene(new ReviewPane(primaryStage, cont), 325, Config.HEIGHT - 50));
             newStage.initModality(Modality.APPLICATION_MODAL);
             newStage.initOwner(cont.getWindow());
             newStage.setOnCloseRequest(Event::consume);

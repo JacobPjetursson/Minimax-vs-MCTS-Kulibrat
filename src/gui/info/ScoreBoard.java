@@ -9,8 +9,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-import static misc.Globals.BLACK;
-import static misc.Globals.RED;
+import static misc.Config.BLACK;
+import static misc.Config.RED;
 
 public class ScoreBoard extends VBox {
     private Label redLabel;

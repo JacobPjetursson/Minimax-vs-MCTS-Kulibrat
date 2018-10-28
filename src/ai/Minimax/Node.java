@@ -7,8 +7,8 @@ import game.State;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import static misc.Globals.BLACK;
-import static misc.Globals.RED;
+import static misc.Config.BLACK;
+import static misc.Config.RED;
 
 public class Node implements Serializable {
     private State state;

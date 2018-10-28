@@ -12,7 +12,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import misc.Globals;
+import misc.Config;
 
 import java.util.ArrayList;
 
@@ -22,7 +22,7 @@ public class MenuPane extends AnchorPane {
     private Application app;
 
     public MenuPane() {
-        setPrefSize(Globals.WIDTH, Globals.HEIGHT);
+        setPrefSize(Config.WIDTH, Config.HEIGHT);
         setPadding(new Insets(30, 0, 0, 0));
         setStyle("-fx-background-color: black;");
 
@@ -40,7 +40,7 @@ public class MenuPane extends AnchorPane {
         buttons.add(newGame);
         newGame.setOnMouseClicked(event -> {
             Stage stage = (Stage) getScene().getWindow();
-            stage.setScene(new Scene(new NewGamePane(), Globals.WIDTH, Globals.HEIGHT));
+            stage.setScene(new Scene(new NewGamePane(), Config.WIDTH, Config.HEIGHT));
         });
 
         continueGame = new Button("Continue Game");
@@ -51,20 +51,20 @@ public class MenuPane extends AnchorPane {
         buttons.add(rules);
         rules.setOnMouseClicked(event -> {
             Stage stage = (Stage) getScene().getWindow();
-            stage.setScene(new Scene(new RulesPane(), Globals.WIDTH, Globals.HEIGHT));
+            stage.setScene(new Scene(new RulesPane(), Config.WIDTH, Config.HEIGHT));
 
         });
         Button readme = new Button("README");
         buttons.add(readme);
         readme.setOnMouseClicked(event -> {
             Stage stage = (Stage) getScene().getWindow();
-            stage.setScene(new Scene(new ReadMePane(), Globals.WIDTH, Globals.HEIGHT));
+            stage.setScene(new Scene(new ReadMePane(), Config.WIDTH, Config.HEIGHT));
         });
         Button exit = new Button("Exit");
         buttons.add(exit);
         exit.setOnMouseClicked(event -> System.exit(0));
         for (Button button : buttons) {
-            button.setMinWidth(Globals.WIDTH / 4);
+            button.setMinWidth(Config.WIDTH / 4);
         }
         VBox box = new VBox(newGame, continueGame, rules, readme, exit);
         box.setAlignment(Pos.CENTER);

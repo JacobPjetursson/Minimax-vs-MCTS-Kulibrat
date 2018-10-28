@@ -9,7 +9,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import misc.Globals;
+import misc.Config;
 
 class RulesPane extends VBox {
 
@@ -19,14 +19,14 @@ class RulesPane extends VBox {
         final WebView browser = new WebView();
         browser.setZoom(1);
         StackPane browserPane = new StackPane(browser);
-        browserPane.setPrefWidth(Globals.WIDTH);
+        browserPane.setPrefWidth(Config.WIDTH);
 
         final WebEngine webEngine = browser.getEngine();
         browser.setZoom(1.3);
         webEngine.load(this.getClass().getClassLoader().getResource("kulibrat_rules.html").toExternalForm());
 
         Button back = new Button("Back");
-        back.setMinWidth(Globals.WIDTH / 6);
+        back.setMinWidth(Config.WIDTH / 6);
         setPadding(new Insets(0, 00, 10, 00));
         back.setBorder(new Border(new BorderStroke(Color.BLACK,
                 BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
@@ -34,7 +34,7 @@ class RulesPane extends VBox {
         back.setOnMouseClicked(event -> {
             Stage stage = (Stage) getScene().getWindow();
             stage.setScene(new Scene(new MenuPane(),
-                    Globals.WIDTH, Globals.HEIGHT));
+                    Config.WIDTH, Config.HEIGHT));
         });
 
         getChildren().addAll(browser, back);

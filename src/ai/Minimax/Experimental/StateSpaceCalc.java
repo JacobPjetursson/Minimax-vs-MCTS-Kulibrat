@@ -9,13 +9,14 @@ import ai.Minimax.Zobrist;
 import game.Logic;
 import game.Move;
 import game.State;
+import misc.Config;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static misc.Globals.BLACK;
-import static misc.Globals.RED;
+import static misc.Config.BLACK;
+import static misc.Config.RED;
 
 public class StateSpaceCalc {
     private static HashMap<BoardConfig, MinimaxPlay> transTable = new HashMap<>();
@@ -170,8 +171,8 @@ public class StateSpaceCalc {
 
     public static void main(String[] args) {
         Zobrist.initialize();
-        int scoreLimit = 15;
-        State state = new State(scoreLimit);
+        Config.SCORELIMIT = 15;
+        State state = new State();
         calcBoardPositions(state);
     }
 

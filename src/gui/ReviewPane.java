@@ -4,7 +4,7 @@ import ai.Minimax.Node;
 import game.Controller;
 import game.Logic;
 import game.Move;
-import game.PrevState;
+import game.StateAndMove;
 import gui.board.Board;
 import gui.board.Goal;
 import gui.board.Player;
@@ -25,13 +25,12 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import misc.Database;
-import misc.Globals;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import static misc.Globals.BLACK;
-import static misc.Globals.RED;
+import static misc.Config.BLACK;
+import static misc.Config.RED;
 
 public class ReviewPane extends VBox {
     private ListView<HBox> lw;
@@ -49,7 +48,7 @@ public class ReviewPane extends VBox {
         HBox bottomBox = new HBox(10);
         VBox.setMargin(bottomBox, new Insets(10));
         bottomBox.setAlignment(Pos.BOTTOM_RIGHT);
-        Button goToState = new Button("Go to State");
+        Button goToState = new Button("Go to FFTLib.Game.State");
         goToState.setDisable(true);
         bottomBox.getChildren().add(goToState);
 
@@ -79,7 +78,7 @@ public class ReviewPane extends VBox {
         lw = new ListView<>();
         lw.setPickOnBounds(false);
         ObservableList<HBox> prevStateBoxes = FXCollections.observableArrayList();
-        for (PrevState ps : currCont.getPreviousStates()) {
+        for (StateAndMove ps : currCont.getPreviousStates()) {
             HBox h = new HBox(35);
             VBox vBox = new VBox(18);
             vBox.setAlignment(Pos.CENTER);
@@ -136,27 +135,27 @@ public class ReviewPane extends VBox {
             stage.close();
 
             int index = lw.getSelectionModel().getSelectedIndex();
-            PrevState selected = currCont.getPreviousStates().get(index);
+            StateAndMove selected = currCont.getPreviousStates().get(index);
             Controller selectedCont = new Controller(primaryStage, currCont.getPlayerInstance(RED),
                     currCont.getPlayerInstance(BLACK), selected.getState(),
                     currCont.getTime(RED), currCont.getTime(BLACK), false);
             selectedCont.setTurnNo(selected.getTurnNo());
             selectedCont.getPlayArea().update(selectedCont);
 
-            ArrayList<PrevState> prevStates = new ArrayList<>();
-            for (PrevState ps : currCont.getPreviousStates()) {
+            ArrayList<StateAndMove> stateAndMoves = new ArrayList<>();
+            for (StateAndMove ps : currCont.getPreviousStates()) {
                 if (ps.getTurnNo() < selectedCont.getTurnNo()) {
-                    prevStates.add(ps);
+                    stateAndMoves.add(ps);
                 }
             }
-            selectedCont.setPreviousStates(prevStates);
+            selectedCont.setPreviousStates(stateAndMoves);
         });
         setVgrow(lw, Priority.ALWAYS);
 
         getChildren().addAll(lw, bottomBox);
     }
 
-    private PlayBox getPlayBox(Controller cont, PrevState ps, ArrayList<Move> bestPlays) {
+    private PlayBox getPlayBox(Controller cont, StateAndMove ps, ArrayList<Move> bestPlays) {
         Board b = new Board(20, 7, false);
         Player playerBlack = new Player(BLACK, cont, 20, 7, false);
         Goal goalRed = new Goal(3 * b.getTileSize(), 17);

@@ -1,9 +1,9 @@
 package game;
 
-import misc.Globals;
+import misc.Config;
 import java.util.Objects;
 
-public class Move {
+public class Move extends FFTLib.Game.Move {
     public int oldRow;
     public int oldCol;
     public int newRow;
@@ -47,13 +47,13 @@ public class Move {
     }
 
     public Move reflect() {
-        int[][] board = new int[Globals.bWidth][Globals.bHeight];
+        int[][] board = new int[Config.bWidth][Config.bHeight];
         if(oldCol != -1)
             board[oldRow][oldCol] = -team;
         if (newCol != -1)
             board[newRow][newCol] = team;
 
-        int[][] ref = new int[Globals.bWidth][Globals.bHeight];
+        int[][] ref = new int[Config.bWidth][Config.bHeight];
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 ref[i][j] = board[i][board.length - 1 - j];

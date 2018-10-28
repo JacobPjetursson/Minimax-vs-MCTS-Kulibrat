@@ -17,9 +17,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import misc.Globals;
+import misc.Config;
 
-import static misc.Globals.RED;
+import static misc.Config.RED;
 
 
 public class SwapPlayerPane extends AnchorPane {
@@ -29,7 +29,7 @@ public class SwapPlayerPane extends AnchorPane {
     private String lookup = "Lookup Table";
     private String fft = "Fast and Frugal Tree";
     private ChoiceBox<String> playerChoices;
-    private int choiceWidth = Globals.WIDTH / 4;
+    private int choiceWidth = Config.WIDTH / 4;
     private VBox finalBox;
 
     private Label AIDelayLabel;
@@ -99,14 +99,14 @@ public class SwapPlayerPane extends AnchorPane {
         Button accept = new Button("Accept");
         accept.setOnMouseClicked(event -> {
             String value = playerChoices.getValue();
-            int playerMode = (value.equals(human)) ? Globals.HUMAN :
-                    (value.equals(minimax)) ? Globals.MINIMAX :
-                            (value.equals(mcts)) ? Globals.MONTE_CARLO :
-                                    (value.equals(fft)) ? Globals.FFT : Globals.LOOKUP_TABLE;
-            if (playerMode == Globals.LOOKUP_TABLE) {
+            int playerMode = (value.equals(human)) ? Config.HUMAN :
+                    (value.equals(minimax)) ? Config.MINIMAX :
+                            (value.equals(mcts)) ? Config.MONTE_CARLO :
+                                    (value.equals(fft)) ? Config.FFT : Config.LOOKUP_TABLE;
+            if (playerMode == Config.LOOKUP_TABLE) {
                 cont.setOverwriteDB(false);
             }
-            if (playerMode != Globals.HUMAN) {
+            if (playerMode != Config.HUMAN) {
                 int time = Integer.parseInt(delayField.getText());
                 cont.setPlayerCalcTime(team, time);
             }

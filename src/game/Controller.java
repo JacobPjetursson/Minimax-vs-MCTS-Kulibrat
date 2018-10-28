@@ -21,19 +21,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import misc.Database;
-import misc.Globals;
+import misc.Config;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import static misc.Globals.*;
+import static misc.Config.*;
 
 public class Controller {
     private int mode;
@@ -63,7 +60,7 @@ public class Controller {
     private Goal goalRed;
     private Goal goalBlack;
     private boolean endGamePopup;
-    private ArrayList<PrevState> previousStates;
+    private ArrayList<StateAndMove> previousStates;
     private Window window;
     private FFTManager fftManager;
     private boolean fftInteractiveMode;
@@ -73,7 +70,6 @@ public class Controller {
     public Controller(Stage primaryStage, int playerRedInstance, int playerBlackInstance,
                       State state, int redTime, int blackTime, boolean overwriteDB) {
         Zobrist.initialize(); // Generate random numbers for state configs
-        Database.setScoreLimit(state.getScoreLimit());
         this.mode = setMode(playerRedInstance, playerBlackInstance);
         this.playerRedInstance = playerRedInstance;
         this.playerBlackInstance = playerBlackInstance;
@@ -90,7 +86,7 @@ public class Controller {
 
         PlayPane playPane = new PlayPane(this);
         primaryStage.setScene(new Scene(playPane,
-                Globals.WIDTH, Globals.HEIGHT));
+                Config.WIDTH, Config.HEIGHT));
         navPane = playPane.getNavPane();
         playArea = playPane.getPlayArea();
         window = playArea.getScene().getWindow();
@@ -147,7 +143,7 @@ public class Controller {
             for (int j = 0; j < tiles[i].length; j++) {
                 BoardTile tile = tiles[i][j];
                 tile.setOnMouseClicked(event -> {
-                    if (tile.getHighlight() || Globals.CUSTOMIZABLE) {
+                    if (tile.getHighlight() || Config.CUSTOMIZABLE) {
                         BoardPiece piece = selected;
                         doHumanTurn(new Move(piece.getRow(), piece.getCol(), tile.getRow(), tile.getCol(), piece.getTeam()));
                     }
@@ -173,14 +169,14 @@ public class Controller {
 
         // Goal Red
         goalRed.setOnMouseClicked(event -> {
-            if (goalRed.getHighlight() || Globals.CUSTOMIZABLE) {
+            if (goalRed.getHighlight() || Config.CUSTOMIZABLE) {
                 BoardPiece piece = selected;
                 doHumanTurn(new Move(piece.getRow(), piece.getCol(), -1, -1, piece.getTeam()));
             }
         });
         // Goal Black
         goalBlack.setOnMouseClicked(event -> {
-            if (goalBlack.getHighlight() || Globals.CUSTOMIZABLE) {
+            if (goalBlack.getHighlight() || Config.CUSTOMIZABLE) {
                 BoardPiece piece = selected;
                 doHumanTurn(new Move(piece.getRow(), piece.getCol(), -1, -1, piece.getTeam()));
             }
@@ -203,11 +199,11 @@ public class Controller {
             }
             helpHumanBox.setDisable(false);
         });
-        // FFTManager LISTENERS
+        // FFTLib.FFT.FFTManager LISTENERS
         // edit fftManager button
         editFFTButton.setOnAction(event -> {
             Scene scene = primaryStage.getScene();
-            primaryStage.setScene(new Scene(new EditFFTScene(primaryStage, scene, fftManager, this), Globals.WIDTH, Globals.HEIGHT));
+            primaryStage.setScene(new Scene(new EditFFTScene(primaryStage, scene, fftManager, this), Config.WIDTH, Config.HEIGHT));
         });
 
         // interactive mode
@@ -217,7 +213,7 @@ public class Controller {
             fftInteractiveMode = newValue;
         });
 
-        // Show FFT button
+        // Show FFTLib.FFT.FFT button
         showFFTButton.setOnAction(event -> {
             deselect();
             Stage newStage = new Stage();
@@ -280,7 +276,7 @@ public class Controller {
     // Is called when a tile is pressed by the user. If vs. the AI, it calls the doAITurn after. This function also highlights
     // the best pieces for the opponent, if it is human vs human.
     private void doHumanTurn(Move move) {
-        previousStates.add(new PrevState(state, move, turnNo));
+        previousStates.add(new StateAndMove(state, move, turnNo));
         state = state.getNextState(move);
         updatePostHumanTurn();
         if (Logic.gameOver(state)) return;
@@ -547,7 +543,7 @@ public class Controller {
         int oldMode = mode;
         this.mode = setMode(playerRedInstance, playerBlackInstance);
         instantiateAI(team);
-        if (state.getTurn() == team && playerInstance != Globals.HUMAN && mode != AI_VS_AI) {
+        if (state.getTurn() == team && playerInstance != Config.HUMAN && mode != AI_VS_AI) {
             doAITurn();
         } else if (state.getTurn() != team && oldMode == AI_VS_AI && mode != AI_VS_AI) {
             doAITurn();
@@ -559,7 +555,7 @@ public class Controller {
     // Opens the review pane
     private void reviewGame() {
         Stage newStage = new Stage();
-        newStage.setScene(new Scene(new ReviewPane(primaryStage, this), 325, Globals.HEIGHT - 50));
+        newStage.setScene(new Scene(new ReviewPane(primaryStage, this), 325, Config.HEIGHT - 50));
         newStage.initModality(Modality.APPLICATION_MODAL);
         newStage.initOwner(window);
         newStage.setOnCloseRequest(Event::consume);
@@ -627,12 +623,12 @@ public class Controller {
         return playArea;
     }
 
-    public ArrayList<PrevState> getPreviousStates() {
+    public ArrayList<StateAndMove> getPreviousStates() {
         return previousStates;
     }
 
-    public void setPreviousStates(ArrayList<PrevState> prevStates) {
-        this.previousStates = prevStates;
+    public void setPreviousStates(ArrayList<StateAndMove> stateAndMoves) {
+        this.previousStates = stateAndMoves;
     }
 
     public Window getWindow() {

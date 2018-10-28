@@ -8,8 +8,8 @@ import game.State;
 import java.util.HashMap;
 import java.util.Random;
 
-import static misc.Globals.BLACK;
-import static misc.Globals.RED;
+import static misc.Config.BLACK;
+import static misc.Config.RED;
 
 public class Minimax extends AI {
     private long calculationTime;

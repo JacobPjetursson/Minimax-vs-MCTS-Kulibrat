@@ -8,7 +8,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import misc.Globals;
+import misc.Config;
 
 public class ReadMePane extends VBox {
 
@@ -52,14 +52,14 @@ public class ReadMePane extends VBox {
         VBox.setVgrow(readme, Priority.ALWAYS);
         Button back = new Button("Back");
         VBox.setMargin(back, new Insets(10));
-        back.setMinWidth(Globals.WIDTH / 6);
+        back.setMinWidth(Config.WIDTH / 6);
         setPadding(new Insets(0, 0, 10, 0));
         back.setBorder(new Border(new BorderStroke(Color.BLACK,
                 BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         back.setOnMouseClicked(event -> {
             Stage stage = (Stage) getScene().getWindow();
             stage.setScene(new Scene(new MenuPane(),
-                    Globals.WIDTH, Globals.HEIGHT));
+                    Config.WIDTH, Config.HEIGHT));
         });
 
         getChildren().addAll(readme, back);

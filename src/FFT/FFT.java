@@ -1,36 +1,34 @@
 package FFT;
 
-import ai.Minimax.MinimaxPlay;
 import ai.Minimax.Node;
 import game.*;
 import misc.Database;
-import misc.Globals;
+import misc.Config;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import static misc.Globals.BLACK;
-import static misc.Globals.RED;
+import static misc.Config.BLACK;
+import static misc.Config.RED;
 
-public class FFT {
+public class FFT  extends FFTLib.FFT.FFT{
     String name;
     ArrayList<RuleGroup> ruleGroups;
-    PrevState failingPoint = null;
+    StateAndMove failingPoint = null;
 
     public FFT(String name) {
-        this.name = name;
-        ruleGroups = new ArrayList<RuleGroup>();
+        super(name);
     }
 
-
+/*
     void addRuleGroup(RuleGroup ruleGroup) {
         ruleGroups.add(ruleGroup);
         FFTManager.save();
     }
 
     boolean verify(int team, boolean wholeFFT) {
-        Node initialNode = new Node(new State(Database.scoreLimit));
+        Node initialNode = new Node(new State());
         LinkedList<Node> frontier = new LinkedList<>();
         HashSet<Node> closedSet = new HashSet<>();
         frontier.add(initialNode);
@@ -75,14 +73,14 @@ public class FFT {
                             }
                         } else if (wholeFFT) {
                             System.out.println("FFT did not apply to certain state, random move lost you the game");
-                            failingPoint = new PrevState(node.getState(), m, true);
+                            failingPoint = new StateAndMove(node.getState(), m, true);
                             return false;
                         }
                     }
                 }
                 else if (!nonLosingPlays.contains(move)) {
                     System.out.println("FFT applied, but its move lost you the game");
-                    failingPoint = new PrevState(node.getState(), move, false);
+                    failingPoint = new StateAndMove(node.getState(), move, false);
                     return false;
                 }
                 else {
@@ -96,12 +94,13 @@ public class FFT {
         }
         return true;
     }
-
+    */
+/*
     private Move makeMove(Node node) {
         State state = node.getState();
         for (RuleGroup ruleGroup : ruleGroups) {
             for (Rule rule : ruleGroup.rules) {
-                for(int symmetry : Globals.SYMMETRY) {
+                for(int symmetry : Config.SYMMETRY) {
                     if (rule.applies(state, symmetry)) {
                         Action action = rule.action.applySymmetry(symmetry);
                         Move move = action.getMove();
@@ -115,4 +114,5 @@ public class FFT {
         }
         return null;
     }
+    */
 }

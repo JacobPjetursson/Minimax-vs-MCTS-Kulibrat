@@ -2,12 +2,8 @@ package gui.board;
 
 import game.Controller;
 import game.State;
-import gui.ReviewPane;
-import gui.SwapPlayerPane;
-import javafx.event.Event;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -15,14 +11,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import misc.Globals;
+import misc.Config;
 
 import java.net.URL;
 import java.util.ArrayList;
 
-import static misc.Globals.*;
+import static misc.Config.*;
 
 public class Player extends VBox {
     private int team;
@@ -43,20 +37,7 @@ public class Player extends VBox {
         setAlignment(Pos.CENTER);
         setSpacing(tileWidth / 6);
         setStyle("-fx-background-color: rgb(255, 255, 255);");
-        int amount_of_pieces;
-        if (Globals.losePieces) {
-            if (cont.getState().getScoreLimit() <= 4) {
-                amount_of_pieces = cont.getState().getScoreLimit();
-            } else {
-                amount_of_pieces = 4;
-            }
-        } else {
-            if (Globals.piece_amount <= 4) {
-                amount_of_pieces = Globals.piece_amount;
-            } else {
-                amount_of_pieces = 4;
-            }
-        }
+        int amount_of_pieces = 4;
         gridPaneBoard = new GridPane();
         gridPaneBoard.setAlignment(Pos.CENTER);
         gridPaneBoard.setPrefSize(tileWidth * 4, tileWidth);

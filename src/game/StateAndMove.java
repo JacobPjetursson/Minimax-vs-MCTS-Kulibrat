@@ -1,19 +1,19 @@
 package game;
 
-public class PrevState {
+public class StateAndMove {
     private State state;
     private Move move;
     private int turnNo;
     public boolean random;
 
-    public PrevState(State state, Move move, int turnNo) {
+    public StateAndMove(State state, Move move, int turnNo) {
         this.state = state;
         this.move = move;
         this.turnNo = turnNo;
     }
 
     // used for fft
-    public PrevState(State state, Move move, boolean random) {
+    public StateAndMove(State state, Move move, boolean random) {
         this.state = state;
         this.move = move;
         this.random = random;

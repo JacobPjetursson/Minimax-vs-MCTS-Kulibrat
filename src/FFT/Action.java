@@ -1,52 +1,29 @@
 package FFT;
 
+import FFTLib.FFT.Clause;
 import game.Move;
-import misc.Globals;
 
 import java.util.ArrayList;
 
-public class Action {
+public class Action extends FFTLib.FFT.Action {
     ArrayList<Clause> addClauses;
     ArrayList<Clause> remClauses;
     boolean actionErr;
 
     Action(ArrayList<String> clauses) {
-        this.addClauses = new ArrayList<Clause>();
-        this.remClauses = new ArrayList<Clause>();
-
-        for (String c : clauses) {
-            if (c.startsWith("+") && Character.isDigit(c.charAt(1))) {
-                c = c.substring(1);
-                addClauses.add(new Clause(c));
-            }
-            else if (c.startsWith("-") && Character.isDigit(c.charAt(1))) {
-                c = c.substring(1);
-                remClauses.add(new Clause(c));
-            } else {
-                System.err.println("Invalid action format! Should be plus or minus, followed by row and column specification");
-                actionErr = true;
-                return;
-            }
-        }
-
-        if (addClauses.isEmpty() && remClauses.isEmpty()) {
-            System.err.println("Action clause list was empty");
-            actionErr = true;
-            return;
-        }
+        super(clauses);
         if (addClauses.size() > 1 || remClauses.size() > 1) {
             System.err.println("Only moves with a single add clause and/or a single remove clause is allowed in this game");
             actionErr = true;
         }
     }
-
-    Action(ArrayList<Clause> addClauses, ArrayList<Clause> remClauses) {
-        this.addClauses = addClauses;
-        this.remClauses = remClauses;
-    }
+    //Action(ArrayList<Clause> addClauses, ArrayList<Clause> remClauses) {
+    //    super(addClauses, remClauses);
+   //}
 
     // Kulibrat specific
-    Move getMove() {
+    @Override
+    public Move getMove() {
         // TODO - fix this piece of shit code
         int newRow = -1; int newCol = -1; int oldRow = -1; int oldCol = -1;
 
@@ -60,21 +37,22 @@ public class Action {
         }
         return new Move(oldRow, oldCol, newRow, newCol, -1);
     }
-
-    Action applySymmetry(int symmetry) {
+/*
+    public Action applySymmetry(int symmetry) {
         switch(symmetry) {
-            case Globals.SYM_HREF:
+            case Config.SYM_HREF:
                 return reflectH();
             default:
                 return this;
         }
     }
-
+    */
+/*
     Action reflectH() {
         ArrayList<Clause> rAddClauses = new ArrayList<>(addClauses);
         ArrayList<Clause> rRemClauses = new ArrayList<>(remClauses);
         int[][] cBoard = makeClauseBoard(rAddClauses, rRemClauses);
-        int[][] refH = new int[Globals.bHeight][Globals.bWidth];
+        int[][] refH = new int[Config.bHeight][Config.bWidth];
 
         // Reflect
         for (int i = 0; i < cBoard.length; i++) {
@@ -88,7 +66,7 @@ public class Action {
     }
 
     private int[][] makeClauseBoard(ArrayList<Clause> addClauses, ArrayList<Clause> remClauses) {
-        int[][] clauseBoard = new int[Globals.bHeight][Globals.bWidth];
+        int[][] clauseBoard = new int[Config.bHeight][Config.bWidth];
         // These clauses will be reflected/rotated
         ArrayList<Clause> addChangeClauses = new ArrayList<>();
         ArrayList<Clause> remChangeClauses = new ArrayList<>();
@@ -123,4 +101,5 @@ public class Action {
             }
         }
     }
+    */
 }

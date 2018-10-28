@@ -3,9 +3,9 @@ package gui.board;
 import game.Controller;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import misc.Globals;
+import misc.Config;
 
-import static misc.Globals.*;
+import static misc.Config.*;
 
 public class BoardPiece extends Circle {
     private Controller cont;
@@ -84,7 +84,7 @@ public class BoardPiece extends Circle {
     }
 
     private boolean isControllable() {
-        return Globals.CUSTOMIZABLE || clickable && cont.getState().getTurn() == this.team &&
+        return Config.CUSTOMIZABLE || clickable && cont.getState().getTurn() == this.team &&
                 (cont.getPlayerInstance(team) == HUMAN || (cont.getPlayerInstance(team) == FFT && cont.getFFTAllowInteraction()));
     }
 

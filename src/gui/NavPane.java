@@ -15,12 +15,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import misc.Globals;
+import misc.Config;
 
 import java.util.ArrayList;
 
 public class NavPane extends VBox {
-    private int buttonWidth = Globals.WIDTH / 6 + 20;
+    private int buttonWidth = Config.WIDTH / 6 + 20;
     private ArrayList<Button> buttons;
     private Button startAIButton;
     private Button stopAIButton;
@@ -37,7 +37,7 @@ public class NavPane extends VBox {
     private VBox AIWidgets;
 
     NavPane(Controller cont) {
-        setMinWidth(Globals.WIDTH / 3);
+        setMinWidth(Config.WIDTH / 3);
         setAlignment(Pos.CENTER);
         setSpacing(40);
         buttons = new ArrayList<Button>();
@@ -69,15 +69,15 @@ public class NavPane extends VBox {
         reviewButton = new Button("Review Game");
         buttons.add(reviewButton);
 
-        showFFTButton = new Button("Show FFT");
+        showFFTButton = new Button("Show FFTLib.FFT.FFT");
         buttons.add(showFFTButton);
 
-        editFFTButton = new Button("Edit FFT");
+        editFFTButton = new Button("Edit FFTLib.FFT.FFT");
         buttons.add(editFFTButton);
 
         interactiveFFT = new CheckBox();
         interactiveFFT.setSelected(true);
-        Label interactiveLabel = new Label("Interactive FFT");
+        Label interactiveLabel = new Label("Interactive FFTLib.FFT.FFT");
         interactiveLabel.setFont(Font.font("Verdana", 14));
         interactiveLabel.setPadding(new Insets(0, 0, 0, 5));
         interactiveFFTBox = new HBox(interactiveFFT, interactiveLabel);
@@ -108,7 +108,7 @@ public class NavPane extends VBox {
 
     private void goToMenu() {
         Stage stage = (Stage) getScene().getWindow();
-        stage.setScene(new Scene(new MenuPane(getScene()), Globals.WIDTH, Globals.HEIGHT));
+        stage.setScene(new Scene(new MenuPane(getScene()), Config.WIDTH, Config.HEIGHT));
     }
 
     public void addAIWidgets() {

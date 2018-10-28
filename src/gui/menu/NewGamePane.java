@@ -16,10 +16,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import misc.Globals;
+import misc.Config;
 
 public class NewGamePane extends AnchorPane {
-    private int choiceWidth = Globals.WIDTH / 4;
+    private int choiceWidth = Config.WIDTH / 4;
     private int textFieldWidth = choiceWidth - 125;
     private String human = "Human";
     private String mcts = "Monte Carlo Tree Search";
@@ -38,7 +38,7 @@ public class NewGamePane extends AnchorPane {
     private Label AIDelayLabelRed;
 
     NewGamePane() {
-        setPrefSize(Globals.WIDTH, Globals.HEIGHT);
+        setPrefSize(Config.WIDTH, Config.HEIGHT);
         setPadding(new Insets(30, 0, 0, 0));
         setStyle("-fx-background-color: black;");
 
@@ -195,32 +195,33 @@ public class NewGamePane extends AnchorPane {
         overwriteDB.setTextFill(Color.WHITE);
 
         Button startGame = new Button("Start Game");
-        startGame.setMinWidth(Globals.WIDTH / 4);
+        startGame.setMinWidth(Config.WIDTH / 4);
         startGame.setOnMouseClicked(event -> {
             String blackValue = playerBlackChoices.getValue();
             String redValue = playerRedChoices.getValue();
             Stage stage = (Stage) getScene().getWindow();
 
-            int playerBlackMode = (blackValue.equals(human)) ? Globals.HUMAN :
-                    (blackValue.equals(minimax)) ? Globals.MINIMAX :
-                    (blackValue.equals(mcts)) ? Globals.MONTE_CARLO :
-                    (blackValue.equals(fft)) ? Globals.FFT : Globals.LOOKUP_TABLE;
-            int playerRedMode = (redValue.equals(human)) ? Globals.HUMAN :
-                    (redValue.equals(minimax)) ? Globals.MINIMAX :
-                    (redValue.equals(mcts)) ? Globals.MONTE_CARLO :
-                    (redValue.equals(fft)) ? Globals.FFT : Globals.LOOKUP_TABLE;
+            int playerBlackMode = (blackValue.equals(human)) ? Config.HUMAN :
+                    (blackValue.equals(minimax)) ? Config.MINIMAX :
+                    (blackValue.equals(mcts)) ? Config.MONTE_CARLO :
+                    (blackValue.equals(fft)) ? Config.FFT : Config.LOOKUP_TABLE;
+            int playerRedMode = (redValue.equals(human)) ? Config.HUMAN :
+                    (redValue.equals(minimax)) ? Config.MINIMAX :
+                    (redValue.equals(mcts)) ? Config.MONTE_CARLO :
+                    (redValue.equals(fft)) ? Config.FFT : Config.LOOKUP_TABLE;
+            Config.SCORELIMIT = scoreLimitChoices.getValue();
             new Controller(stage, playerRedMode,
-                    playerBlackMode, new State(scoreLimitChoices.getValue()),
+                    playerBlackMode, new State(),
                     Integer.parseInt(redDelayField.getText()),
                     Integer.parseInt(blackDelayField.getText()), overwriteDB.isSelected());
         });
 
         Button back = new Button("Back");
-        back.setMinWidth(Globals.WIDTH / 6);
+        back.setMinWidth(Config.WIDTH / 6);
         back.setOnMouseClicked(event -> {
             Stage stage = (Stage) getScene().getWindow();
             stage.setScene(new Scene(new MenuPane(),
-                    Globals.WIDTH, Globals.HEIGHT));
+                    Config.WIDTH, Config.HEIGHT));
         });
 
         HBox btnBox = new HBox(startGame, back);

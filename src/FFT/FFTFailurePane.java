@@ -3,7 +3,7 @@ package FFT;
 import ai.Minimax.Node;
 import game.Controller;
 import game.Move;
-import game.PrevState;
+import game.StateAndMove;
 import gui.PlayBox;
 import gui.board.Board;
 import gui.board.Goal;
@@ -17,7 +17,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -28,8 +27,8 @@ import misc.Database;
 
 import java.util.ArrayList;
 
-import static misc.Globals.BLACK;
-import static misc.Globals.RED;
+import static misc.Config.BLACK;
+import static misc.Config.RED;
 
 public class FFTFailurePane extends BorderPane {
     private FFTManager fftManager;
@@ -38,7 +37,7 @@ public class FFTFailurePane extends BorderPane {
     public FFTFailurePane(Scene prevScene, FFTManager fftManager, Controller cont) {
         setStyle("-fx-background-color: rgb(255, 255, 255);");
         this.fftManager = fftManager;
-        Label title = new Label("This is the first encountered state where the FFT failed");
+        Label title = new Label("This is the first encountered state where the FFTLib.FFT.FFT failed");
         title.setFont(Font.font("Verdana", FontWeight.BOLD, 20));
         title.setAlignment(Pos.CENTER);
         title.setTextAlignment(TextAlignment.CENTER);
@@ -46,7 +45,7 @@ public class FFTFailurePane extends BorderPane {
         setTop(title);
         BorderPane.setAlignment(title, Pos.CENTER);
 
-        PrevState ps = fftManager.currFFT.failingPoint;
+        StateAndMove ps = fftManager.currFFT.failingPoint;
         Node n = new Node(ps.getState());
         ArrayList<Move> nonLosingPlays = Database.nonLosingPlays(n);
         PlayBox playBox = getPlayBox(cont, ps, nonLosingPlays);
@@ -70,9 +69,9 @@ public class FFTFailurePane extends BorderPane {
 
         String moveInfo;
         if (fftManager.currFFT.failingPoint.random)
-            moveInfo = "The FFT did not apply to the above state, and a random, losing move existed";
+            moveInfo = "The FFTLib.FFT.FFT did not apply to the above state, and a random, losing move existed";
         else
-            moveInfo = "The FFT applied to the above state, but the move it chose was a losing move";
+            moveInfo = "The FFTLib.FFT.FFT applied to the above state, but the move it chose was a losing move";
         Label moveInfoLabel = new Label(moveInfo);
         moveInfoLabel.setFont(Font.font("Verdana", 15));
 
@@ -88,7 +87,7 @@ public class FFTFailurePane extends BorderPane {
     }
 
 
-    private PlayBox getPlayBox(Controller cont, PrevState ps, ArrayList<Move> nonLosingPlays) {
+    private PlayBox getPlayBox(Controller cont, StateAndMove ps, ArrayList<Move> nonLosingPlays) {
         int tileW = 60;
         int pieceRad = 20;
         int goalH = 50;
@@ -110,7 +109,7 @@ public class FFTFailurePane extends BorderPane {
     private void showRuleGroups() {
         ObservableList<VBox> ruleGroups = FXCollections.observableArrayList();
         for (int i = 0; i < fftManager.currFFT.ruleGroups.size(); i++) {
-            // Rule group
+            // FFTLib.FFT.Rule group
             RuleGroup rg = fftManager.currFFT.ruleGroups.get(i);
             VBox rgVBox = new VBox(10);
             rgVBox.setAlignment(Pos.CENTER);

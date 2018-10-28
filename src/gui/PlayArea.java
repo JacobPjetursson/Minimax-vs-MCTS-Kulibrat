@@ -10,10 +10,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import misc.Globals;
+import misc.Config;
 
-import static misc.Globals.*;
+import static misc.Config.*;
 
 public class PlayArea extends GridPane {
 
@@ -31,8 +30,8 @@ public class PlayArea extends GridPane {
         board = new Board(60, 20, true);
         playerBlack = new Player(BLACK, cont, 60, 20, true);
         playerRed = new Player(RED, cont, 60, 20, true);
-        goalRed = new Goal(Globals.bWidth * board.getTileSize(), 50);
-        goalBlack = new Goal(Globals.bWidth * board.getTileSize(), 50);
+        goalRed = new Goal(Config.bWidth * board.getTileSize(), 50);
+        goalBlack = new Goal(Config.bWidth * board.getTileSize(), 50);
         info = new InfoPane(cont.getScoreLimit(), cont.getMode());
 
         ColumnConstraints column = new ColumnConstraints(WIDTH / 3);

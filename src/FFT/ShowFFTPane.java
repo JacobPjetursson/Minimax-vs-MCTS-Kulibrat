@@ -3,7 +3,6 @@ package FFT;
 import game.Controller;
 import game.Logic;
 import game.Move;
-import game.State;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -18,7 +17,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import misc.Globals;
+import misc.Config;
 
 public class ShowFFTPane extends BorderPane {
     private ListView<VBox> lw;
@@ -30,7 +29,7 @@ public class ShowFFTPane extends BorderPane {
         this.cont = cont;
         Label title = new Label();
         if (fftManager.currFFT == null)
-            title.setText("You do not have an FFT yet");
+            title.setText("You do not have an FFTLib.FFT.FFT yet");
         else
             title.setText(fftManager.currFFT.name);
         title.setFont(Font.font("Verdana", FontWeight.BOLD, 20));
@@ -75,7 +74,7 @@ public class ShowFFTPane extends BorderPane {
                 Rule r = rg.rules.get(j);
                 Label rLabel = new Label((j + 1) + ": " + r.printRule());
                 rLabel.setFont(Font.font("Verdana", 10));
-                for(int symmetry : Globals.SYMMETRY) {
+                for(int symmetry : Config.SYMMETRY) {
                     if (!ruleApplied && r.applies(cont.getState(), symmetry)) {
                         // TODO - messy code below
                         Move move = r.action.getMove();

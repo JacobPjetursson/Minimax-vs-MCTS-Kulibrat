@@ -13,7 +13,7 @@ import game.State;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static misc.Globals.RED;
+import static misc.Config.RED;
 
 public class FindWinningCycles {
     private static HashMap<Long, MinimaxPlay> transpoTable = new HashMap<>();
@@ -92,7 +92,7 @@ public class FindWinningCycles {
 
     public static void main(String args[]) {
         Zobrist.initialize();
-        State state = new State(5);
+        State state = new State();
         String winner = iterativeDeepeningMinimax(state);
         System.out.print("Algorithm is finished running. ");
         System.out.println(winner + " is able to force a winning cycle");

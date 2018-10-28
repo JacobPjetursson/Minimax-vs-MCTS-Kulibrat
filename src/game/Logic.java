@@ -2,7 +2,7 @@ package game;
 
 import java.awt.*;
 import java.util.ArrayList;
-import static misc.Globals.*;
+import static misc.Config.*;
 
 public abstract class Logic {
     // Outputs a list of legal moves from a state

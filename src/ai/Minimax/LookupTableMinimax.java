@@ -5,13 +5,12 @@ import game.Logic;
 import game.Move;
 import game.State;
 import misc.Database;
-import misc.Globals;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 
-import static misc.Globals.BLACK;
-import static misc.Globals.RED;
+import static misc.Config.BLACK;
+import static misc.Config.RED;
 
 public class LookupTableMinimax extends AI {
     private boolean useDB = true;
@@ -82,7 +81,7 @@ public class LookupTableMinimax extends AI {
             play = minimax(simNode, CURR_MAX_DEPTH);
             System.out.println("CURRENT MAX DEPTH: " + CURR_MAX_DEPTH + ", LOOKUP TABLE SIZE: " + lookupTable.size() + ", UNEVALUATED NODES: " + unevaluatedNodes);
             if (lookupTable.size() == prevSize && unevaluatedNodes == prevUnevaluatedNodes) {
-                System.out.println("State space explored, and unevaluated nodes unchanged between runs. I'm done");
+                System.out.println("FFTLib.Game.State space explored, and unevaluated nodes unchanged between runs. I'm done");
                 doneCounter++;
             } else
                 doneCounter = 0;

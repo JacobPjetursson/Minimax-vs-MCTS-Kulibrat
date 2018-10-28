@@ -6,7 +6,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
-import static misc.Globals.BLACK;
+import static misc.Config.BLACK;
 
 public class BoardTile extends StackPane {
     private int row;

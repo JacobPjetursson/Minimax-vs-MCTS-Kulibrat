@@ -1,6 +1,7 @@
+/*
 package FFT;
 
-import misc.Globals;
+import misc.Config;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,8 +12,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FFTManager {
-    static String path = Globals.FFT_PATH;
+public class FFTManager extends FFTLib.FFT.FFTManager {
+    static String path = Config.FFT_PATH;
     static ArrayList<FFT> ffts;
     FFT currFFT;
 
@@ -97,7 +98,7 @@ public class FFTManager {
                         }
                     }
                 }
-                // In case of at least 1 FFT
+                // In case of at least 1 FFTLib.FFT.FFT
                 if (fft != null) {
                     if(rg != null)
                         fft.ruleGroups.add(rg);
@@ -110,6 +111,6 @@ public class FFTManager {
         }
     }
 
-
 }
+*/
 

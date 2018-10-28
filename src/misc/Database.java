@@ -16,26 +16,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static misc.Globals.BLACK;
-import static misc.Globals.RED;
+import static misc.Config.BLACK;
+import static misc.Config.RED;
 
 public class Database {
     public static Connection dbConnection;
-    public static int scoreLimit;
 
     // Connects to the database. If the table in question is incomplete or missing, show a pane to allow creating the DB on the spot.
     public static boolean connectAndVerify() {
         System.out.println("Connecting to database. This might take some time");
         try {
             dbConnection = DriverManager.getConnection(
-                    Globals.REG_DB);
+                    Config.DB_PATH);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         System.out.println("Connection successful");
 
-        String tableName = "plays_" + scoreLimit;
-        long key = new Node(new State(scoreLimit)).getHashCode();
+        String tableName = "plays_" + Config.SCORELIMIT;
+        long key = new Node(new State()).getHashCode();
         boolean error = false;
         // Try query to check for table existance
         try {
@@ -62,7 +61,7 @@ public class Database {
         System.out.println("Connecting to database. This might take some time");
         try {
             dbConnection = DriverManager.getConnection(
-                    Globals.REG_DB);
+                    Config.DB_PATH);
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -138,7 +137,7 @@ public class Database {
     // Fetches the best play corresponding to the input node
     public static MinimaxPlay queryPlay(Node n) {
         MinimaxPlay play = null;
-        String tableName = "plays_" + scoreLimit;
+        String tableName = "plays_" + Config.SCORELIMIT;
         Long key = n.getHashCode();
         try {
             Statement statement = dbConnection.createStatement();
@@ -195,7 +194,7 @@ public class Database {
 
     public static void fillLookupTable(HashMap<Long, MinimaxPlay> lookupTable) throws SQLException {
         System.out.println("Inserting data into table. This will take some time");
-        String tableName = "plays_" + scoreLimit;
+        String tableName = "plays_" + Config.SCORELIMIT;
         long startTime = System.currentTimeMillis();
         dbConnection.createStatement().execute("truncate table " + tableName);
 
@@ -229,7 +228,7 @@ public class Database {
         if (!connect())
             return;
         // Creating the table, if it does not exist already
-        String tableName = "plays_" + scoreLimit;
+        String tableName = "plays_" + Config.SCORELIMIT;
         try {
             dbConnection.createStatement().execute("create table " + tableName +
                     "(id bigint primary key, oldRow smallint, oldCol smallint, newRow smallint, newCol smallint, team smallint, score smallint)");
@@ -240,12 +239,8 @@ public class Database {
 
     // Builds the DB
     public static void buildLookupDB() {
-        State state = new State(scoreLimit);
+        State state = new State();
         new LookupTableMinimax(RED, state, true);
-    }
-
-    public static void setScoreLimit(int otherScoreLimit) {
-        scoreLimit = otherScoreLimit;
     }
 
 
