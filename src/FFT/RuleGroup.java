@@ -1,29 +1,23 @@
-
 package FFT;
 
 import java.util.ArrayList;
 
-public class RuleGroup extends FFTLib.FFT.RuleGroup {
-    ArrayList<Rule> rules;
-    String name;
+public class RuleGroup {
+    public ArrayList<Rule> rules;
+    public String name;
+
     public RuleGroup(String name) {
-        super(name);
-    }
-
-    public RuleGroup(RuleGroup copy) {
-        super(copy);
-    }
-/*
-
-
-    public RuleGroup(String name, ArrayList<Rule> rules) {
-        super(name, rules);
-    }
-    public RuleGroup(String name) {
-        rules = new ArrayList<Rule>();
+        rules = new ArrayList<>();
         this.name = name;
     }
 
+    public RuleGroup(String name, ArrayList<Rule> rules) {
+        this.name = name;
+        this.rules = rules;
+    }
 
-*/
+    public RuleGroup(RuleGroup copy) {
+        this.rules = new ArrayList<>(copy.rules);
+        this.name = copy.name;
+    }
 }

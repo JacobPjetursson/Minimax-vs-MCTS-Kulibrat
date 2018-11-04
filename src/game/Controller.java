@@ -199,7 +199,7 @@ public class Controller {
             }
             helpHumanBox.setDisable(false);
         });
-        // FFTLib.FFT.FFTManager LISTENERS
+        // FFTManager LISTENERS
         // edit fftManager button
         editFFTButton.setOnAction(event -> {
             Scene scene = primaryStage.getScene();
@@ -213,7 +213,7 @@ public class Controller {
             fftInteractiveMode = newValue;
         });
 
-        // Show FFTLib.FFT.FFT button
+        // Show FFT button
         showFFTButton.setOnAction(event -> {
             deselect();
             Stage newStage = new Stage();

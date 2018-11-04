@@ -69,15 +69,15 @@ public class NavPane extends VBox {
         reviewButton = new Button("Review Game");
         buttons.add(reviewButton);
 
-        showFFTButton = new Button("Show FFTLib.FFT.FFT");
+        showFFTButton = new Button("Show FFT");
         buttons.add(showFFTButton);
 
-        editFFTButton = new Button("Edit FFTLib.FFT.FFT");
+        editFFTButton = new Button("EditFFT");
         buttons.add(editFFTButton);
 
         interactiveFFT = new CheckBox();
         interactiveFFT.setSelected(true);
-        Label interactiveLabel = new Label("Interactive FFTLib.FFT.FFT");
+        Label interactiveLabel = new Label("Interactive FFT");
         interactiveLabel.setFont(Font.font("Verdana", 14));
         interactiveLabel.setPadding(new Insets(0, 0, 0, 5));
         interactiveFFTBox = new HBox(interactiveFFT, interactiveLabel);

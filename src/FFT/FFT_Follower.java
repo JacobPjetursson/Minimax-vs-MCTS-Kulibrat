@@ -8,6 +8,7 @@ import misc.Config;
 
 public class FFT_Follower extends AI {
     private FFTManager fftManager;
+    public int team;
 
     public FFT_Follower(int team, FFTManager fftManager) {
         super(team);
@@ -35,5 +36,4 @@ public class FFT_Follower extends AI {
         System.out.print("No rules could be applied with a legal move. ");
         return null;
     }
-
 }

@@ -47,7 +47,7 @@ public class EditFFTScene extends VBox {
         VBox changeRenameBox = new VBox(5);
         changeRenameBox.setAlignment(Pos.CENTER);
         changeBox = new ComboBox<>();
-        changeBox.setPromptText("Change FFTLib.FFT.FFT");
+        changeBox.setPromptText("Change FFT");
         changeBox.setMinWidth(100);
         // set items
         changeBox.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> {
@@ -60,12 +60,12 @@ public class EditFFTScene extends VBox {
         });
         changeRenameBox.getChildren().add(changeBox);
 
-        renameBtn = new Button("Rename FFTLib.FFT.FFT");
+        renameBtn = new Button("Rename FFT");
         renameBtn.setMinWidth(100);
         renameBtn.setOnAction(event -> {
             Stage newStage = new Stage();
             newStage.setScene(new Scene(
-                    new NameFFTPane("Rename your FFTLib.FFT.FFT", true), 500, 200));
+                    new NameFFTPane("Rename your FFT", true), 500, 200));
             newStage.initModality(Modality.APPLICATION_MODAL);
             newStage.initOwner(getScene().getWindow());
             newStage.setOnCloseRequest(Event::consume);
@@ -75,12 +75,12 @@ public class EditFFTScene extends VBox {
 
         VBox delNewBox = new VBox(5);
         delNewBox.setAlignment(Pos.CENTER);
-        delBtn = new Button("Delete FFTLib.FFT.FFT");
+        delBtn = new Button("Delete FFT");
         delBtn.setMinWidth(100);
         delBtn.setStyle("-fx-border-color: #000000; -fx-background-color: #ff0000;");
         delBtn.setOnAction(event -> {
             Stage newStage = new Stage();
-            String labelText = "Are you sure you want to delete the FFTLib.FFT.FFT:\n" +
+            String labelText = "Are you sure you want to delete the FFT:\n" +
                     fftManager.currFFT.name + "?";
             newStage.setScene(new Scene(new DeleteFFTDialog(labelText, this, fftManager), 500, 150));
             newStage.initModality(Modality.APPLICATION_MODAL);
@@ -89,13 +89,13 @@ public class EditFFTScene extends VBox {
         });
         delNewBox.getChildren().add(delBtn);
 
-        newBtn = new Button("New FFTLib.FFT.FFT");
+        newBtn = new Button("New FFT");
         newBtn.setMinWidth(100);
         newBtn.setStyle("-fx-border-color: #000000; -fx-background-color: blue;");
         newBtn.setOnAction(event -> {
             Stage newStage = new Stage();
             newStage.setScene(new Scene(
-                    new NameFFTPane("Name your new FFTLib.FFT.FFT", false), 500, 200));
+                    new NameFFTPane("Name your new FFT", false), 500, 200));
             newStage.initModality(Modality.APPLICATION_MODAL);
             newStage.initOwner(getScene().getWindow());
             newStage.setOnCloseRequest(Event::consume);
@@ -152,14 +152,14 @@ public class EditFFTScene extends VBox {
         ChoiceBox<String> verificationChoice = new ChoiceBox<>();
         verificationChoice.setMinWidth(textFieldWidth);
         verificationChoice.setMaxWidth(textFieldWidth);
-        verificationChoice.setValue("Whole FFTLib.FFT.FFT");
-        verificationChoice.setItems(FXCollections.observableArrayList("Whole FFTLib.FFT.FFT", "Existing Rules"));
+        verificationChoice.setValue("Whole FFT");
+        verificationChoice.setItems(FXCollections.observableArrayList("Whole FFT", "Existing Rules"));
 
-        Label verifiedLabel = new Label("The FFTLib.FFT.FFT was successfully verified");
+        Label verifiedLabel = new Label("The FFT was successfully verified");
         verifiedLabel.setFont(Font.font("Verdana", 15));
 
-        verifyBtn = new Button("Verify FFTLib.FFT.FFT");
-        verifyBtn.setTooltip(new Tooltip("Checks if the current FFTLib.FFT.FFT is a winning strategy,\n" +
+        verifyBtn = new Button("Verify FFT");
+        verifyBtn.setTooltip(new Tooltip("Checks if the current FFT is a winning strategy,\n" +
                 "or if given rules are part of winning strategy"));
         verifyBtn.setOnMouseClicked(event -> {
             if (!Database.connectAndVerify())
@@ -205,11 +205,11 @@ public class EditFFTScene extends VBox {
         addNewRuleGroupBtn.setDisable(isNull);
         verifyBtn.setDisable(isNull);
         if (isNull) {
-            title.setText("Please make a new FFTLib.FFT.FFT");
+            title.setText("Please make a new FFT");
             return;
         }
         else
-            title.setText("Edit FFTLib.FFT.FFT with name:\n" + fftManager.currFFT.name);
+            title.setText("Edit FFT with name:\n" + fftManager.currFFT.name);
         // Items in changeBox (combobox)
         ObservableList<String> fftStrs = FXCollections.observableArrayList();
         for (FFT fft : FFTManager.ffts) {
@@ -219,7 +219,7 @@ public class EditFFTScene extends VBox {
         // ListView
         ObservableList<BorderPane> ruleGroups = FXCollections.observableArrayList();
         for (int i = 0; i < fftManager.currFFT.ruleGroups.size(); i++) {
-            // FFTLib.FFT.Rule group
+            // Rule group
             final int index = i; // FUCKING JAVA CANCER
             RuleGroup rg = fftManager.currFFT.ruleGroups.get(i);
             VBox rgVBox = new VBox(10);

@@ -3,7 +3,7 @@ package game;
 import misc.Config;
 import java.util.Objects;
 
-public class Move extends FFTLib.Game.Move {
+public class Move {
     public int oldRow;
     public int oldCol;
     public int newRow;

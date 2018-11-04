@@ -10,7 +10,7 @@ import java.util.Objects;
 import static misc.Config.BLACK;
 import static misc.Config.RED;
 
-public class State extends FFTLib.Game.State {
+public class State {
     private int[][] board;
     private int turn;
     private int redScore;
@@ -141,7 +141,6 @@ public class State extends FFTLib.Game.State {
     }
 
     // Creates and/or returns a list of new state objects which correspond to the children of the given state.
-    @Override
     public ArrayList<Move> getLegalMoves() {
         if (legalMoves != null) return legalMoves;
         legalMoves = Logic.legalMoves(turn, this);

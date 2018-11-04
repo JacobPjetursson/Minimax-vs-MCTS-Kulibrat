@@ -37,7 +37,7 @@ public class FFTFailurePane extends BorderPane {
     public FFTFailurePane(Scene prevScene, FFTManager fftManager, Controller cont) {
         setStyle("-fx-background-color: rgb(255, 255, 255);");
         this.fftManager = fftManager;
-        Label title = new Label("This is the first encountered state where the FFTLib.FFT.FFT failed");
+        Label title = new Label("This is the first encountered state where the FFT failed");
         title.setFont(Font.font("Verdana", FontWeight.BOLD, 20));
         title.setAlignment(Pos.CENTER);
         title.setTextAlignment(TextAlignment.CENTER);
@@ -69,9 +69,9 @@ public class FFTFailurePane extends BorderPane {
 
         String moveInfo;
         if (fftManager.currFFT.failingPoint.random)
-            moveInfo = "The FFTLib.FFT.FFT did not apply to the above state, and a random, losing move existed";
+            moveInfo = "The FFT did not apply to the above state, and a random, losing move existed";
         else
-            moveInfo = "The FFTLib.FFT.FFT applied to the above state, but the move it chose was a losing move";
+            moveInfo = "The FFT applied to the above state, but the move it chose was a losing move";
         Label moveInfoLabel = new Label(moveInfo);
         moveInfoLabel.setFont(Font.font("Verdana", 15));
 
@@ -109,7 +109,7 @@ public class FFTFailurePane extends BorderPane {
     private void showRuleGroups() {
         ObservableList<VBox> ruleGroups = FXCollections.observableArrayList();
         for (int i = 0; i < fftManager.currFFT.ruleGroups.size(); i++) {
-            // FFTLib.FFT.Rule group
+            // Rule group
             RuleGroup rg = fftManager.currFFT.ruleGroups.get(i);
             VBox rgVBox = new VBox(10);
             rgVBox.setAlignment(Pos.CENTER);

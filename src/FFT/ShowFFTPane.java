@@ -29,7 +29,7 @@ public class ShowFFTPane extends BorderPane {
         this.cont = cont;
         Label title = new Label();
         if (fftManager.currFFT == null)
-            title.setText("You do not have an FFTLib.FFT.FFT yet");
+            title.setText("You do not have an FFT yet");
         else
             title.setText(fftManager.currFFT.name);
         title.setFont(Font.font("Verdana", FontWeight.BOLD, 20));

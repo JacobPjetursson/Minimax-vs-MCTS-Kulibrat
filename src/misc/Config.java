@@ -1,7 +1,6 @@
 package misc;
 
-public class Config extends FFTLib.Config{
-
+public class Config {
     // TEAMS
     public static final int RED = 1;
     public static final int BLACK = 2;
@@ -29,6 +28,16 @@ public class Config extends FFTLib.Config{
     public static final int bWidth = 3;
     public static final int bHeight = 3;
     public static int SCORELIMIT = 0;
+
+    // LEVEL OF SYMMETRY
+    public static final int SYM_NONE = 0;
+    public static final int SYM_HREF = 1;
+    public static final int SYM_VREF = 2;
+    public static final int SYM_HVREF = 3;
+    public static final int SYM_ROT = 4;
+    public static final int SYM_HREF_ROT = 5;
+    public static final int SYM_VREF_ROT = 6;
+    public static final int SYM_HVREF_ROT = 7;
 
     // MISC
     public static final int[] SYMMETRY = {SYM_NONE, SYM_HREF};

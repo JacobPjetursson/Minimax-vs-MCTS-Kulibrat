@@ -1,9 +1,11 @@
 package FFT;
-
 import ai.Minimax.Node;
-import game.*;
-import misc.Database;
+import game.Logic;
+import game.Move;
+import game.State;
+import game.StateAndMove;
 import misc.Config;
+import misc.Database;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,22 +14,23 @@ import java.util.LinkedList;
 import static misc.Config.BLACK;
 import static misc.Config.RED;
 
-public class FFT  extends FFTLib.FFT.FFT{
-    String name;
-    ArrayList<RuleGroup> ruleGroups;
+public class FFT {
+    public String name;
+    public ArrayList<RuleGroup> ruleGroups;
     StateAndMove failingPoint = null;
 
     public FFT(String name) {
-        super(name);
+        this.name = name;
+        ruleGroups = new ArrayList<>();
     }
 
-/*
-    void addRuleGroup(RuleGroup ruleGroup) {
+
+    public void addRuleGroup(RuleGroup ruleGroup) {
         ruleGroups.add(ruleGroup);
         FFTManager.save();
     }
 
-    boolean verify(int team, boolean wholeFFT) {
+    public boolean verify(int team, boolean wholeFFT) {
         Node initialNode = new Node(new State());
         LinkedList<Node> frontier = new LinkedList<>();
         HashSet<Node> closedSet = new HashSet<>();
@@ -94,8 +97,7 @@ public class FFT  extends FFTLib.FFT.FFT{
         }
         return true;
     }
-    */
-/*
+
     private Move makeMove(Node node) {
         State state = node.getState();
         for (RuleGroup ruleGroup : ruleGroups) {
@@ -114,5 +116,4 @@ public class FFT  extends FFTLib.FFT.FFT{
         }
         return null;
     }
-    */
 }

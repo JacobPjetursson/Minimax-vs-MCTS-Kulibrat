@@ -40,7 +40,7 @@ public class EditRuleGroupPane extends VBox {
         showRules();
 
         // New rule
-        Label newRuleLabel = new Label("New FFTLib.FFT.Rule");
+        Label newRuleLabel = new Label("New Rule");
         newRuleLabel.setFont(Font.font("Verdana", 15));
         HBox newRuleBox = new HBox();
         newRuleBox.setAlignment(Pos.CENTER);

@@ -41,11 +41,11 @@ public class MCTS extends AI {
                 simulationDepth = i;
                 if (debug && simulationDepth > (max_moves - 50)) {
                     System.out.println("Cycle spotted!: ");
-                    System.out.println("FFTLib.Game.State: " + sim_node);
+                    System.out.println("State: " + sim_node);
                     System.out.println("Board: " + Arrays.deepToString(sim_node.getState().getBoard()));
                     System.out.println("Turn: " + sim_node.getState().getTurn());
                     System.out.println("Legal moves size: " + sim_node.getState().getLegalMoves().size());
-                    System.out.println("FFTLib.Game.State plays: " + sim_node.getPlays());
+                    System.out.println("State plays: " + sim_node.getPlays());
                     System.out.println("Depth: " + simulationDepth);
                     System.out.println();
                 }

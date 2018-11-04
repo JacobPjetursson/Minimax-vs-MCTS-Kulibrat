@@ -48,7 +48,7 @@ public class ReviewPane extends VBox {
         HBox bottomBox = new HBox(10);
         VBox.setMargin(bottomBox, new Insets(10));
         bottomBox.setAlignment(Pos.BOTTOM_RIGHT);
-        Button goToState = new Button("Go to FFTLib.Game.State");
+        Button goToState = new Button("Go to State");
         goToState.setDisable(true);
         bottomBox.getChildren().add(goToState);
 
